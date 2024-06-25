@@ -1,0 +1,48 @@
+﻿@{
+    ViewBag.Title = "E-Wallet";
+    Layout = "~/Views/Shared/UserLayout.cshtml";
+}
+
+<!-- E-Wallet Start -->
+<div class="container-fluid">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">My Wallet</span></h2>
+    <div class="row px-xl-5">
+        <div class="col-lg-5 mb-5">
+            <div class="p-30 mb-30" style="background-color: #E8E742;">
+                <!-- Using the specified color -->
+                <h5 class="card-title text-dark">
+                    <i class="fas fa-wallet mr-2"></i>Wallet Balance
+                </h5>
+                <p class="display-4 text-dark">₱<span id="wallet-balance">100.00</span></p>
+            </div>
+        </div>
+        <div class="col-lg-7 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title">Transaction History</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transaction-history">
+                        <tr>
+                            <td>2024-06-01</td>
+                            <td>Purchase at Shop</td>
+                            <td>-$50.00</td>
+                        </tr>
+                        <tr>
+                            <td>2024-06-10</td>
+                            <td>Funds Added</td>
+                            <td>+$100.00</td>
+                        </tr>
+                        <!-- Additional transactions -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- E-Wallet End -->
