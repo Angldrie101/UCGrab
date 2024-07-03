@@ -1,0 +1,75 @@
+﻿@{
+    ViewBag.Title = "MyStore";
+    Layout = "~/Views/Shared/ShopPageLayout.cshtml";
+}
+
+<!-- Store Information Start -->
+<div class="container-fluid">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Store Information</span></h2>
+    <div class="row px-xl-5">
+        <div class="col-lg-6 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title"><i class="fas fa-store mr-2"></i>Store Details</h5>
+                <div class="mb-3">
+                    <label for="storeName" class="form-label">Store Name</label>
+                    <p id="storeName">University of Cebu Store</p>
+                </div>
+                <div class="mb-3">
+                    <label for="storeAddress" class="form-label">Store Address</label>
+                    <p id="storeAddress">A.C. Cortes Ave. Looc, Mandaue City</p>
+                </div>
+                <div class="mb-3">
+                    <label for="storeEmail" class="form-label">Email</label>
+                    <p id="storeEmail">ucstore@gmail.com</p>
+                </div>
+                <div class="mb-3">
+                    <label for="storePhone" class="form-label">Phone</label>
+                    <p id="storePhone">+012 345 67890</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title"><i class="fas fa-clock mr-2"></i>Operating Hours</h5>
+                <form>
+                    <div class="form-group">
+                        <label for="storeHours" class="form-label">Store Hours</label>
+                        <textarea class="form-control" id="storeHours" rows="5">
+                            Monday - Friday: 9:00 AM - 6:00 PM
+                            Saturday: 10:00 AM - 4:00 PM
+                            Sunday: Closed
+                        </textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row px-xl-5">
+        <div class="col-lg-12 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title"><i class="fas fa-info-circle mr-2"></i>About Our Store</h5>
+                <form>
+                    <div class="form-group">
+                        <label for="aboutStore" class="form-label">About Our Store</label>
+                        <textarea class="form-control" id="aboutStore" rows="5">Welcome to the University of Cebu Store! We offer a wide range of products for students, faculty, and the general public. Our store is committed to providing high-quality products at affordable prices. We take pride in our excellent customer service and strive to make your shopping experience as pleasant as possible. Visit us today and discover the variety of products we have in store for you!</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Store Information End -->
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="/Assets/Shop/lib/easing/easing.min.js"></script>
+<script src="/Assets/Shop/lib/owlcarousel/owl.carousel.min.js"></script>
+
+<!-- Contact Javascript File -->
+<script src="/Assets/Shop/mail/jqBootstrapValidation.min.js"></script>
+<script src="/Assets/Shop/mail/contact.js"></script>
+
+<!-- Template Javascript -->
+<script src="/Assets/Shop/js/main.js"></script>

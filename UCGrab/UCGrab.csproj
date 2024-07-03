@@ -124,6 +124,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\admin\css\tailwind.css" />
+    <Content Include="Assets\admin\css\tailwind.output.css" />
+    <Content Include="Assets\admin\img\create-account-office-dark.jpeg" />
+    <Content Include="Assets\admin\img\create-account-office.jpeg" />
+    <Content Include="Assets\admin\img\dashboard.png" />
+    <Content Include="Assets\admin\img\forgot-password-office-dark.jpeg" />
+    <Content Include="Assets\admin\img\forgot-password-office.jpeg" />
+    <Content Include="Assets\admin\img\github.svg" />
+    <Content Include="Assets\admin\img\login-office-dark.jpeg" />
+    <Content Include="Assets\admin\img\login-office.jpeg" />
+    <Content Include="Assets\admin\img\twitter.svg" />
+    <Content Include="Assets\admin\js\charts-bars.js" />
+    <Content Include="Assets\admin\js\charts-lines.js" />
+    <Content Include="Assets\admin\js\charts-pie.js" />
+    <Content Include="Assets\admin\js\focus-trap.js" />
+    <Content Include="Assets\admin\js\init-alpine.js" />
     <Content Include="Assets\login\css\bootstrap.min.css" />
     <Content Include="Assets\login\css\bootstrap\mixins\_border-radius.css" />
     <Content Include="Assets\login\css\bootstrap\mixins\_screen-reader.css" />
@@ -137,6 +153,10 @@
     <Content Include="Assets\login\js\jquery.min.js" />
     <Content Include="Assets\login\js\main.js" />
     <Content Include="Assets\login\js\popper.js" />
+    <Content Include="Assets\PageNotFound\225203-P29OZD-286-min.png" />
+    <Content Include="Assets\PageNotFound\5-removebg-preview.png" />
+    <Content Include="Assets\PageNotFound\css-removebg-preview.png" />
+    <Content Include="Assets\PageNotFound\logo1-removebg-preview.png" />
     <Content Include="Assets\Shop\css\bootstrap-grid.css" />
     <Content Include="Assets\Shop\css\bootstrap-grid.min.css" />
     <Content Include="Assets\Shop\css\bootstrap-reboot.css" />
@@ -171,6 +191,7 @@
     <Content Include="Assets\Shop\img\offer-1.jpg" />
     <Content Include="Assets\Shop\img\offer-2.jpg" />
     <Content Include="Assets\Shop\img\payments.png" />
+    <Content Include="Assets\Shop\img\profile.jpg" />
     <Content Include="Assets\Shop\img\psits.jpg" />
     <Content Include="Assets\Shop\img\seniorHS.jpg" />
     <Content Include="Assets\Shop\img\Snacks.jpg" />
@@ -213,9 +234,34 @@
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Contracts\IBaseRepository.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ShopController.cs" />
+    <Compile Include="Database\Category.cs">
+      <DependentUpon>UCGrab.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\ContactUs.cs">
+      <DependentUpon>UCGrab.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Image.cs">
+      <DependentUpon>UCGrab.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Order.cs">
+      <DependentUpon>UCGrab.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Order_Detail.cs">
+      <DependentUpon>UCGrab.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Product.cs">
+      <DependentUpon>UCGrab.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Stock.cs">
+      <DependentUpon>UCGrab.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Store.cs">
+      <DependentUpon>UCGrab.tt</DependentUpon>
+    </Compile>
     <Compile Include="Database\sysdiagrams.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>
@@ -253,6 +299,11 @@
     <Compile Include="Models\UserLogged.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\BaseRepository.cs" />
+    <Compile Include="Repository\CategoryManager.cs" />
+    <Compile Include="Repository\ImageManager.cs" />
+    <Compile Include="Repository\OrderManager.cs" />
+    <Compile Include="Repository\ProductManager.cs" />
+    <Compile Include="Repository\StoreManager.cs" />
     <Compile Include="Repository\UserManager.cs" />
     <Compile Include="Utils\MyRole.cs" />
     <Compile Include="Utils\Utilities.cs" />
@@ -476,6 +527,11 @@
     <Content Include="Views\Home\EditProfile.cshtml" />
     <Content Include="Views\Home\FavoritedProduct.cshtml" />
     <Content Include="Views\Home\MyOrders.cshtml" />
+    <Content Include="Views\Home\PageNotFound.cshtml" />
+    <Content Include="Views\Shop\MyStore.cshtml" />
+    <Content Include="Views\Shop\ProductInfo.cshtml" />
+    <Content Include="Views\Shop\MyProfile.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -485,6 +541,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="UploadedFiles\" />
     <Folder Include="Views\Base\" />
     <Folder Include="Views\IBase\" />
   </ItemGroup>

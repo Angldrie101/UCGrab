@@ -11,10 +11,12 @@ namespace UCGrab.Repository
     {
         private BaseRepository<User_Accounts> _userAcc;
         private BaseRepository<User_Information> _userInfo;
+        private UCGrabEntities _dbContext;
         public UserManager()
         {
             _userAcc = new BaseRepository<User_Accounts>();
             _userInfo = new BaseRepository<User_Information>();
+            _dbContext = new UCGrabEntities();
         }
 
         public User_Accounts GetUserById(int Id)
@@ -43,7 +45,7 @@ namespace UCGrab.Repository
             var userSignIn = GetUserByUsername(username);
             if (userSignIn == null)
             {
-                errMsg = "User not exist!";
+                errMsg = "Username not exist! Try again.";
                 return ErrorCode.Error;
             }
 
@@ -133,9 +135,54 @@ namespace UCGrab.Repository
             return GetUserInfoByUserId(User.user_id);
 
         }
+        public User_Information Retrieve(String username, ref String err)
+        {
+            // Retrieve the user by username
+            var User = GetUserByUsername(username);
+            if (User == null)
+            {
+                err = "User not found";
+                return null;
+            }
+
+            // Retrieve the user information by user_id
+            var UserInformation = GetUserInfoByUserId(User.user_id);
+
+            // If user information already exists, return it
+            if (UserInformation != null)
+                return UserInformation;
+
+            // Create new user information if it does not exist
+            UserInformation = new User_Information
+            {
+                user_id = User.user_id,
+                email = User.email,
+                status = (Int32)Status.Active
+            };
+
+            // Ensure email is set correctly
+            var userEmail = User.email;
+            if (!String.IsNullOrEmpty(userEmail))
+            {
+                UserInformation.email = userEmail;
+            }
+
+            // Create the new user information in the database
+            var errorCode = _userInfo.Create(UserInformation, out err);
+            if (errorCode != ErrorCode.Success)
+            {
+                // Handle the error if creation failed
+                return null;
+            }
+            // Retrieve the user information after creation
+            return GetUserInfoByUserId(User.user_id);
+        }
+
         public List<User_Accounts> GetAllBUserInfo()
         {
             return _userAcc.GetAll().ToList();
         }
+
+      
     }
 }

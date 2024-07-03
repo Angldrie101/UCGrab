@@ -32,12 +32,12 @@ namespace UCGrab.Utils
         HasStock
     }
 
-    public enum BookStatus
+    public enum OrderStatus
     {
         Pending,
         Confirmed,
         InProgress,
-        Canceled,
+        Delivered,
         Done
     }
 

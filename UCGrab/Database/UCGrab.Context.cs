@@ -25,10 +25,18 @@ namespace UCGrab.Database
             throw new UnintentionalCodeFirstException();
         }
     
-        public DbSet<User_Accounts> User_Accounts { get; set; }
-        public DbSet<User_Role> User_Role { get; set; }
+        public DbSet<Category> Category { get; set; }
+        public DbSet<ContactUs> ContactUs { get; set; }
+        public DbSet<Image> Image { get; set; }
+        public DbSet<Order> Order { get; set; }
+        public DbSet<Order_Detail> Order_Detail { get; set; }
+        public DbSet<Product> Product { get; set; }
+        public DbSet<Stock> Stock { get; set; }
+        public DbSet<Store> Store { get; set; }
         public DbSet<sysdiagrams> sysdiagrams { get; set; }
+        public DbSet<User_Accounts> User_Accounts { get; set; }
         public DbSet<User_Information> User_Information { get; set; }
+        public DbSet<User_Role> User_Role { get; set; }
         public DbSet<vw_Role> vw_Role { get; set; }
     }
 }

@@ -6,6 +6,8 @@ using System.Web.Mvc;
 using System.Web.Security;
 using UCGrab.Utils;
 using UCGrab.Models;
+using UCGrab.Database;
+using System.IO;
 
 namespace UCGrab.Controllers
 {
@@ -53,7 +55,7 @@ namespace UCGrab.Controllers
                     case Constant.Role_Customer:
                         return RedirectToAction("Index");
                     case Constant.Role_Provider:
-                        return RedirectToAction("Index");
+                        return RedirectToAction("Index", "Shop");
                     default:
                         return RedirectToAction("Index");
                 }
@@ -66,7 +68,50 @@ namespace UCGrab.Controllers
         [AllowAnonymous]
         public ActionResult EditProfile()
         {
-            return View();
+            IsUserLoggedSession();
+            var user = _userManager.Retrieve(User.Identity.Name, ref ErrorMessage);
+
+            if (user == null)
+            {
+                // Handle the case where user creation or retrieval failed
+                // Redirect to an error page or show an error message
+                TempData["ErrorMessage"] = "User could not be found or created.";
+                return RedirectToAction("Error");
+            }
+
+            return View(user);
+        }
+
+
+        [HttpPost]
+        public ActionResult EditProfile(User_Information userInf, HttpPostedFileBase profilePicture)
+        {
+            
+            if(profilePicture != null && profilePicture.ContentLength > 0)
+            {
+                var fileName = Path.GetFileName(profilePicture.FileName);
+                var serverSavePath = Path.Combine(Server.MapPath("~/UploadedFiles/"), fileName);
+                profilePicture.SaveAs(serverSavePath);
+
+                var user = _userManager.GetUserInfoByUserId(UserId);
+
+                var image = new Image { image_file = fileName, image_id = user.id};
+
+                user.Image.Add(image);
+
+                if(_userManager.UpdateUserInformation(userInf, ref ErrorMessage) == ErrorCode.Error)
+                {
+                    ModelState.AddModelError(String.Empty, ErrorMessage);
+                    return View(userInf);
+                }
+                else
+                {
+                    ModelState.AddModelError(String.Empty, "Please select a valid image file.");
+                    
+                }
+            }
+            TempData["Message"] = $"User Information {ErrorMessage}!";
+            return RedirectToAction("EditProfile");
         }
 
         [AllowAnonymous]
@@ -121,6 +166,12 @@ namespace UCGrab.Controllers
 
         [AllowAnonymous]
         public ActionResult MyOrders()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        public ActionResult PageNotFound()
         {
             return View();
         }

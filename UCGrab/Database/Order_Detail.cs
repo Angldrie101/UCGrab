@@ -12,15 +12,15 @@ namespace UCGrab.Database
     using System;
     using System.Collections.Generic;
     
-    public partial class User_Information
+    public partial class Order_Detail
     {
         public int id { get; set; }
-        public string user_id { get; set; }
-        public string last_name { get; set; }
-        public string first_name { get; set; }
-        public string phone { get; set; }
-        public string email { get; set; }
-        public Nullable<int> status { get; set; }
-        public Nullable<int> store_id { get; set; }
+        public int order_id { get; set; }
+        public int product_id { get; set; }
+        public int quatity { get; set; }
+        public decimal price { get; set; }
+    
+        public virtual Order Order { get; set; }
+        public virtual Product Product { get; set; }
     }
 }

@@ -1,0 +1,146 @@
+﻿@{
+    ViewBag.Title = "ProductInfo";
+    Layout = "~/Views/Shared/ShopPageLayout.cshtml";
+}
+
+<!-- Product Management Start -->
+<div class="container-fluid">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Product Management</span></h2>
+    <div class="row px-xl-5">
+        <!-- Product Category Section Start -->
+        <div class="col-lg-6 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title"><i class="fas fa-tags mr-2"></i>Product Categories</h5>
+                <form>
+                    <div class="form-group">
+                        <label for="categoryName" class="form-label">Category Name</label>
+                        <input type="text" class="form-control" id="categoryName" placeholder="Enter category name">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Category</button>
+                </form>
+                <hr>
+                <h5 class="card-title">Existing Categories</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Electronics</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning">Edit</button>
+                                <button class="btn btn-sm btn-danger">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Books</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning">Edit</button>
+                                <button class="btn btn-sm btn-danger">Delete</button>
+                            </td>
+                        </tr>
+                        <!-- Additional categories -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Product Category Section End -->
+        <!-- Product Section Start -->
+        <div class="col-lg-6 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title"><i class="fas fa-box mr-2"></i>Products</h5>
+                <form>
+                    <div class="form-group">
+                        <label class="form-label">Product Image</label>
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <img id="productImagePreview" src="https://via.placeholder.com/300" alt="Product Image" class="img-fluid mb-3" style="width: 100%; max-width: 300px; height: auto;">
+                                <input type="file" class="form-control-file" id="productImage" accept="image/*" onchange="previewImage(event)">
+                            </div>
+                            <div class="card-footer text-muted">
+                                <button type="button" class="btn btn-warning" onclick="document.getElementById('productImage').click();">Upload New Photo</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="productName" class="form-label">Product Name</label>
+                        <input type="text" class="form-control" id="productName" placeholder="Enter product name">
+                    </div>
+                    <div class="form-group">
+                        <label for="productCategory" class="form-label">Category</label>
+                        <select class="form-control" id="productCategory">
+                            <option value="1">Electronics</option>
+                            <option value="2">Books</option>
+                            <!-- Additional categories -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productPrice" class="form-label">Price</label>
+                        <input type="text" class="form-control" id="productPrice" placeholder="Enter product price">
+                    </div>
+                    <div class="form-group">
+                        <label for="productDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="productDescription" rows="3" placeholder="Enter product description"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Product</button>
+                </form>
+                <hr>
+                <h5 class="card-title">Existing Products</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Smartphone</td>
+                            <td>Electronics</td>
+                            <td>$500.00</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning">Edit</button>
+                                <button class="btn btn-sm btn-danger">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Laptop</td>
+                            <td>Electronics</td>
+                            <td>$1000.00</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning">Edit</button>
+                                <button class="btn btn-sm btn-danger">Delete</button>
+                            </td>
+                        </tr>
+                        <!-- Additional products -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Product Section End -->
+    </div>
+</div>
+<!-- Product Management End -->
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="/Assets/Shop/lib/easing/easing.min.js"></script>
+<script src="/Assets/Shop/lib/owlcarousel/owl.carousel.min.js"></script>
+
+<!-- Contact Javascript File -->
+<script src="/Assets/Shop/mail/jqBootstrapValidation.min.js"></script>
+<script src="/Assets/Shop/mail/contact.js"></script>
+
+<!-- Template Javascript -->
+<script src="/Assets/Shop/js/main.js"></script>

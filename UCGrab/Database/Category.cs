@@ -12,15 +12,18 @@ namespace UCGrab.Database
     using System;
     using System.Collections.Generic;
     
-    public partial class User_Information
+    public partial class Category
     {
-        public int id { get; set; }
+        public Category()
+        {
+            this.Product = new HashSet<Product>();
+        }
+    
+        public int category_id { get; set; }
+        public string category_name { get; set; }
+        public Nullable<System.DateTime> date_created { get; set; }
         public string user_id { get; set; }
-        public string last_name { get; set; }
-        public string first_name { get; set; }
-        public string phone { get; set; }
-        public string email { get; set; }
-        public Nullable<int> status { get; set; }
-        public Nullable<int> store_id { get; set; }
+    
+        public virtual ICollection<Product> Product { get; set; }
     }
 }
