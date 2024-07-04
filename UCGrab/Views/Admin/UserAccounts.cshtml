@@ -1,0 +1,81 @@
+﻿@model UCGrab.Database.User_Accounts
+
+@{
+    ViewBag.Title = "User Accounts";
+    Layout = "~/Views/Shared/AdminPageLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">User Accounts</span></h2>
+    <div class="row px-xl-5">
+        <div class="col-lg-6 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title">Add New Account</h5>
+                @using (Html.BeginForm("UserAccounts", "Admin", FormMethod.Post))
+                {
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="form-group">
+                        <label for="name">Username</label>
+                        <input type="text" class="form-control" id="name" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ConfirmPass">Confirm Password</label>
+                        <input type="password" class="form-control" id="ConfirmPass" name="ConfirmPass" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Role</label>
+                        @Html.DropDownList("role_id", (IEnumerable<SelectListItem>)ViewBag.Role, new { @class = "form-control", @required = "required" })
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Account</button>
+                }
+            </div>
+        </div>
+        <!-- User Accounts List Table -->
+        <div class="col-lg-6 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title">User Accounts List</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-accounts">
+                        <tr>
+                            <td>23</td>
+                            <td>John Doe</td>
+                            <td>johndoe@example.com</td>
+                            <td>Admin</td>
+                            <td>Active</td>
+                            <td>
+                                <a href="/Admin/EditUser/1" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="/Admin/DeleteUser/1" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                        <!-- Additional user accounts -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="/Assets/Shop/lib/easing/easing.min.js"></script>
+<script src="/Assets/Shop/lib/owlcarousel/owl.carousel.min.js"></script>
+<script src="/Assets/Shop/mail/jqBootstrapValidation.min.js"></script>
+<script src="/Assets/Shop/mail/contact.js"></script>
+<script src="/Assets/Shop/js/main.js"></script>

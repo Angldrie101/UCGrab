@@ -1,0 +1,108 @@
+﻿@{
+    ViewBag.Title = "ManageStore";
+    Layout = "~/Views/Shared/AdminPageLayout.cshtml";
+}
+
+<!-- Store Management Start -->
+<div class="container-fluid">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Store Management</span></h2>
+    <div class="row px-xl-5">
+        <!-- Store Details -->
+        <div class="col-lg-6 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title">Store Details</h5>
+                <form id="store-details-form" method="post" action="/Admin/UpdateStoreDetails">
+                    <div class="form-group">
+                        <label for="store-name">Store Name</label>
+                        <input type="text" class="form-control" id="store-name" name="StoreName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="store-description">Store Description</label>
+                        <textarea class="form-control" id="store-description" name="StoreDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="store-address">Store Address</label>
+                        <input type="text" class="form-control" id="store-address" name="StoreAddress" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="store-phone">Store Phone</label>
+                        <input type="text" class="form-control" id="store-phone" name="StorePhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="store-email">Store Email</label>
+                        <input type="email" class="form-control" id="store-email" name="StoreEmail" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Store Details</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Store List Table -->
+        <div class="col-lg-6 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title">List of Stores</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Store ID</th>
+                            <th>Store Name</th>
+                            <th>Address</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="store-list">
+                        <tr>
+                            <td>#S001</td>
+                            <td>Store A</td>
+                            <td>123 Main St, City</td>
+                            <td>+012 345 6789</td>
+                            <td>storea@example.com</td>
+                            <td>
+                                <a href="/Admin/EditStore/1" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="/Admin/DeleteStore/1" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#S002</td>
+                            <td>Store B</td>
+                            <td>456 Elm St, City</td>
+                            <td>+012 345 6789</td>
+                            <td>storeb@example.com</td>
+                            <td>
+                                <a href="/Admin/EditStore/2" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="/Admin/DeleteStore/2" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#S003</td>
+                            <td>Store C</td>
+                            <td>789 Oak St, City</td>
+                            <td>+012 345 6789</td>
+                            <td>storec@example.com</td>
+                            <td>
+                                <a href="/Admin/EditStore/3" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="/Admin/DeleteStore/3" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                        <!-- Additional stores -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Store Management End -->
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="/Assets/Shop/lib/easing/easing.min.js"></script>
+<script src="/Assets/Shop/lib/owlcarousel/owl.carousel.min.js"></script>
+
+<!-- Contact Javascript File -->
+<script src="/Assets/Shop/mail/jqBootstrapValidation.min.js"></script>
+<script src="/Assets/Shop/mail/contact.js"></script>
+
+<!-- Template Javascript -->
+<script src="/Assets/Shop/js/main.js"></script>

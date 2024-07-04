@@ -57,7 +57,7 @@ namespace UCGrab.Controllers
                     case Constant.Role_Provider:
                         return RedirectToAction("Index", "Shop");
                     default:
-                        return RedirectToAction("Index");
+                        return RedirectToAction("Index", "Admin");
                 }
             }
             ViewBag.Error = ErrorMessage;
@@ -87,29 +87,29 @@ namespace UCGrab.Controllers
         public ActionResult EditProfile(User_Information userInf, HttpPostedFileBase profilePicture)
         {
             
-            if(profilePicture != null && profilePicture.ContentLength > 0)
-            {
-                var fileName = Path.GetFileName(profilePicture.FileName);
-                var serverSavePath = Path.Combine(Server.MapPath("~/UploadedFiles/"), fileName);
-                profilePicture.SaveAs(serverSavePath);
+            //if(profilePicture != null && profilePicture.ContentLength > 0)
+            //{
+            //    var fileName = Path.GetFileName(profilePicture.FileName);
+            //    var serverSavePath = Path.Combine(Server.MapPath("~/UploadedFiles/"), fileName);
+            //    profilePicture.SaveAs(serverSavePath);
 
-                var user = _userManager.GetUserInfoByUserId(UserId);
+            //    var user = _userManager.GetUserInfoByUserId(UserId);
 
-                var image = new Image { image_file = fileName, image_id = user.id};
+            //    var image = new Image { image_file = fileName, image_id = user.id};
 
-                user.Image.Add(image);
+            //    user.Image.Add(image);
 
-                if(_userManager.UpdateUserInformation(userInf, ref ErrorMessage) == ErrorCode.Error)
-                {
-                    ModelState.AddModelError(String.Empty, ErrorMessage);
-                    return View(userInf);
-                }
-                else
-                {
-                    ModelState.AddModelError(String.Empty, "Please select a valid image file.");
+            //    if(_userManager.UpdateUserInformation(userInf, ref ErrorMessage) == ErrorCode.Error)
+            //    {
+            //        ModelState.AddModelError(String.Empty, ErrorMessage);
+            //        return View(userInf);
+            //    }
+            //    else
+            //    {
+            //        ModelState.AddModelError(String.Empty, "Please select a valid image file.");
                     
-                }
-            }
+            //    }
+            //}
             TempData["Message"] = $"User Information {ErrorMessage}!";
             return RedirectToAction("EditProfile");
         }

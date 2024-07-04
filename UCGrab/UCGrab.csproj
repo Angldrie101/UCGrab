@@ -301,6 +301,7 @@
     <Compile Include="Repository\BaseRepository.cs" />
     <Compile Include="Repository\CategoryManager.cs" />
     <Compile Include="Repository\ImageManager.cs" />
+    <Compile Include="Repository\MailManager.cs" />
     <Compile Include="Repository\OrderManager.cs" />
     <Compile Include="Repository\ProductManager.cs" />
     <Compile Include="Repository\StoreManager.cs" />
@@ -532,6 +533,10 @@
     <Content Include="Views\Shop\ProductInfo.cshtml" />
     <Content Include="Views\Shop\MyProfile.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Admin\UserAccounts.cshtml" />
+    <Content Include="Views\Admin\ManageWallet.cshtml" />
+    <Content Include="Views\Admin\Transaction.cshtml" />
+    <Content Include="Views\Admin\ManageStore.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

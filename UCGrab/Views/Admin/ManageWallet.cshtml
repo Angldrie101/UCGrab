@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "ManageWallet";
+    Layout = "~/Views/Shared/AdminPageLayout.cshtml";
+}
+
+<!-- E-Wallet Management Start -->
+<div class="container-fluid">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">E-Wallet Management</span></h2>
+    <div class="row px-xl-5">
+        <div class="col-lg-5 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title">Add Money to User Wallet</h5>
+                <form id="add-money-form" method="post" action="/Admin/AddMoney">
+                    <div class="form-group">
+                        <label for="user-id">User ID</label>
+                        <input type="text" class="form-control" id="user-id" name="UserId" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount</label>
+                        <input type="number" class="form-control" id="amount" name="Amount" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Money</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-7 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title">User Wallets</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Current Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-wallets">
+                        <tr>
+                            <td>#U001</td>
+                            <td>John Doe</td>
+                            <td>johndoe@example.com</td>
+                            <td>$500.00</td>
+                        </tr>
+                        <!-- Additional user wallets -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- E-Wallet Management End -->
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="/Assets/Shop/lib/easing/easing.min.js"></script>
+<script src="/Assets/Shop/lib/owlcarousel/owl.carousel.min.js"></script>
+
+<!-- Contact Javascript File -->
+<script src="/Assets/Shop/mail/jqBootstrapValidation.min.js"></script>
+<script src="/Assets/Shop/mail/contact.js"></script>
+
+<!-- Template Javascript -->
+<script src="/Assets/Shop/js/main.js"></script>

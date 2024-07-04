@@ -4,15 +4,135 @@
 
 }
 
-<!DOCTYPE html>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
-</head>
-<body>
-    <div> 
+<!-- Dashboard Start -->
+<div class="container-fluid">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Dashboard</span></h2>
+    <div class="row px-xl-5">
+        <div class="col-lg-3 mb-5">
+            <div class="p-30 mb-30" style="background-color: #E8E742;">
+                <h5 class="card-title text-dark">
+                    <i class="fas fa-dollar-sign mr-2"></i>Total Transaction Fee
+                </h5>
+                <p class="display-4 text-dark">$<span id="total-sales">2,345</span></p>
+                <p class="text-dark">Last 30 days</p>
+            </div>
+        </div>
+        <div class="col-lg-3 mb-5">
+            <div class="p-30 mb-30" style="background-color: #E8E742;">
+                <h5 class="card-title text-dark">
+                    <i class="fas fa-boxes mr-2"></i>Total Revenue
+                </h5>
+                <p class="display-4 text-dark">$<span id="total-products">10,000</span></p>
+                <p class="text-dark">In your store</p>
+            </div>
+        </div>
+        <div class="col-lg-3 mb-5">
+            <div class="p-30 mb-30" style="background-color: #E8E742;">
+                <h5 class="card-title text-dark">
+                    <i class="fas fa-shopping-cart mr-2"></i>Number of Stores
+                </h5>
+                <p class="display-4 text-dark"><span id="total-orders">20</span></p>
+                <p class="text-dark">Last 30 days</p>
+            </div>
+        </div>
+        <div class="col-lg-3 mb-5">
+            <div class="p-30 mb-30" style="background-color: #E8E742;">
+                <h5 class="card-title text-dark">
+                    <i class="fas fa-users mr-2"></i>Total Accounts
+                </h5>
+                <p class="display-4 text-dark"><span id="new-customers">1,550</span></p>
+                <p class="text-dark">Last 30 days</p>
+            </div>
+        </div>
     </div>
-</body>
-</html>
+    <div class="row px-xl-5">
+        <div class="col-lg-6 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title">Recent Transaction</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-orders">
+                        <tr>
+                            <td>#12345</td>
+                            <td>2024-06-01</td>
+                            <td>$100.00</td>
+                            <td>Pending</td>
+                        </tr>
+                        <tr>
+                            <td>#12346</td>
+                            <td>2024-06-10</td>
+                            <td>$150.00</td>
+                            <td>Shipped</td>
+                        </tr>
+                        <tr>
+                            <td>#12347</td>
+                            <td>2024-06-15</td>
+                            <td>$200.00</td>
+                            <td>Delivered</td>
+                        </tr>
+                        <!-- Additional orders -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title">Recent Added Accounts</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Name</th>
+                            <th>Sales</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody id="top-selling-products">
+                        <tr>
+                            <td>#P123</td>
+                            <td>Product A</td>
+                            <td>500</td>
+                            <td>$5,000</td>
+                        </tr>
+                        <tr>
+                            <td>#P124</td>
+                            <td>Product B</td>
+                            <td>300</td>
+                            <td>$3,000</td>
+                        </tr>
+                        <tr>
+                            <td>#P125</td>
+                            <td>Product C</td>
+                            <td>200</td>
+                            <td>$2,000</td>
+                        </tr>
+                        <!-- Additional top-selling products -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Dashboard End -->
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="/Assets/Shop/lib/easing/easing.min.js"></script>
+<script src="/Assets/Shop/lib/owlcarousel/owl.carousel.min.js"></script>
+
+<!-- Contact Javascript File -->
+<script src="/Assets/Shop/mail/jqBootstrapValidation.min.js"></script>
+<script src="/Assets/Shop/mail/contact.js"></script>
+
+<!-- Template Javascript -->
+<script src="/Assets/Shop/js/main.js"></script>
+
+

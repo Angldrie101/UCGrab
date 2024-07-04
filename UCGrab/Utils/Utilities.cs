@@ -75,15 +75,19 @@ namespace UCGrab.Utils
             {
                 BaseRepository<User_Role> role = new BaseRepository<User_Role>();
                 var list = new List<SelectListItem>();
+
                 foreach (var item in role.GetAll())
                 {
-                    var r = new SelectListItem
+                    if (item.rolename == "Customer" || item.rolename == "Provider")
                     {
-                        Text = item.rolename,
-                        Value = item.role_id.ToString()
-                    };
+                        var r = new SelectListItem
+                        {
+                            Text = item.rolename,
+                            Value = item.role_id.ToString()
+                        };
 
-                    list.Add(r);
+                        list.Add(r);
+                    }
                 }
 
                 return list;
