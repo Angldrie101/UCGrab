@@ -26,7 +26,9 @@ namespace UCGrab.Controllers
 
                 ViewBag.Role = Utilities.ListRole;
 
-            return View();
+            var user = new UserManager();
+            var allUsers = user.GetAllBUserInfo();
+            return View(allUsers);
         }
 
         [AllowAnonymous]

@@ -1,5 +1,4 @@
-﻿@model UCGrab.Database.User_Accounts
-
+﻿@model  IEnumerable<UCGrab.Database.User_Accounts>
 @{
     ViewBag.Title = "User Accounts";
     Layout = "~/Views/Shared/AdminPageLayout.cshtml";
@@ -54,17 +53,20 @@
                         </tr>
                     </thead>
                     <tbody id="user-accounts">
+                        @foreach (var user in Model)
+                        {
                         <tr>
-                            <td>23</td>
-                            <td>John Doe</td>
-                            <td>johndoe@example.com</td>
-                            <td>Admin</td>
-                            <td>Active</td>
+                            <td>@user.id</td>
+                            <td>@user.username</td>
+                            <td>@user.email</td>
+                            <td>@user.role_id</td> <!-- Assuming RoleName is a property -->
+                            <td>@user.status</td>
                             <td>
                                 <a href="/Admin/EditUser/1" class="btn btn-primary btn-sm">Edit</a>
                                 <a href="/Admin/DeleteUser/1" class="btn btn-danger btn-sm">Delete</a>
                             </td>
                         </tr>
+                        }
                         <!-- Additional user accounts -->
                     </tbody>
                 </table>
