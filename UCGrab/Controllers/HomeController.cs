@@ -8,6 +8,7 @@ using UCGrab.Utils;
 using UCGrab.Models;
 using UCGrab.Database;
 using System.IO;
+using UCGrab.Repository;
 
 namespace UCGrab.Controllers
 {
@@ -15,7 +16,7 @@ namespace UCGrab.Controllers
     public class HomeController : BaseController
     {
         // GET: Home
-        [AllowAnonymous]
+        [Authorize]
         public ActionResult Index()
         {
             IsUserLoggedSession();
@@ -44,7 +45,13 @@ namespace UCGrab.Controllers
             if (_userManager.SignIn(username, password, ref ErrorMessage) == ErrorCode.Success)
             {
                 var user = _userManager.GetUserByUsername(username);
-                
+
+                if (user.status != (int)Status.Active)
+                {
+                    TempData["username"] = username;
+                    return RedirectToAction("Verify");
+                }
+
                 FormsAuthentication.SetAuthCookie(username, false);
                 //
                 if (!String.IsNullOrEmpty(ReturnUrl))
@@ -66,52 +73,267 @@ namespace UCGrab.Controllers
         }
 
         [AllowAnonymous]
+        public ActionResult Verify()
+        {
+            if (String.IsNullOrEmpty(TempData["username"] as String))
+                return RedirectToAction("Login");
+
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public ActionResult Verify(string verify_code, string username)
+        {
+            if (String.IsNullOrEmpty(username))
+                return RedirectToAction("Login");
+
+            TempData["username"] = username;
+
+            var user = _userManager.GetUserByUsername(username);
+            if (user == null)
+            {
+                TempData["error"] = "User not found.";
+            }
+            if (!user.verify_code.Equals(verify_code))
+            {
+                TempData["error"] = "Incorrect Code";
+                return View();
+            }
+
+            user.status = (Int32)Status.Active;
+            _userManager.UpdateUser(user, ref ErrorMessage);
+
+            SendActivationNotificationEmail(user.email);
+            
+            return RedirectToAction("Login");
+        }
+
+        private void SendActivationNotificationEmail(string userEmail)
+        {
+            string emailBody = "Your account has been activated successfully.";
+            string errorMessage = "";
+
+            var mailManager = new MailManager();
+            bool emailSent = mailManager.SendEmail(userEmail, "Account Activation Notification", emailBody, ref errorMessage);
+
+            if (!emailSent)
+            {
+                // Handle email sending failure
+            }
+        }
+        [AllowAnonymous]
+        [HttpPost]
+        public ActionResult ResendCode(User_Accounts ua, string username)
+        {
+            if (String.IsNullOrEmpty(username))
+                return RedirectToAction("Login");
+
+            var user = _userManager.GetUserByUsername(username);
+
+            string verificationCode = ua.verify_code;
+            string emailBody = $"Your verification code is: {verificationCode}";
+            string errorMessage = "";
+
+            var mailManager = new MailManager();
+            bool emailSent = mailManager.SendEmail(ua.email, "Verification Code", emailBody, ref errorMessage);
+
+            if (!emailSent)
+            {
+                ModelState.AddModelError(String.Empty, errorMessage);
+                return View(ua);
+            }
+
+            TempData["username"] = username;
+            return RedirectToAction("Verify");
+        }
+
+        [AllowAnonymous]
+        public ActionResult SignUp()
+        {
+            if (User.Identity.IsAuthenticated)
+                return RedirectToAction("Index");
+
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public ActionResult SignUp(User_Accounts ua, string ConfirmPass)
+        {
+            if (!ua.password.Equals(ConfirmPass))
+            {
+                ModelState.AddModelError(String.Empty, "Password does not match");
+                return View(ua);
+            }
+
+            if (_userManager.SignUp(ua, ref ErrorMessage) != ErrorCode.Success)
+            {
+                ModelState.AddModelError(String.Empty, ErrorMessage);
+                return View(ua);
+            }
+
+            var user = _userManager.GetUserByEmail(ua.email);
+            string verificationCode = ua.verify_code;
+
+            string emailBody = $"Your verification code is: {verificationCode}";
+            string errorMessage = "";
+
+            var mailManager = new MailManager();
+            bool emailSent = mailManager.SendEmail(ua.email, "Verification Code", emailBody, ref errorMessage);
+
+            //if (!emailSent)
+            //{
+            //    ModelState.AddModelError(String.Empty, errorMessage);
+            //    return View(ua);
+            //}
+
+            TempData["username"] = ua.username;
+            return RedirectToAction("Verify");
+        }
+        [Authorize]
+        public ActionResult MyProfile()
+        {
+            IsUserLoggedSession();
+            var user = User.Identity.Name;
+            var userinfo = _userManager.GetUserInfoByUsername(user);
+
+            if(userinfo == null)
+            {
+                TempData["ErrorMessage"] = "Failed retreiving user information.";
+                return RedirectToAction("MyProfile");
+
+            }
+            return View(userinfo);
+        }
+        [HttpPost]
+        public ActionResult MyProfile(User_Information userInf, HttpPostedFileBase profilePicture)
+        {
+            IsUserLoggedSession();
+
+            if (ModelState.IsValid)
+            {
+                var user = _userManager.GetUserByUserId(userInf.user_id);
+                if(user == null)
+                {
+                    TempData["ErrorMessage"] = "User Not Found,";
+                    return View(userInf);
+                }
+            }
+            if (profilePicture != null && profilePicture.ContentLength > 0)
+            {
+                var uploadsFolderPath = Server.MapPath("~/UploadedFiles/");
+                if (!Directory.Exists(uploadsFolderPath))
+                    Directory.CreateDirectory(uploadsFolderPath);
+
+                var profileFileName = Path.GetFileName(profilePicture.FileName);
+                var profileSavePath = Path.Combine(uploadsFolderPath, profileFileName);
+                profilePicture.SaveAs(profileSavePath);
+
+                var existingImage = _imageManager.ListImgAttachByImageId(userInf.id).FirstOrDefault();
+                if (existingImage != null)
+                {
+                    existingImage.image_file = profileFileName;
+                    if (_imageManager.UpdateImg(existingImage, ref ErrorMessage) == ErrorCode.Error)
+                    {
+                        ModelState.AddModelError(String.Empty, ErrorMessage);
+                        return View(userInf);
+                    }
+                }
+                
+            }
+            return View(userInf);
+        }
+        [Authorize]
         public ActionResult EditProfile()
         {
             IsUserLoggedSession();
-            var user = _userManager.Retrieve(User.Identity.Name, ref ErrorMessage);
 
-            if (user == null)
+            var user = User.Identity.Name;
+            var usrinfo = _userManager.GetUserInfoByUsername(user);
+
+            if (usrinfo == null)
             {
-                // Handle the case where user creation or retrieval failed
-                // Redirect to an error page or show an error message
-                TempData["ErrorMessage"] = "User could not be found or created.";
-                return RedirectToAction("Error");
+                TempData["ErrorMessage"] = "Failed retrieving user information.";
+                return RedirectToAction("MyProfile");
             }
 
-            return View(user);
+            return View(usrinfo);
         }
-
 
         [HttpPost]
         public ActionResult EditProfile(User_Information userInf, HttpPostedFileBase profilePicture)
         {
-            
-            //if(profilePicture != null && profilePicture.ContentLength > 0)
-            //{
-            //    var fileName = Path.GetFileName(profilePicture.FileName);
-            //    var serverSavePath = Path.Combine(Server.MapPath("~/UploadedFiles/"), fileName);
-            //    profilePicture.SaveAs(serverSavePath);
+            IsUserLoggedSession();
 
-            //    var user = _userManager.GetUserInfoByUserId(UserId);
+            if (ModelState.IsValid)
+            {
+                var user = _userManager.GetUserByUserId(userInf.user_id);
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "Error updating profile: User not found.";
+                    return View(userInf);
+                }
 
-            //    var image = new Image { image_file = fileName, image_id = user.id};
+                // Handle profile picture upload
+                if (profilePicture != null && profilePicture.ContentLength > 0)
+                {
+                    var uploadsFolderPath = Server.MapPath("~/UploadedFiles/");
+                    if (!Directory.Exists(uploadsFolderPath))
+                        Directory.CreateDirectory(uploadsFolderPath);
 
-            //    user.Image.Add(image);
+                    var profileFileName = Path.GetFileName(profilePicture.FileName);
+                    var profileSavePath = Path.Combine(uploadsFolderPath, profileFileName);
+                    profilePicture.SaveAs(profileSavePath);
 
-            //    if(_userManager.UpdateUserInformation(userInf, ref ErrorMessage) == ErrorCode.Error)
-            //    {
-            //        ModelState.AddModelError(String.Empty, ErrorMessage);
-            //        return View(userInf);
-            //    }
-            //    else
-            //    {
-            //        ModelState.AddModelError(String.Empty, "Please select a valid image file.");
-                    
-            //    }
-            //}
-            TempData["Message"] = $"User Information {ErrorMessage}!";
-            return RedirectToAction("EditProfile");
+                    // Log the save path
+                    System.Diagnostics.Debug.WriteLine("Profile picture saved at: " + profileSavePath);
+
+                    var existingImage = _imageManager.ListImgAttachByImageId(userInf.id).FirstOrDefault();
+                    if (existingImage != null)
+                    {
+                        existingImage.image_file = profileFileName;
+                        if(_imageManager.UpdateImg(existingImage, ref ErrorMessage) == ErrorCode.Error)
+                        {
+                            ModelState.AddModelError(String.Empty, ErrorMessage);
+                            return View(userInf);
+                        }
+                    }
+                    else
+                    {
+                        Image img = new Image
+                        {
+                            image_file = profileFileName,
+                            image_id = userInf.id
+                        };
+
+                       if (_imageManager.CreateImg(img, ref ErrorMessage) == ErrorCode.Error)
+                        {
+                            ModelState.AddModelError(String.Empty, ErrorMessage);
+                            return View(userInf);
+                        }
+                    }
+                }
+
+           if (_userManager.UpdateUserInformation(userInf, ref ErrorMessage) == ErrorCode.Error)
+                {
+                    ModelState.AddModelError(String.Empty, ErrorMessage);
+                    return View(userInf);
+
+                }
+                TempData["SuccessMessage"] = "Profile updated successfully.";
+                return RedirectToAction("MyProfile");
+            }
+
+            return View(userInf);
+        }
+
+
+
+        [AllowAnonymous]
+        public ActionResult ForgotPass()
+        {
+            return View();
         }
 
         [AllowAnonymous]
@@ -124,6 +346,12 @@ namespace UCGrab.Controllers
 
         [AllowAnonymous]
         public ActionResult Shop()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        public ActionResult ShopList()
         {
             return View();
         }

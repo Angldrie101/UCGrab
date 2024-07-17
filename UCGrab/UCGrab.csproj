@@ -170,12 +170,14 @@
     <Content Include="Assets\Shop\img\CarBooks.jpeg" />
     <Content Include="Assets\Shop\img\catbooks.jpg" />
     <Content Include="Assets\Shop\img\ccs.jpg" />
+    <Content Include="Assets\Shop\img\Choks.jpg" />
     <Content Include="Assets\Shop\img\Coke.jpg" />
     <Content Include="Assets\Shop\img\comstudies.png" />
     <Content Include="Assets\Shop\img\crim.jpg" />
     <Content Include="Assets\Shop\img\customs.jpg" />
     <Content Include="Assets\Shop\img\DepartmentalShirts.jpg" />
     <Content Include="Assets\Shop\img\Drinks.jpg" />
+    <Content Include="Assets\Shop\img\dunkin.png" />
     <Content Include="Assets\Shop\img\foods&amp;bev.jpg" />
     <Content Include="Assets\Shop\img\foodsdrinks.jpg" />
     <Content Include="Assets\Shop\img\hmtm.jpg" />
@@ -191,7 +193,7 @@
     <Content Include="Assets\Shop\img\offer-1.jpg" />
     <Content Include="Assets\Shop\img\offer-2.jpg" />
     <Content Include="Assets\Shop\img\payments.png" />
-    <Content Include="Assets\Shop\img\profile.jpg" />
+    <Content Include="UploadedFiles\profile.jpg" />
     <Content Include="Assets\Shop\img\psits.jpg" />
     <Content Include="Assets\Shop\img\seniorHS.jpg" />
     <Content Include="Assets\Shop\img\Snacks.jpg" />
@@ -533,10 +535,15 @@
     <Content Include="Views\Shop\ProductInfo.cshtml" />
     <Content Include="Views\Shop\MyProfile.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
-    <Content Include="Views\Admin\UserAccounts.cshtml" />
     <Content Include="Views\Admin\ManageWallet.cshtml" />
     <Content Include="Views\Admin\Transaction.cshtml" />
     <Content Include="Views\Admin\ManageStore.cshtml" />
+    <Content Include="Views\Admin\UserAccounts.cshtml" />
+    <Content Include="Views\Home\Verify.cshtml" />
+    <Content Include="Views\Home\SignUp.cshtml" />
+    <Content Include="Views\Home\ForgotPass.cshtml" />
+    <Content Include="Views\Home\ShopList.cshtml" />
+    <Content Include="Views\Home\MyProfile.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -546,7 +553,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="UploadedFiles\" />
     <Folder Include="Views\Base\" />
     <Folder Include="Views\IBase\" />
   </ItemGroup>

@@ -25,6 +25,8 @@ namespace UCGrab.Database
         public Nullable<System.DateTime> date_created { get; set; }
         public Nullable<System.DateTime> date_modified { get; set; }
     
+        public virtual User_Accounts User_Accounts1 { get; set; }
+        public virtual User_Accounts User_Accounts2 { get; set; }
         public virtual User_Role User_Role { get; set; }
     }
 }

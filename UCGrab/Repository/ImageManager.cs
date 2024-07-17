@@ -16,7 +16,7 @@ namespace UCGrab.Repository
             _img = new BaseRepository<Image>();
         }
 
-        public List<Image> ListImgAttachByProdId(int? id)
+        public List<Image> ListImgAttachByImageId(int? id)
         {
             return _img._table.Where(m => m.image_id == id).ToList();
         }

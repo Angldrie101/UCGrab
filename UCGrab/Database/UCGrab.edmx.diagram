@@ -4,26 +4,27 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="4093e9d94cc84dcea2e2d7cb37b480e5" Name="Diagram1" ZoomLevel="82">
-        <EntityTypeShape EntityType="UCGrabModel.Category" Width="1.5" PointX="5.75" PointY="3.875" />
+      <Diagram DiagramId="4093e9d94cc84dcea2e2d7cb37b480e5" Name="Diagram1" ZoomLevel="77">
+        <EntityTypeShape EntityType="UCGrabModel.Category" Width="1.5" PointX="5.75" PointY="2.5" />
         <EntityTypeShape EntityType="UCGrabModel.ContactUs" Width="1.5" PointX="0.75" PointY="5.75" />
-        <EntityTypeShape EntityType="UCGrabModel.Image" Width="1.5" PointX="10.25" PointY="8.375" />
-        <EntityTypeShape EntityType="UCGrabModel.Order" Width="1.5" PointX="11" PointY="11.625" />
-        <EntityTypeShape EntityType="UCGrabModel.Order_Detail" Width="1.5" PointX="13.25" PointY="3.75" />
-        <EntityTypeShape EntityType="UCGrabModel.Product" Width="1.5" PointX="8" PointY="3" />
-        <EntityTypeShape EntityType="UCGrabModel.Stock" Width="1.5" PointX="10.25" PointY="2.75" />
-        <EntityTypeShape EntityType="UCGrabModel.Store" Width="1.5" PointX="8.75" PointY="11.5" />
+        <EntityTypeShape EntityType="UCGrabModel.Image" Width="1.5" PointX="3" PointY="11.5" />
+        <EntityTypeShape EntityType="UCGrabModel.Order" Width="1.5" PointX="8" PointY="7.25" />
+        <EntityTypeShape EntityType="UCGrabModel.Order_Detail" Width="1.5" PointX="10.25" PointY="2.375" />
+        <EntityTypeShape EntityType="UCGrabModel.Product" Width="1.5" PointX="8" PointY="1.75" />
+        <EntityTypeShape EntityType="UCGrabModel.Stock" Width="1.5" PointX="10.25" PointY="5.75" />
+        <EntityTypeShape EntityType="UCGrabModel.Store" Width="1.5" PointX="5.75" PointY="7.125" />
         <EntityTypeShape EntityType="UCGrabModel.sysdiagrams" Width="1.5" PointX="2.75" PointY="5.75" />
         <EntityTypeShape EntityType="UCGrabModel.User_Accounts" Width="1.5" PointX="3" PointY="1" />
-        <EntityTypeShape EntityType="UCGrabModel.User_Information" Width="1.5" PointX="4.75" PointY="6.75" />
-        <EntityTypeShape EntityType="UCGrabModel.User_Role" Width="1.5" PointX="0.75" PointY="1.375" />
-        <EntityTypeShape EntityType="UCGrabModel.vw_Role" Width="1.5" PointX="6.75" PointY="7.75" />
+        <EntityTypeShape EntityType="UCGrabModel.User_Information" Width="1.5" PointX="0.75" PointY="11" />
+        <EntityTypeShape EntityType="UCGrabModel.User_Role" Width="1.5" PointX="0.75" PointY="1.625" />
+        <EntityTypeShape EntityType="UCGrabModel.vw_Role" Width="1.5" PointX="2.75" PointY="8.75" />
         <AssociationConnector Association="UCGrabModel.FK_Product_Category" />
-        <AssociationConnector Association="UCGrabModel.FK_Image_Product" />
+        <AssociationConnector Association="UCGrabModel.FK_Image_User_Accounts" />
         <AssociationConnector Association="UCGrabModel.FK_Order_Detail_Order" />
         <AssociationConnector Association="UCGrabModel.FK_Order_Store" />
         <AssociationConnector Association="UCGrabModel.FK_Order_Detail_Product" />
         <AssociationConnector Association="UCGrabModel.FK_Stock_Product" />
+        <AssociationConnector Association="UCGrabModel.FK_User_Accounts_User_Accounts" />
         <AssociationConnector Association="UCGrabModel.FK_User_Accounts_User_Role" />
         <AssociationConnector Association="UCGrabModel.FK_User_Role_User_Role" />
         <AssociationConnector Association="UCGrabModel.FK_User_Role_User_Role1" />

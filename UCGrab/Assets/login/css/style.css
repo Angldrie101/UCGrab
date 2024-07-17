@@ -1053,7 +1053,10 @@ pre {
     -webkit-box-flex: 0;
     -ms-flex: 0 0 41.66667%;
     flex: 0 0 41.66667%;
-    max-width: 41.66667%; }
+    max-width: 41.66667%;
+    background-color:#fff;
+    border-radius: 10px;
+  }
   .col-lg-6 {
     -webkit-box-flex: 0;
     -ms-flex: 0 0 50%;

@@ -16,7 +16,6 @@ namespace UCGrab.Database
     {
         public Product()
         {
-            this.Image = new HashSet<Image>();
             this.Order_Detail = new HashSet<Order_Detail>();
             this.Stock = new HashSet<Stock>();
         }
@@ -33,7 +32,6 @@ namespace UCGrab.Database
         public string user_id { get; set; }
     
         public virtual Category Category { get; set; }
-        public virtual ICollection<Image> Image { get; set; }
         public virtual ICollection<Order_Detail> Order_Detail { get; set; }
         public virtual ICollection<Stock> Stock { get; set; }
     }

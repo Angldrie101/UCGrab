@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "ShopList";
+    Layout = "~/Views/Shared/UserLayout.cshtml";
+}
+
+<!-- Shops Start -->
+<div class="container-fluid">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Shops Selling Foods</span></h2>
+    <div class="row px-xl-5">
+        <!-- Example Shop Start -->
+        <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+            <a href="/Home/Shop" class="text-decoration-none">
+                <div class="shop-item bg-light mb-4">
+                    <div class="shop-img position-relative overflow-hidden" style="height: 250px;">
+                        <img class="img-fluid w-100 h-100" src="~/Assets/Shop/img/Choks.jpg" alt="Chooks To Go" style="object-fit: cover;">
+                    </div>
+                    <div class="text-center py-4">
+                        <a class="h6 text-decoration-none text-truncate" href="/Home/Shop">Chooks To Go</a>
+                        <div class="d-flex align-items-center justify-content-center mb-1">
+                            <small class="fa fa-star text-primary mr-1"></small>
+                            <small class="fa fa-star text-primary mr-1"></small>
+                            <small class="fa fa-star text-primary mr-1"></small>
+                            <small class="fa fa-star text-primary mr-1"></small>
+                            <small class="fa fa-star-half-alt text-primary mr-1"></small>
+                            <small>(99)</small>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- Example Shop End -->
+        <!-- Repeat Example Shop for more shops -->
+        <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+            <a href="/Home/Shop" class="text-decoration-none">
+                <div class="shop-item bg-light mb-4">
+                    <div class="shop-img position-relative overflow-hidden" style="height: 250px;">
+                        <img class="img-fluid w-100 h-100" src="~/Assets/Shop/img/dunkin.png" alt="Dunkin Donuts" style="object-fit: cover;">
+                    </div>
+                    <div class="text-center py-4">
+                        <a class="h6 text-decoration-none text-truncate" href="/Home/Shop">Dunkin Donuts</a>
+                        <div class="d-flex align-items-center justify-content-center mb-1">
+                            <small class="fa fa-star text-primary mr-1"></small>
+                            <small class="fa fa-star text-primary mr-1"></small>
+                            <small class="fa fa-star text-primary mr-1"></small>
+                            <small class="fa fa-star text-primary mr-1"></small>
+                            <small class="fa fa-star-half-alt text-primary mr-1"></small>
+                            <small>(99)</small>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Repeat as needed for more shops -->
+        <!-- No Shops Message Start -->
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                There are no shops available.
+            </div>
+        </div>
+        <!-- No Shops Message End -->
+    </div>
+</div>
+<!-- Shops End -->

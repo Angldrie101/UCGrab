@@ -23,8 +23,9 @@ namespace UCGrab.Controllers
         public ActionResult UserAccounts()
         {
             if (User.Identity.IsAuthenticated)
-
+            {
                 ViewBag.Role = Utilities.ListRole;
+            }
 
             var user = new UserManager();
             var allUsers = user.GetAllBUserInfo();
@@ -35,24 +36,27 @@ namespace UCGrab.Controllers
         [HttpPost]
         public ActionResult UserAccounts(User_Accounts ua, String ConfirmPass)
         {
+            ViewBag.Role = Utilities.ListRole;
+
             if (!ua.password.Equals(ConfirmPass))
             {
-                ModelState.AddModelError(String.Empty, "Password not match");
-                ViewBag.Role = Utilities.ListRole;
-                return View(ua);
+                ModelState.AddModelError(String.Empty, "Password does not match");
+
+                var user = new UserManager();
+                var allUsers = user.GetAllBUserInfo();
+                return View(allUsers);
             }
 
             if (_userManager.SignUp(ua, ref ErrorMessage) != ErrorCode.Success)
             {
                 ModelState.AddModelError(String.Empty, ErrorMessage);
 
-                ViewBag.Role = Utilities.ListRole;
-                return View(ua);
+                var user = new UserManager();
+                var allUsers = user.GetAllBUserInfo();
+                return View(allUsers);
             }
 
-            var user = _userManager.GetUserByEmail(ua.email);
             string verificationCode = ua.verify_code;
-
             string emailBody = $"Your verification code is: {verificationCode}";
             string errorMessage = "";
 
@@ -62,9 +66,12 @@ namespace UCGrab.Controllers
             if (!emailSent)
             {
                 ModelState.AddModelError(String.Empty, errorMessage);
-                ViewBag.Role = Utilities.ListRole;
-                return View(ua);
+
+                var user = new UserManager();
+                var allUsers = user.GetAllBUserInfo();
+                return View(allUsers);
             }
+
             TempData["username"] = ua.username;
             return RedirectToAction("UserAccounts");
         }

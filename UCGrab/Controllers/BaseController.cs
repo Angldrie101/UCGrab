@@ -14,6 +14,7 @@ namespace UCGrab.Controllers
     {
         public String ErrorMessage;
         public UserManager _userManager;
+        public ImageManager _imageManager;
 
         public String Username { get { return User.Identity.Name; } }
         public String UserId { get { return _userManager.GetUserByUsername(Username).user_id; } }
@@ -22,6 +23,7 @@ namespace UCGrab.Controllers
         {
             ErrorMessage = String.Empty;
             _userManager = new UserManager();
+            _imageManager = new ImageManager();
 
         }
         public void IsUserLoggedSession()

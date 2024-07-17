@@ -18,6 +18,6 @@ namespace UCGrab.Database
         public Nullable<int> image_id { get; set; }
         public string image_file { get; set; }
     
-        public virtual Product Product { get; set; }
+        public virtual User_Information User_Information { get; set; }
     }
 }

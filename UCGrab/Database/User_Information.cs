@@ -14,6 +14,11 @@ namespace UCGrab.Database
     
     public partial class User_Information
     {
+        public User_Information()
+        {
+            this.Image = new HashSet<Image>();
+        }
+    
         public int id { get; set; }
         public string user_id { get; set; }
         public string last_name { get; set; }
@@ -22,5 +27,7 @@ namespace UCGrab.Database
         public string email { get; set; }
         public Nullable<int> status { get; set; }
         public Nullable<int> store_id { get; set; }
+    
+        public virtual ICollection<Image> Image { get; set; }
     }
 }
