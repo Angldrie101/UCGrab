@@ -86,10 +86,24 @@ namespace UCGrab.Controllers
         {
             return View();
         }
-        [AllowAnonymous]
+        [Authorize]
         public ActionResult ManageStore()
         {
-            return View();
+            var store = _storeManager.CreateOrRetrieve(User.Identity.Name, ref ErrorMessage);
+            return View(store);
+        }
+        [HttpPost]
+        public ActionResult ManageStore(Store store)
+        {
+            if (_storeManager.UpdateStore(store.id, store, ref ErrorMessage) == Utils.ErrorCode.Error)
+            {
+                ModelState.AddModelError(String.Empty, ErrorMessage);
+                return View(store);
+            }
+
+            TempData["Message"] = $"Store {ErrorMessage}!";
+
+            return View(store);
         }
     }
 }

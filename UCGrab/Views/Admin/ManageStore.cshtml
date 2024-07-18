@@ -1,4 +1,6 @@
-﻿@{
+﻿@model UCGrab.Database.Store
+
+@{
     ViewBag.Title = "ManageStore";
     Layout = "~/Views/Shared/AdminPageLayout.cshtml";
 }
@@ -11,29 +13,38 @@
         <div class="col-lg-6 mb-5">
             <div class="bg-light p-30 mb-30">
                 <h5 class="card-title">Store Details</h5>
-                <form id="store-details-form" method="post" action="/Admin/UpdateStoreDetails">
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                <form id="store-details-form" method="post" action="">
+                    @Html.HiddenFor(model => model.id)
                     <div class="form-group">
                         <label for="store-name">Store Name</label>
-                        <input type="text" class="form-control" id="store-name" name="StoreName" required>
+                        <input type="text" class="form-control" id="store-name" name="store_name" required>
                     </div>
                     <div class="form-group">
                         <label for="store-description">Store Description</label>
-                        <textarea class="form-control" id="store-description" name="StoreDescription" rows="3" required></textarea>
+                        <textarea class="form-control" id="store-description" name="store_description" rows="3" required></textarea>
                     </div>
                     <div class="form-group">
                         <label for="store-address">Store Address</label>
-                        <input type="text" class="form-control" id="store-address" name="StoreAddress" required>
+                        <input type="text" class="form-control" id="store-address" name="store_address" required>
                     </div>
                     <div class="form-group">
                         <label for="store-phone">Store Phone</label>
-                        <input type="text" class="form-control" id="store-phone" name="StorePhone" required>
+                        <input type="text" class="form-control" id="store-phone" name="phone" required>
                     </div>
                     <div class="form-group">
                         <label for="store-email">Store Email</label>
-                        <input type="email" class="form-control" id="store-email" name="StoreEmail" required>
+                        <input type="email" class="form-control" id="store-email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="store-email">Store Operation Hours</label>
+                        <textarea type="text" class="form-control" id="store-hours" name="operation_hours" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Add Store</button>
                 </form>
+                }
             </div>
         </div>
 

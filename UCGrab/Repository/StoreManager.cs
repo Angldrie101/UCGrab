@@ -13,8 +13,6 @@ namespace UCGrab.Repository
         BaseRepository<User_Information> _userInfo;
         UserManager _userMgr;
 
-
-
         public StoreManager()
         {
             _store = new BaseRepository<Store>();
