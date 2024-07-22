@@ -1,8 +1,18 @@
-﻿@{
+﻿@model UCGrab.Database.Product
+
+@{
     ViewBag.Title = "ProductInfo";
     Layout = "~/Views/Shared/ShopPageLayout.cshtml";
 }
 
+<style>
+    #preview img {
+        border-radius: 5px;
+        margin-bottom: 15px;
+        width: 350px;
+        height: 300px;
+    }
+</style>
 <!-- Product Management Start -->
 <div class="container-fluid">
     <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Product Management</span></h2>
@@ -11,13 +21,15 @@
         <div class="col-lg-6 mb-5">
             <div class="bg-light p-30 mb-30">
                 <h5 class="card-title"><i class="fas fa-tags mr-2"></i>Product Categories</h5>
-                <form>
+                @using (Html.BeginForm("AddCategory", "Shop", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
                     <div class="form-group">
                         <label for="categoryName" class="form-label">Category Name</label>
-                        <input type="text" class="form-control" id="categoryName" placeholder="Enter category name">
+                        <input type="text" name="category_name" class="form-control" id="categoryName" placeholder="Enter category name" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Add Category</button>
-                </form>
+                }
                 <hr>
                 <h5 class="card-title">Existing Categories</h5>
                 <table class="table table-striped">
@@ -25,27 +37,32 @@
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
+                            <th>Date</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Electronics</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning">Edit</button>
-                                <button class="btn btn-sm btn-danger">Delete</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Books</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning">Edit</button>
-                                <button class="btn btn-sm btn-danger">Delete</button>
-                            </td>
-                        </tr>
-                        <!-- Additional categories -->
+                        @if (ViewBag.Categories != null && ViewBag.Categories.Count > 0)
+                        {
+                            foreach (var category in ViewBag.Categories)
+                            {
+                                <tr>
+                                    <td>@category.category_id</td>
+                                    <td>@category.category_name</td>
+                                    <td>@category.date_created.ToString("yyyy-MM-dd")</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning">Edit</button>
+                                        <button class="btn btn-sm btn-danger">Delete</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3">No categories available.</td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>
@@ -55,41 +72,38 @@
         <div class="col-lg-6 mb-5">
             <div class="bg-light p-30 mb-30">
                 <h5 class="card-title"><i class="fas fa-box mr-2"></i>Products</h5>
-                <form>
+                @using (Html.BeginForm("ProductInfo", "Shop", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
                     <div class="form-group">
                         <label class="form-label">Product Image</label>
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <img id="productImagePreview" src="https://via.placeholder.com/300" alt="Product Image" class="img-fluid mb-3" style="width: 100%; max-width: 300px; height: auto;">
-                                <input type="file" class="form-control-file" id="productImage" accept="image/*" onchange="previewImage(event)">
-                            </div>
-                            <div class="card-footer text-muted">
-                                <button type="button" class="btn btn-warning" onclick="document.getElementById('productImage').click();">Upload New Photo</button>
-                            </div>
+                        <div alt="Product" class="img-fluid" id="preview"></div>
+                        <div class="form-group">
+                            <input id="files" name="files" type="file" accept="image/*">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="productName" class="form-label">Product Name</label>
-                        <input type="text" class="form-control" id="productName" placeholder="Enter product name">
+                        <input type="text" class="form-control" id="productName" name="product_name" placeholder="Enter product name">
                     </div>
                     <div class="form-group">
                         <label for="productCategory" class="form-label">Category</label>
-                        <select class="form-control" id="productCategory">
-                            <option value="1">Electronics</option>
-                            <option value="2">Books</option>
-                            <!-- Additional categories -->
-                        </select>
+                        @Html.DropDownList("category_id", (IEnumerable<SelectListItem>)ViewBag.Category, new { @class = "form-control" })
                     </div>
                     <div class="form-group">
                         <label for="productPrice" class="form-label">Price</label>
-                        <input type="text" class="form-control" id="productPrice" placeholder="Enter product price">
+                        <input type="text" class="form-control" id="productPrice" name="price" placeholder="Enter product price">
                     </div>
                     <div class="form-group">
                         <label for="productDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="productDescription" rows="3" placeholder="Enter product description"></textarea>
+                        <textarea class="form-control" id="productDescription" name="product_description" rows="3" placeholder="Enter product description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="productSize" class="form-label">Product Size (If applicable)</label>
+                        <input type="text" class="form-control" id="productPrice" name="size" placeholder="Enter product size">
                     </div>
                     <button type="submit" class="btn btn-primary">Add Product</button>
-                </form>
+                }
                 <hr>
                 <h5 class="card-title">Existing Products</h5>
                 <table class="table table-striped">
@@ -99,31 +113,34 @@
                             <th>Name</th>
                             <th>Category</th>
                             <th>Price</th>
+                            <th>Date Created</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Smartphone</td>
-                            <td>Electronics</td>
-                            <td>$500.00</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning">Edit</button>
-                                <button class="btn btn-sm btn-danger">Delete</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Laptop</td>
-                            <td>Electronics</td>
-                            <td>$1000.00</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning">Edit</button>
-                                <button class="btn btn-sm btn-danger">Delete</button>
-                            </td>
-                        </tr>
-                        <!-- Additional products -->
+                        @if (ViewBag.Products != null && ViewBag.Products.Count > 0)
+                        {
+                            foreach (var product in ViewBag.Products)
+                            {
+                                <tr>
+                                    <td>@product.id</td>
+                                    <td>@product.product_name</td>
+                                    <td>@product.Category.category_name</td>
+                                    <td>@product.price</td>
+                                    <td>@product.date_created.ToString("yyyy-MM-dd")</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning">Edit</button>
+                                        <button class="btn btn-sm btn-danger">Delete</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5">No products available.</td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>
@@ -144,3 +161,23 @@
 
 <!-- Template Javascript -->
 <script src="/Assets/Shop/js/main.js"></script>
+
+<script type="text/javascript">
+    const preview = (file) => {
+        const fr = new FileReader();
+        fr.onload = () => {
+            const img = document.createElement("img");
+            img.src = fr.result;  // String Base64
+            img.alt = file.name;
+            const previewDiv = document.querySelector('#preview');
+            previewDiv.innerHTML = ''; // Clear any existing images
+            previewDiv.append(img);
+        };
+        fr.readAsDataURL(file);
+    };
+
+    document.querySelector("#files").addEventListener("change", (ev) => {
+        if (!ev.target.files) return; // Do nothing if no files are selected
+        preview(ev.target.files[0]); // Preview the first file only
+    });
+</script>

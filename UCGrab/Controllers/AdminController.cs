@@ -89,20 +89,18 @@ namespace UCGrab.Controllers
         [Authorize]
         public ActionResult ManageStore()
         {
-            var store = _storeManager.CreateOrRetrieve(User.Identity.Name, ref ErrorMessage);
-            return View(store);
+            return View(new Store());
         }
         [HttpPost]
-        public ActionResult ManageStore(Store store)
+        public ActionResult ManageStore(Store store, string user_id)
         {
-            if (_storeManager.UpdateStore(store.id, store, ref ErrorMessage) == Utils.ErrorCode.Error)
+            if (_storeManager.AddStoreForUser(store, user_id, ref ErrorMessage) == Utils.ErrorCode.Error)
             {
                 ModelState.AddModelError(String.Empty, ErrorMessage);
                 return View(store);
             }
 
-            TempData["Message"] = $"Store {ErrorMessage}!";
-
+            TempData["Message"] = $"Store {store.store_name} added successfully!";
             return View(store);
         }
     }

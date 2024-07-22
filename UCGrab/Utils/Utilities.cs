@@ -93,5 +93,22 @@ namespace UCGrab.Utils
                 return list;
             }
         }
+
+        public static List<SelectListItem> SelectListItemCategoryByUser(String username)
+        {
+            CategoryManager _categoryMgr = new CategoryManager();
+            var list = new List<SelectListItem>();
+            foreach (var item in _categoryMgr.ListCategory(username))
+            {
+                var r = new SelectListItem
+                {
+                    Text = item.category_name,
+                    Value = item.category_id.ToString()
+                };
+                list.Add(r);
+            }
+
+            return list;
+        }
     }
 }

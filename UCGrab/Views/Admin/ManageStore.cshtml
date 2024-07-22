@@ -18,6 +18,11 @@
                     @Html.AntiForgeryToken()
                 <form id="store-details-form" method="post" action="">
                     @Html.HiddenFor(model => model.id)
+
+                    <div class="form-group">
+                        <label for="store-name">Owner's User ID</label>
+                        <input type="text" class="form-control" id="username" name="user_id" required>
+                    </div>
                     <div class="form-group">
                         <label for="store-name">Store Name</label>
                         <input type="text" class="form-control" id="store-name" name="store_name" required>
@@ -31,8 +36,8 @@
                         <input type="text" class="form-control" id="store-address" name="store_address" required>
                     </div>
                     <div class="form-group">
-                        <label for="store-phone">Store Phone</label>
-                        <input type="text" class="form-control" id="store-phone" name="phone" required>
+                        <label for="phone">Phone Number</label>
+                        <input type="text" name="verify_code" class="form-control" maxlength="11" pattern="\d{11}" title="Please enter Philippine 11-digit phone number" required>
                     </div>
                     <div class="form-group">
                         <label for="store-email">Store Email</label>
@@ -40,7 +45,7 @@
                     </div>
                     <div class="form-group">
                         <label for="store-email">Store Operation Hours</label>
-                        <textarea type="text" class="form-control" id="store-hours" name="operation_hours" required></textarea>
+                        <textarea type="text" class="form-control" id="store-hours" name="operating_hours" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Add Store</button>
                 </form>

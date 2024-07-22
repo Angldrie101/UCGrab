@@ -249,6 +249,9 @@
     <Compile Include="Database\Image.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>
+    <Compile Include="Database\Image_Product.cs">
+      <DependentUpon>UCGrab.tt</DependentUpon>
+    </Compile>
     <Compile Include="Database\Order.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>

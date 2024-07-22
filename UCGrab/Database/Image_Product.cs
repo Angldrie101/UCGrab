@@ -12,23 +12,12 @@ namespace UCGrab.Database
     using System;
     using System.Collections.Generic;
     
-    public partial class Store
+    public partial class Image_Product
     {
-        public Store()
-        {
-            this.Order = new HashSet<Order>();
-        }
-    
         public int id { get; set; }
-        public string store_id { get; set; }
-        public string user_id { get; set; }
-        public string store_name { get; set; }
-        public string store_description { get; set; }
-        public string store_address { get; set; }
-        public string phone { get; set; }
-        public string email { get; set; }
-        public string operating_hours { get; set; }
+        public Nullable<int> product_id { get; set; }
+        public string image_file { get; set; }
     
-        public virtual ICollection<Order> Order { get; set; }
+        public virtual Product Product { get; set; }
     }
 }

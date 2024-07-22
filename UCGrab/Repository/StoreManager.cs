@@ -28,34 +28,40 @@ namespace UCGrab.Repository
             return _store.GetAll().Where(m => m.store_id == id).FirstOrDefault();
         }
 
-        public ErrorCode UpdateStore(int id, Store store, ref String err)
+        public Store GetStoreByUserId(string userId)
         {
-            return _store.Update(id, store, out err);
+
+            return _store._table.FirstOrDefault(m => m.user_id == userId);
         }
-        public Store CreateOrRetrieve(String username, ref String err)
+
+        public ErrorCode AddStoreForUser(Store store, string user_id, ref String err)
         {
-            var user = _userMgr.GetUserByUsername(username);
-            var userInf = _userMgr.GetUserInfoByUserId(user.user_id);
+            var userInfo = _userInfo.GetAll().FirstOrDefault(ui => ui.user_id == user_id);
+            if (userInfo == null)
+            {
+                err = "User not found.";
+                return ErrorCode.Error;
+            }
 
-            if (userInf.store_id != null)
-                return _store.Get(userInf.store_id);
-
-            var store = new Store();
             store.store_id = Utilities.gUid;
-            store.store_name = $"{user.username}.Store";
-
             if (_store.Create(store, out err) != ErrorCode.Success)
             {
-                // Return Error
-                return null;
+                return ErrorCode.Error;
             }
-            store = GetStoreByGuId(store.store_id);
-            // Update user information assign store id
-            userInf.id = store.id;
-            //
-            _userInfo.Update(userInf.id, userInf, out err);
 
-            return store;
+            userInfo.store_id = store.id;
+            if (_userInfo.Update(userInfo.id, userInfo, out err) != ErrorCode.Success)
+            {
+                return ErrorCode.Error;
+            }
+
+            return ErrorCode.Success;
         }
+
+        public ErrorCode StoreUpdate(Store st, ref string errMsg)
+        {
+            return _store.Update(st.id, st, out errMsg);
+        }
+       
     }
 }

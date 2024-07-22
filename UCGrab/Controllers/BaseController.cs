@@ -16,6 +16,8 @@ namespace UCGrab.Controllers
         public UserManager _userManager;
         public ImageManager _imageManager;
         public StoreManager _storeManager;
+        public ProductManager _productManager;
+        public CategoryManager _categoryManager;
 
         public String Username { get { return User.Identity.Name; } }
         public String UserId { get { return _userManager.GetUserByUsername(Username).user_id; } }
@@ -26,6 +28,8 @@ namespace UCGrab.Controllers
             _userManager = new UserManager();
             _imageManager = new ImageManager();
             _storeManager = new StoreManager();
+            _productManager = new ProductManager();
+            _categoryManager = new CategoryManager();
 
         }
         public void IsUserLoggedSession()

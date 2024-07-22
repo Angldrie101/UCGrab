@@ -11,8 +11,8 @@
           </Key>
           <Property Name="category_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="category_name" Type="varchar" MaxLength="255" Nullable="false" />
-          <Property Name="date_created" Type="date" />
-          <Property Name="user_id" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="date_created" Type="datetime" />
+          <Property Name="user_id" Type="varchar(max)" Nullable="false" />
         </EntityType>
         <EntityType Name="ContactUs">
           <Key>
@@ -30,6 +30,14 @@
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="image_id" Type="int" />
+          <Property Name="image_file" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Image_Product">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="product_id" Type="int" />
           <Property Name="image_file" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="Order">
@@ -82,12 +90,13 @@
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="store_id" Type="varchar" MaxLength="255" />
+          <Property Name="user_id" Type="varchar(max)" />
           <Property Name="store_name" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="store_description" Type="varchar(max)" />
           <Property Name="store_address" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="phone" Type="varchar" MaxLength="255" />
           <Property Name="email" Type="nvarchar" MaxLength="255" />
-          <Property Name="operating_hours" Type="datetime" />
+          <Property Name="operating_hours" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -206,6 +215,18 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Product_Image_Product">
+          <End Role="Product" Type="Self.Product" Multiplicity="0..1" />
+          <End Role="Image_Product" Type="Self.Image_Product" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Image_Product">
+              <PropertyRef Name="product_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Stock_Product">
           <End Role="Product" Type="Self.Product" Multiplicity="1" />
           <End Role="Stock" Type="Self.Stock" Multiplicity="*" />
@@ -270,6 +291,7 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
           <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ContactUs" EntityType="Self.ContactUs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Image" EntityType="Self.Image" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Image_Product" EntityType="Self.Image_Product" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Order" EntityType="Self.Order" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Order_Detail" EntityType="Self.Order_Detail" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
@@ -306,6 +328,10 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <End Role="Category" EntitySet="Category" />
             <End Role="Product" EntitySet="Product" />
           </AssociationSet>
+          <AssociationSet Name="FK_Product_Image_Product" Association="Self.FK_Product_Image_Product">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="Image_Product" EntitySet="Image_Product" />
+          </AssociationSet>
           <AssociationSet Name="FK_Stock_Product" Association="Self.FK_Stock_Product">
             <End Role="Product" EntitySet="Product" />
             <End Role="Stock" EntitySet="Stock" />
@@ -335,6 +361,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <EntitySet Name="Category" EntityType="UCGrabModel.Category" />
           <EntitySet Name="ContactUs" EntityType="UCGrabModel.ContactUs" />
           <EntitySet Name="Image" EntityType="UCGrabModel.Image" />
+          <EntitySet Name="Image_Product" EntityType="UCGrabModel.Image_Product" />
           <EntitySet Name="Order" EntityType="UCGrabModel.Order" />
           <EntitySet Name="Order_Detail" EntityType="UCGrabModel.Order_Detail" />
           <EntitySet Name="Product" EntityType="UCGrabModel.Product" />
@@ -352,6 +379,10 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <AssociationSet Name="FK_Image_User_Accounts" Association="UCGrabModel.FK_Image_User_Accounts">
             <End Role="User_Information" EntitySet="User_Information" />
             <End Role="Image" EntitySet="Image" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Product_Image_Product" Association="UCGrabModel.FK_Product_Image_Product">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="Image_Product" EntitySet="Image_Product" />
           </AssociationSet>
           <AssociationSet Name="FK_Order_Detail_Order" Association="UCGrabModel.FK_Order_Detail_Order">
             <End Role="Order" EntitySet="Order" />
@@ -392,8 +423,8 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </Key>
           <Property Name="category_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="category_name" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
-          <Property Name="date_created" Type="DateTime" Precision="0" />
-          <Property Name="user_id" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="date_created" Type="DateTime" Precision="3" />
+          <Property Name="user_id" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Product" Relationship="UCGrabModel.FK_Product_Category" FromRole="Category" ToRole="Product" />
         </EntityType>
         <EntityType Name="ContactUs">
@@ -414,6 +445,15 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="image_id" Type="Int32" />
           <Property Name="image_file" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="User_Information" Relationship="UCGrabModel.FK_Image_User_Accounts" FromRole="Image" ToRole="User_Information" />
+        </EntityType>
+        <EntityType Name="Image_Product">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="product_id" Type="Int32" />
+          <Property Name="image_file" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Product" Relationship="UCGrabModel.FK_Product_Image_Product" FromRole="Image_Product" ToRole="Product" />
         </EntityType>
         <EntityType Name="Order">
           <Key>
@@ -455,6 +495,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="status" Type="Int32" Nullable="false" />
           <Property Name="user_id" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Category" Relationship="UCGrabModel.FK_Product_Category" FromRole="Product" ToRole="Category" />
+          <NavigationProperty Name="Image_Product" Relationship="UCGrabModel.FK_Product_Image_Product" FromRole="Product" ToRole="Image_Product" />
           <NavigationProperty Name="Order_Detail" Relationship="UCGrabModel.FK_Order_Detail_Product" FromRole="Product" ToRole="Order_Detail" />
           <NavigationProperty Name="Stock" Relationship="UCGrabModel.FK_Stock_Product" FromRole="Product" ToRole="Stock" />
         </EntityType>
@@ -473,12 +514,13 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="store_id" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="user_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="store_name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="store_description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="store_address" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="phone" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="operating_hours" Type="DateTime" Precision="3" />
+          <Property Name="operating_hours" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Order" Relationship="UCGrabModel.FK_Order_Store" FromRole="Store" ToRole="Order" />
         </EntityType>
         <EntityType Name="sysdiagrams">
@@ -566,6 +608,18 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             </Principal>
             <Dependent Role="Image">
               <PropertyRef Name="image_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Product_Image_Product">
+          <End Type="UCGrabModel.Product" Role="Product" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Image_Product" Role="Image_Product" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Image_Product">
+              <PropertyRef Name="product_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -701,6 +755,15 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Image_Product">
+            <EntityTypeMapping TypeName="UCGrabModel.Image_Product">
+              <MappingFragment StoreEntitySet="Image_Product">
+                <ScalarProperty Name="image_file" ColumnName="image_file" />
+                <ScalarProperty Name="product_id" ColumnName="product_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Order">
             <EntityTypeMapping TypeName="UCGrabModel.Order">
               <MappingFragment StoreEntitySet="Order">
@@ -758,6 +821,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
                 <ScalarProperty Name="store_address" ColumnName="store_address" />
                 <ScalarProperty Name="store_description" ColumnName="store_description" />
                 <ScalarProperty Name="store_name" ColumnName="store_name" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
                 <ScalarProperty Name="store_id" ColumnName="store_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
