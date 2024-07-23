@@ -39,5 +39,6 @@ namespace UCGrab.Database
         public DbSet<User_Information> User_Information { get; set; }
         public DbSet<User_Role> User_Role { get; set; }
         public DbSet<vw_Role> vw_Role { get; set; }
+        public DbSet<Image_Store> Image_Store { get; set; }
     }
 }

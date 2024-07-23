@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="4093e9d94cc84dcea2e2d7cb37b480e5" Name="Diagram1" ZoomLevel="66">
+      <Diagram DiagramId="4093e9d94cc84dcea2e2d7cb37b480e5" Name="Diagram1" ZoomLevel="52">
         <EntityTypeShape EntityType="UCGrabModel.Category" Width="1.5" PointX="5.75" PointY="3.875" />
         <EntityTypeShape EntityType="UCGrabModel.ContactUs" Width="1.5" PointX="5.75" PointY="7.75" />
         <EntityTypeShape EntityType="UCGrabModel.Image" Width="1.5" PointX="3" PointY="7.5" />
@@ -30,6 +30,8 @@
         <AssociationConnector Association="UCGrabModel.FK_User_Accounts_User_Role" />
         <AssociationConnector Association="UCGrabModel.FK_User_Role_User_Role" />
         <AssociationConnector Association="UCGrabModel.FK_User_Role_User_Role1" />
+        <EntityTypeShape EntityType="UCGrabModel.Image_Store" Width="1.5" PointX="11" PointY="15.125" />
+        <AssociationConnector Association="UCGrabModel.FK_Image_Store_Image_Store" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

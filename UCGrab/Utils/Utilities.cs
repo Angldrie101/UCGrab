@@ -32,6 +32,12 @@ namespace UCGrab.Utils
         HasStock
     }
 
+    public enum StoreStatus
+    {
+        Inactive,
+        Active
+    }
+
     public enum OrderStatus
     {
         Pending,

@@ -40,6 +40,14 @@
           <Property Name="product_id" Type="int" />
           <Property Name="image_file" Type="nvarchar(max)" />
         </EntityType>
+        <EntityType Name="Image_Store">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="store_id" Type="int" />
+          <Property Name="image_file" Type="nvarchar(max)" />
+        </EntityType>
         <EntityType Name="Order">
           <Key>
             <PropertyRef Name="order_id" />
@@ -97,6 +105,7 @@
           <Property Name="phone" Type="varchar" MaxLength="255" />
           <Property Name="email" Type="nvarchar" MaxLength="255" />
           <Property Name="operating_hours" Type="varchar" MaxLength="50" />
+          <Property Name="status" Type="int" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -153,6 +162,18 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
           <Property Name="username" Type="nvarchar" MaxLength="50" />
           <Property Name="rolename" Type="nvarchar" MaxLength="50" />
         </EntityType>
+        <Association Name="FK_Image_Store_Image_Store">
+          <End Role="Store" Type="Self.Store" Multiplicity="0..1" />
+          <End Role="Image_Store" Type="Self.Image_Store" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Store">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Image_Store">
+              <PropertyRef Name="store_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Image_User_Accounts">
           <End Role="User_Information" Type="Self.User_Information" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
@@ -292,6 +313,7 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
           <EntitySet Name="ContactUs" EntityType="Self.ContactUs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Image" EntityType="Self.Image" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Image_Product" EntityType="Self.Image_Product" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Image_Store" EntityType="Self.Image_Store" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Order" EntityType="Self.Order" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Order_Detail" EntityType="Self.Order_Detail" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
@@ -308,6 +330,10 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
 [vw_Role].[rolename] AS [rolename]
 FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </EntitySet>
+          <AssociationSet Name="FK_Image_Store_Image_Store" Association="Self.FK_Image_Store_Image_Store">
+            <End Role="Store" EntitySet="Store" />
+            <End Role="Image_Store" EntitySet="Image_Store" />
+          </AssociationSet>
           <AssociationSet Name="FK_Image_User_Accounts" Association="Self.FK_Image_User_Accounts">
             <End Role="User_Information" EntitySet="User_Information" />
             <End Role="Image" EntitySet="Image" />
@@ -416,6 +442,11 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <End Role="User_Role" EntitySet="User_Role" />
             <End Role="User_Role1" EntitySet="User_Role" />
           </AssociationSet>
+          <EntitySet Name="Image_Store" EntityType="UCGrabModel.Image_Store" />
+          <AssociationSet Name="FK_Image_Store_Image_Store" Association="UCGrabModel.FK_Image_Store_Image_Store">
+            <End Role="Store" EntitySet="Store" />
+            <End Role="Image_Store" EntitySet="Image_Store" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Category">
           <Key>
@@ -522,6 +553,8 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="operating_hours" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Order" Relationship="UCGrabModel.FK_Order_Store" FromRole="Store" ToRole="Order" />
+          <NavigationProperty Name="Image_Store" Relationship="UCGrabModel.FK_Image_Store_Image_Store" FromRole="Store" ToRole="Image_Store" />
+          <Property Name="status" Type="Int32" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -719,6 +752,27 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Image_Store">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="store_id" Type="Int32" />
+          <Property Name="image_file" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Image_Store_Image_Store" FromRole="Image_Store" ToRole="Store" />
+        </EntityType>
+        <Association Name="FK_Image_Store_Image_Store">
+          <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Image_Store" Role="Image_Store" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Store">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Image_Store">
+              <PropertyRef Name="store_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -815,6 +869,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <EntitySetMapping Name="Store">
             <EntityTypeMapping TypeName="UCGrabModel.Store">
               <MappingFragment StoreEntitySet="Store">
+                <ScalarProperty Name="status" ColumnName="status" />
                 <ScalarProperty Name="operating_hours" ColumnName="operating_hours" />
                 <ScalarProperty Name="email" ColumnName="email" />
                 <ScalarProperty Name="phone" ColumnName="phone" />
@@ -881,6 +936,15 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
               <MappingFragment StoreEntitySet="vw_Role">
                 <ScalarProperty Name="rolename" ColumnName="rolename" />
                 <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Image_Store">
+            <EntityTypeMapping TypeName="UCGrabModel.Image_Store">
+              <MappingFragment StoreEntitySet="Image_Store">
+                <ScalarProperty Name="image_file" ColumnName="image_file" />
+                <ScalarProperty Name="store_id" ColumnName="store_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

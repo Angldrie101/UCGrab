@@ -1,0 +1,100 @@
+﻿@model UCGrab.Database.Store
+
+@{
+    ViewBag.Title = "ChangeLogo";
+    Layout = "~/Views/Shared/ShopPageLayout.cshtml";
+}
+
+@using (Html.BeginForm("ChangeLogo", "Shop", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+<!-- Store Information Start -->
+<div class="container-fluid">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
+        <span class="bg-secondary pr-3">Store Information</span>
+    </h2>
+    <div class="row px-xl-5">
+        <!-- Store Details Start -->
+        <div class="col-lg-12 mb-5 d-flex">
+            @if (!String.IsNullOrEmpty(TempData["Message"] as String))
+            {
+                <div class="alert alert-success" role="alert">@TempData["Message"]</div>
+            }
+            @Html.HiddenFor(model => model.id)
+            @Html.HiddenFor(model => model.user_id)
+            @Html.HiddenFor(model => model.store_id)
+            @Html.HiddenFor(model => model.status)
+            <div class="bg-primary p-4" style="border-radius: 2px; text-align: center; width: 300px;">
+                <div class="bg-primary p-4" style="border-radius: 5px; text-align: center;">
+                    <h4 style="color: white;">Store Logo</h4>
+                    <img src="~/Assets/Shop/img/profile.jpg" alt="Avatar" class="img-fluid" style="border-radius: 5px; margin-bottom: 15px" id="currentStoreImage" />
+                    <div class="form-group">
+                        <input type="file" accept="image/*" class="form-control" id="profilePicture" name="profilePicture" style="display: none;" onchange="previewImage(event);" />
+                        <button class="btn btn-warning py-2 px-4" type="button" onclick="document.getElementById('profilePicture').click();">Upload New Photo</button>
+                    </div>
+                </div>
+            </div>
+            <div class="store-details bg-light p-4 mb-4 shadow-sm rounded" style="flex: 2;">
+                <h5 class="card-title"><i class="fas fa-store mr-2"></i>Store Details</h5>
+                <div class="mb-3">
+                    <label for="storeName" class="form-label">Store Name</label>
+                    @Html.TextBoxFor(model => model.store_name, new { @class = "form-control", placeholder = "Store name", required = "required", data_validation_required_message = "Please enter store name", @readonly = "readonly" })
+                </div>
+                <div class="mb-3">
+                    <label for="storeAddress" class="form-label">Store Address</label>
+                    @Html.TextBoxFor(model => model.store_address, new { @class = "form-control", placeholder = "Store Address", required = "required", data_validation_required_message = "Please enter store address", @readonly = "readonly" })
+                </div>
+                <div class="mb-3">
+                    <label for="storeEmail" class="form-label">Email</label>
+                    @Html.TextBoxFor(model => model.email, new { @class = "form-control", placeholder = "Email", required = "required", data_validation_required_message = "Please enter store email", @readonly = "readonly" })
+                </div>
+                <div class="mb-3">
+                    <label for="storePhone" class="form-label">Phone</label>
+                    @Html.TextBoxFor(model => model.phone, new { @class = "form-control", placeholder = "Phone", required = "required", data_validation_required_message = "Please enter store phone"})
+                </div>
+                <div class="mb-3">
+                    <label for="storePhone" class="form-label">Operating Hours</label>
+                    @Html.TextAreaFor(model => model.operating_hours, new { @class = "form-control", placeholder = "Operating Hours", required = "required", data_validation_required_message = "Please enter store operation" })
+                </div>
+                <div class="mb-3">
+                    <label for="storePhone" class="form-label">Description</label>
+                    @Html.TextAreaFor(model => model.store_description, new { @class = "form-control", placeholder = "Description", required = "required", data_validation_required_message = "Please enter store description" })
+                </div>
+                <div>
+                    <button class="btn btn-primary py-2 px-4" type="submit" id="saveProfileButton">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+}
+<!-- Store Information End -->
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="/Assets/Shop/lib/easing/easing.min.js"></script>
+<script src="/Assets/Shop/lib/owlcarousel/owl.carousel.min.js"></script>
+
+<!-- Contact Javascript File -->
+<script src="/Assets/Shop/mail/jqBootstrapValidation.min.js"></script>
+<script src="/Assets/Shop/mail/contact.js"></script>
+
+<!-- Template Javascript -->
+<script src="/Assets/Shop/js/main.js"></script>
+
+<script>
+    function previewImage(event) {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+            var currentProfileImage = document.getElementById('currentStoreImage');
+            currentProfileImage.src = e.target.result;
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
+</script>

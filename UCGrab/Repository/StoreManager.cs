@@ -19,6 +19,10 @@ namespace UCGrab.Repository
             _userInfo = new BaseRepository<User_Information>();
             _userMgr = new UserManager();
         }
+        public List<Store> ListStore()
+        {
+            return _store._table.Where(m => m.status == (Int32)StoreStatus.Active).ToList();
+        }
         public Store GetStoreById(int? id)
         {
             return _store.Get(id);

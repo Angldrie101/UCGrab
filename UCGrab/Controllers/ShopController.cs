@@ -54,15 +54,114 @@ namespace UCGrab.Controllers
         }
 
         [HttpPost]
-        public ActionResult MyStore(Store store)
+        public ActionResult MyStore(Store store, HttpPostedFileBase storeLogo)
         {
-            if (_storeManager.UpdateStore(store.id, store, ref ErrorMessage) == Utils.ErrorCode.Error)
-            {
-                ModelState.AddModelError(String.Empty, ErrorMessage);
-                return View(store);
-            }
+            IsUserLoggedSession();
 
-            TempData["Message"] = $"Store {ErrorMessage}!";
+            if (ModelState.IsValid)
+            {
+                var user = _userManager.GetUserByUserId(store.store_id);
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "User Not Found,";
+                    return View(store);
+                }
+            }
+            if (storeLogo != null && storeLogo.ContentLength > 0)
+            {
+                var uploadsFolderPath = Server.MapPath("~/UploadedFiles/");
+                if (!Directory.Exists(uploadsFolderPath))
+                    Directory.CreateDirectory(uploadsFolderPath);
+
+                var profileFileName = Path.GetFileName(storeLogo.FileName);
+                var profileSavePath = Path.Combine(uploadsFolderPath, profileFileName);
+                storeLogo.SaveAs(profileSavePath);
+
+                var existingImage = _imageManager.ListImgAttachByImageStoreId(store.id).FirstOrDefault();
+                if (existingImage != null)
+                {
+                    existingImage.image_file = profileFileName;
+                    if (_imageManager.UpdateImgStore(existingImage, ref ErrorMessage) == ErrorCode.Error)
+                    {
+                        ModelState.AddModelError(String.Empty, ErrorMessage);
+                        return View(store);
+                    }
+                }
+
+            }
+            return View(store);
+        }
+
+        [Authorize]
+        public ActionResult ChangeLogo()
+        {
+            var store = _storeManager.CreateOrRetrieve(User.Identity.Name, ref ErrorMessage);
+
+            return View(store);
+        }
+
+        [HttpPost]
+        public ActionResult ChangeLogo(Store store, HttpPostedFileBase profilePicture)
+        {
+            IsUserLoggedSession();
+
+            if (ModelState.IsValid)
+            {
+                var user = _userManager.GetUserByUserId(store.user_id);
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "Error updating profile: User not found.";
+                    return View(store);
+                }
+
+                // Handle profile picture upload
+                if (profilePicture != null && profilePicture.ContentLength > 0)
+                {
+                    var uploadsFolderPath = Server.MapPath("~/UploadedFiles/");
+                    if (!Directory.Exists(uploadsFolderPath))
+                        Directory.CreateDirectory(uploadsFolderPath);
+
+                    var profileFileName = Path.GetFileName(profilePicture.FileName);
+                    var profileSavePath = Path.Combine(uploadsFolderPath, profileFileName);
+                    profilePicture.SaveAs(profileSavePath);
+
+                    // Log the save path
+                    System.Diagnostics.Debug.WriteLine("Profile picture saved at: " + profileSavePath);
+
+                    var existingImage = _imageManager.ListImgAttachByImageStoreId(store.id).FirstOrDefault();
+                    if (existingImage != null)
+                    {
+                        existingImage.image_file = profileFileName;
+                        if (_imageManager.UpdateImgStore(existingImage, ref ErrorMessage) == ErrorCode.Error)
+                        {
+                            ModelState.AddModelError(String.Empty, ErrorMessage);
+                            return View(store);
+                        }
+                    }
+                    else
+                    {
+                        Image_Store img = new Image_Store
+                        {
+                            image_file = profileFileName,
+                            store_id = store.id
+                        };
+
+                        if (_imageManager.CreateImgStore(img, ref ErrorMessage) == ErrorCode.Error)
+                        {
+                            ModelState.AddModelError(String.Empty, ErrorMessage);
+                            return View(store);
+                        }
+                    }
+                }
+                if (_storeManager.UpdateStore(store.id, store, ref ErrorMessage) == ErrorCode.Error)
+                {
+                    ModelState.AddModelError(String.Empty, ErrorMessage);
+                    return View(store);
+
+                }
+                TempData["SuccessMessage"] = "Profile updated successfully.";
+                return RedirectToAction("MyStore");
+            }
 
             return View(store);
         }

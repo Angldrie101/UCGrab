@@ -252,6 +252,9 @@
     <Compile Include="Database\Image_Product.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>
+    <Compile Include="Database\Image_Store.cs">
+      <DependentUpon>UCGrab.tt</DependentUpon>
+    </Compile>
     <Compile Include="Database\Order.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>
@@ -547,6 +550,7 @@
     <Content Include="Views\Home\ForgotPass.cshtml" />
     <Content Include="Views\Home\ShopList.cshtml" />
     <Content Include="Views\Home\MyProfile.cshtml" />
+    <Content Include="Views\Shop\ChangeLogo.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
