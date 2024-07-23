@@ -352,10 +352,11 @@ namespace UCGrab.Controllers
         }
 
         [AllowAnonymous]
-        public ActionResult ShopList()
+        public ActionResult ShopList(string category)
         {
-            var store = _storeManager.ListStore();
-            return View(store);
+            var stores = _storeManager.ListStore(category);
+
+            return View(stores);
         }
 
         [AllowAnonymous]
