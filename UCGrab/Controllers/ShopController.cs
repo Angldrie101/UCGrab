@@ -48,46 +48,22 @@ namespace UCGrab.Controllers
         [Authorize]
         public ActionResult MyStore()
         {
-            IsUserLoggedSession();
-            var user = User.Identity.Name;
-            var store = _storeManager.GetStoreByUserId(user);
-
-            if (store == null)
-            {
-                TempData["ErrorMessage"] = "Store not found.";
-            }
+            var store = _storeManager.CreateOrRetrieve(User.Identity.Name, ref ErrorMessage);
 
             return View(store);
         }
 
         [HttpPost]
-        public ActionResult MyStore(Store store, User_Information ui)
+        public ActionResult MyStore(Store store)
         {
-            IsUserLoggedSession();
-
-            if (ModelState.IsValid)
+            if (_storeManager.UpdateStore(store.id, store, ref ErrorMessage) == Utils.ErrorCode.Error)
             {
-
-                var st = _storeManager.GetStoreByUserId(store.user_id);
-                if (st == null)
-                {
-                    TempData["ErrorMessage"] = "User Not Found,";
-                    return View(store);
-                }
-
-                // Update store details if needed
-                st.operating_hours = store.operating_hours;
-                st.store_description = store.store_description;
-
-                if (_storeManager.StoreUpdate(store, ref ErrorMessage) != ErrorCode.Success)
-                {
-                    ModelState.AddModelError(String.Empty, ErrorMessage);
-                    return View(store);
-                }
-
-                TempData["SuccessMessage"] = "Store information updated successfully.";
-                return RedirectToAction("MyStore");
+                ModelState.AddModelError(String.Empty, ErrorMessage);
+                return View(store);
             }
+
+            TempData["Message"] = $"Store {ErrorMessage}!";
+
             return View(store);
         }
 

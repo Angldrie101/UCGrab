@@ -11,11 +11,13 @@ namespace UCGrab.Repository
     {
         private BaseRepository<User_Accounts> _userAcc;
         private BaseRepository<User_Information> _userInfo;
+        private BaseRepository<Store> _store;
         private UCGrabEntities _dbContext;
         public UserManager()
         {
             _userAcc = new BaseRepository<User_Accounts>();
             _userInfo = new BaseRepository<User_Information>();
+            _store = new BaseRepository<Store>();
             _dbContext = new UCGrabEntities();
         }
 
@@ -110,6 +112,11 @@ namespace UCGrab.Repository
         public User_Information GetUserInfoByUserId(String userId)
         {
             return _userInfo._table.Where(m => m.user_id == userId).FirstOrDefault();
+        }
+
+        public User_Information GetUserInfoByStoreId(int storeId)
+        {
+            return _userInfo._table.Where(m => m.store_id == storeId).FirstOrDefault();
         }
         public User_Information CreateOrRetrieve(String username, ref String err)
         {

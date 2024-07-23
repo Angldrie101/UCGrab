@@ -58,10 +58,35 @@ namespace UCGrab.Repository
             return ErrorCode.Success;
         }
 
-        public ErrorCode StoreUpdate(Store st, ref string errMsg)
+        public ErrorCode UpdateStore(int id, Store store, ref String err)
         {
-            return _store.Update(st.id, st, out errMsg);
+            return _store.Update(id, store, out err);
         }
-       
+        public Store CreateOrRetrieve(String username, ref String err)
+        {
+            var user = _userMgr.GetUserByUsername(username);
+            var userInf = _userMgr.GetUserInfoByUserId(user.user_id);
+
+            if (userInf.store_id != null)
+                return _store.Get(userInf.store_id);
+
+            var store = new Store();
+            store.store_id = Utilities.gUid;
+            store.store_name = $"{user.username}.Store";
+
+            if (_store.Create(store, out err) != ErrorCode.Success)
+            {
+                // Return Error
+                return null;
+            }
+            store = GetStoreByGuId(store.store_id);
+            // Update user information assign store id
+            userInf.store_id = store.id;
+            //
+            _userInfo.Update(userInf.id, userInf, out err);
+
+            return store;
+        }
+
     }
 }

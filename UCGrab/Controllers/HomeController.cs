@@ -182,11 +182,11 @@ namespace UCGrab.Controllers
             var mailManager = new MailManager();
             bool emailSent = mailManager.SendEmail(ua.email, "Verification Code", emailBody, ref errorMessage);
 
-            //if (!emailSent)
-            //{
-            //    ModelState.AddModelError(String.Empty, errorMessage);
-            //    return View(ua);
-            //}
+            if (!emailSent)
+            {
+                ModelState.AddModelError(String.Empty, errorMessage);
+                return View(ua);
+            }
 
             TempData["username"] = ua.username;
             return RedirectToAction("Verify");

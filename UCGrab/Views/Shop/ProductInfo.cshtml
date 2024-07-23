@@ -26,8 +26,17 @@
                     @Html.AntiForgeryToken()
                     <div class="form-group">
                         <label for="categoryName" class="form-label">Category Name</label>
-                        <input type="text" name="category_name" class="form-control" id="categoryName" placeholder="Enter category name" required>
-                    </div>
+                        <select name="category_name" class="form-control" id="categoryName" required>
+                            <option value="" disabled selected>Select a category to add to your store</option>
+                            <option value="Snack">Snack</option>
+                            <option value="Beverage">Beverage</option>
+                            <option value="Breakfast">Breakfast</option>
+                            <option value="Uniform">Uniform</option>
+                            <option value="Departmental Shirts">Departmental Shirts</option>
+                            <option value="Books
+                                    ">Books</option>
+                            <!-- Add more options as needed -->
+                        </select>                    </div>
                     <button type="submit" class="btn btn-primary">Add Category</button>
                 }
                 <hr>
@@ -101,6 +110,9 @@
                     <div class="form-group">
                         <label for="productSize" class="form-label">Product Size (If applicable)</label>
                         <input type="text" class="form-control" id="productPrice" name="size" placeholder="Enter product size">
+                    </div>
+                    <div class="form-group" hidden>
+                        <input type="text" class="form-control" id="productStatus" name="status" value="1">
                     </div>
                     <button type="submit" class="btn btn-primary">Add Product</button>
                 }

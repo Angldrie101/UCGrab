@@ -70,39 +70,17 @@
                     </thead>
                     <tbody id="store-list">
                         <tr>
-                            <td>#S001</td>
-                            <td>Store A</td>
-                            <td>123 Main St, City</td>
-                            <td>+012 345 6789</td>
-                            <td>storea@example.com</td>
+                            <td>@Model.id</td>
+                            <td>@Model.store_name</td>
+                            <td>@Model.store_address</td>
+                            <td>@Model.phone</td>
+                            <td>@Model.email</td>
                             <td>
                                 <a href="/Admin/EditStore/1" class="btn btn-primary btn-sm">Edit</a>
                                 <a href="/Admin/DeleteStore/1" class="btn btn-danger btn-sm">Delete</a>
                             </td>
                         </tr>
-                        <tr>
-                            <td>#S002</td>
-                            <td>Store B</td>
-                            <td>456 Elm St, City</td>
-                            <td>+012 345 6789</td>
-                            <td>storeb@example.com</td>
-                            <td>
-                                <a href="/Admin/EditStore/2" class="btn btn-primary btn-sm">Edit</a>
-                                <a href="/Admin/DeleteStore/2" class="btn btn-danger btn-sm">Delete</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#S003</td>
-                            <td>Store C</td>
-                            <td>789 Oak St, City</td>
-                            <td>+012 345 6789</td>
-                            <td>storec@example.com</td>
-                            <td>
-                                <a href="/Admin/EditStore/3" class="btn btn-primary btn-sm">Edit</a>
-                                <a href="/Admin/DeleteStore/3" class="btn btn-danger btn-sm">Delete</a>
-                            </td>
-                        </tr>
-                        <!-- Additional stores -->
+                        
                     </tbody>
                 </table>
             </div>
