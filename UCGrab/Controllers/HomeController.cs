@@ -347,7 +347,8 @@ namespace UCGrab.Controllers
         [AllowAnonymous]
         public ActionResult Shop()
         {
-            return View();
+            var products = _productManager.ListActiveProduct();
+            return View(products);
         }
 
         [AllowAnonymous]
