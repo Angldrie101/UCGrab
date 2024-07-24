@@ -18,7 +18,7 @@ namespace UCGrab.Repository
             _product = new BaseRepository<Product>();
             _stock = new BaseRepository<Stock>();
         }
-        public List<Product> ListActiveProduct()
+        public List<Product> ListActiveProduct(String storeId)
         {
             return _product._table.Where(m => m.status == (Int32)ProductStatus.HasStock).ToList();
         }
@@ -36,6 +36,11 @@ namespace UCGrab.Repository
         public Product GetProductBygUId(String gUid)
         {
             return _product._table.Where(m => m.product_id == gUid).FirstOrDefault();
+        }
+
+        public Product GetProductInfo(String productId)
+        {
+            return _product._table.Where(m => m.product_id == productId).FirstOrDefault();
         }
 
         public ErrorCode CreateProduct(Product prod, ref String err)

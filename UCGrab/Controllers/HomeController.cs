@@ -345,24 +345,39 @@ namespace UCGrab.Controllers
         }
 
         [AllowAnonymous]
-        public ActionResult Shop()
+        public ActionResult Shop(String storeId)
         {
-            var products = _productManager.ListActiveProduct();
-            return View(products);
+            var store = _storeManager.GetStoreByUserId(storeId);
+
+            if (store != null)
+            {
+                var products = _productManager.ListActiveProduct(storeId);
+                return View(products);
+            }
+
+            // Optionally, handle the case where the store is not found
+            return HttpNotFound("Store not found");
         }
 
         [AllowAnonymous]
-        public ActionResult ShopList(string category)
+        public ActionResult ShopList()
         {
-            var stores = _storeManager.ListStore(category);
+            var stores = _storeManager.ListStore();
 
             return View(stores);
         }
 
         [AllowAnonymous]
-        public ActionResult Detail()
+        public ActionResult Detail(String productId)
         {
-            return View();
+            var product = _productManager.GetProductInfo(productId);
+
+            if (product != null)
+            {
+                return View(product);
+            }
+
+            return HttpNotFound("Product not found");
         }
 
         [AllowAnonymous]

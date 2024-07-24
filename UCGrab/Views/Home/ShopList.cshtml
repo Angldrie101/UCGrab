@@ -24,13 +24,13 @@
             foreach (var store in Model)
             {
                 <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-                    <a href="/Home/Shop" class="text-decoration-none">
+                    <a href="/Home/Shop?storeId=@store.user_id" class="text-decoration-none">
                         <div class="shop-item bg-light mb-4">
                             <div class="shop-img position-relative overflow-hidden" style="height: 250px;">
-                                <img class="img-fluid w-100 h-100" src="~/UploadedFiles/@store.Image_Store.FirstOrDefault().image_file" alt="Chooks To Go" style="object-fit: cover;">
+                                <img class="img-fluid w-100 h-100" src="~/UploadedFiles/@store.Image_Store.FirstOrDefault().image_file" alt="@store.store_name" style="object-fit: cover;">
                             </div>
                             <div class="text-center py-4">
-                                <a class="h6 text-decoration-none text-truncate" href="/Home/Shop">@store.store_name</a>
+                                <a class="h6 text-decoration-none text-truncate" href="/Home/Shop?storeId=@store.user_id">@store.store_name</a>
                                 <div class="d-flex align-items-center justify-content-center mb-1">
                                     <small class="fa fa-star text-primary mr-1"></small>
                                     <small class="fa fa-star text-primary mr-1"></small>

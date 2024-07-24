@@ -165,11 +165,11 @@
                     <div class="product-item bg-light mb-4">
 
                         <div class="product-img position-relative overflow-hidden">
-                            <img class="img-fluid w-100" src="~/UploadedFiles/@item.Image_Product.FirstOrDefault().image_file" alt="">
+                            <img class="img-fluid w-100" src="~/UploadedFiles/@item.Image_Product.FirstOrDefault().image_file" alt="@item.product_name">
                             <div class="product-action">
                                 <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
                                 <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                                <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-info-circle"></i></a>
+                                <a class="btn btn-outline-dark btn-square" href="/Home/Detail?productId=@item.product_id"><i class="fa fa-info-circle"></i></a>
                             </div>
                         </div>
                         <div class="text-center py-4">

@@ -19,22 +19,9 @@ namespace UCGrab.Repository
             _userInfo = new BaseRepository<User_Information>();
             _userMgr = new UserManager();
         }
-        public List<Store> ListStore(string category)
+        public List<Store> ListStore()
         {
-            using (var context = new UCGrabEntities())
-            {
-                if (!string.IsNullOrEmpty(category))
-                {
-                    var stores = from s in context.Store
-                                 join c in context.Category on s.user_id equals c.user_id
-                                 where c.category_name == category
-                                 select s;
-
-                    return stores.ToList();
-                }
-             return context.Store.ToList();
-                
-            }
+            return _store._table.Where(m => m.status == (Int32)StoreStatus.Active).ToList();
         }
         public Store GetStoreById(int? id)
         {
