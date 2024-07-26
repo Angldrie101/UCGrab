@@ -159,37 +159,83 @@
                         </div>
                     </div>
                 </div>
-@foreach (var item in Model)
-{
-                <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
-                    <div class="product-item bg-light mb-4">
-
-                        <div class="product-img position-relative overflow-hidden">
-                            <img class="img-fluid w-100" src="~/UploadedFiles/@item.Image_Product.FirstOrDefault().image_file" alt="@item.product_name">
-                            <div class="product-action">
-                                <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                                <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                                <a class="btn btn-outline-dark btn-square" href="/Home/Detail?productId=@item.product_id"><i class="fa fa-info-circle"></i></a>
+                @foreach (var item in Model)
+                {
+                    var imageUrl = item.Image_Product.FirstOrDefault()?.image_file ?? "default_image.jpg";
+                    <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
+                        <div class="product-item bg-light mb-4">
+                            <div class="product-img position-relative overflow-hidden">
+                                <img class="img-fluid w-100" src="~/UploadedFiles/@imageUrl" alt="@item.product_name">
+                                <div class="product-action">
+                                    <a class="btn btn-outline-dark btn-square" onclick="addToCart(@item.id, 1)"><i class="fa fa-shopping-cart"></i></a>
+                                    <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
+                                    <a class="btn btn-outline-dark btn-square" href="/Home/Detail?productId=@item.product_id"><i class="fa fa-info-circle"></i></a>
+                                </div>
+                            </div>
+                            <div class="text-center py-4">
+                                <a class="h6 text-decoration-none text-truncate" href="">@item.product_name</a>
+                                <div class="d-flex align-items-center justify-content-center mt-2">
+                                    <h5>Php @item.price.ToString("N2")</h5><h6 class="text-muted ml-2"><del> @item.price.ToString("N2")</del></h6>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-center mb-1">
+                                    <small class="fa fa-star text-primary mr-1"></small>
+                                    <small class="fa fa-star text-primary mr-1"></small>
+                                    <small class="fa fa-star text-primary mr-1"></small>
+                                    <small class="fa fa-star text-primary mr-1"></small>
+                                    <small class="fa fa-star text-primary mr-1"></small>
+                                    <small>(99)</small>
+                                </div>
                             </div>
                         </div>
-                        <div class="text-center py-4">
-                            <a class="h6 text-decoration-none text-truncate" href="">@item.product_name</a>
-                            <div class="d-flex align-items-center justify-content-center mt-2">
-                                <h5>Php @item.price.ToString("N2")</h5><h6 class="text-muted ml-2"><del> @item.price.ToString("N2")</del></h6>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-center mb-1">
-                                <small class="fa fa-star text-primary mr-1"></small>
-                                <small class="fa fa-star text-primary mr-1"></small>
-                                <small class="fa fa-star text-primary mr-1"></small>
-                                <small class="fa fa-star text-primary mr-1"></small>
-                                <small class="fa fa-star text-primary mr-1"></small>
-                                <small>(99)</small>
-                            </div>
-                        </div>
-
                     </div>
-                </div>
-}
+                }
     </div>
 </div>
-<!-- Shop End -->
+        <script>
+    function addToCart(productId, quantity) {
+        console.log(`Adding to cart: Product ID = ${productId}, Quantity = ${quantity}`);
+
+        $.ajax({
+            url: '@Url.Action("AddCart", "Shop")',
+            type: 'POST',
+            data: { prodId: productId, qty: quantity },
+            success: function (response) {
+                if (response.code === 0) {
+                    Swal.fire({
+                        title: 'Success',
+                        text: response.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                    loadCartCount();
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            },
+            error: function () {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'There was an error adding the item to the cart.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    }
+
+    function loadCartCount() {
+        $.get('@Url.Action("GetCartCount", "Shop")',
+            function (data) {
+                $('#cart-count').text(data.count);
+            });
+    }
+        </script>
+
+
+
+

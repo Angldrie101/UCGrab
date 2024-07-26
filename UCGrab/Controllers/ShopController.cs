@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using UCGrab.Database;
+using UCGrab.Models;
 using UCGrab.Utils;
 
 namespace UCGrab.Controllers
@@ -170,9 +171,19 @@ namespace UCGrab.Controllers
         public ActionResult ProductInfo()
         {
             ViewBag.Category = Utilities.SelectListItemCategoryByUser(Username);
-            ViewBag.Categories = _categoryManager.ListCategory(Username) ?? new List<Category>(); // Ensure it is not null
-            ViewBag.Products = _productManager.ListProduct(Username) ?? new List<Product>(); // Ensure it is not null
-            return View();
+            ViewBag.Categories = _categoryManager.ListCategory(Username) ?? new List<Category>();
+            //ViewBag.Products = _productManager.ListProduct(Username) ?? new List<Product>();
+
+            var products = _productManager.ListProduct(Username) ?? new List<Product>();
+            var productViewModels = products.Select(product => new ProductViewModel
+            {
+                Product = product,
+                TotalStock = product.Stock.Sum(s => s.quantity)
+            }).ToList();
+
+            ViewBag.Products = productViewModels;
+
+            return View(productViewModels);
         }
 
         [HttpPost]
@@ -184,7 +195,6 @@ namespace UCGrab.Controllers
             }
             else
             {
-                
                 var category = new Category
                 {
                     category_name = category_name,
@@ -199,19 +209,26 @@ namespace UCGrab.Controllers
             }
 
             ViewBag.Category = Utilities.SelectListItemCategoryByUser(Username);
-            ViewBag.Categories = _categoryManager.ListCategory(Username) ?? new List<Category>(); // Ensure it is not null
-            ViewBag.Products = _productManager.ListProduct(Username) ?? new List<Product>(); // Ensure it is not null
-            return View("ProductInfo");
+            ViewBag.Categories = _categoryManager.ListCategory(Username) ?? new List<Category>();
+            //ViewBag.Products = _productManager.ListProduct(Username) ?? new List<Product>();
+            var products = _productManager.ListProduct(Username) ?? new List<Product>();
+
+            var productViewModels = products.Select(product => new ProductViewModel
+            {
+                Product = product,
+                TotalStock = product.Stock.Sum(s => s.quantity)
+            }).ToList();
+
+            return View("ProductInfo", productViewModels);
         }
 
         [HttpPost]
-        public ActionResult ProductInfo(Product product, HttpPostedFileBase[] files)
+        public ActionResult ProductInfo(Product product, HttpPostedFileBase[] files, int stock_quantity)
         {
             ViewBag.Category = Utilities.SelectListItemCategoryByUser(Username);
-            ViewBag.Categories = _categoryManager.ListCategory(Username) ?? new List<Category>(); // Ensure it is not null
+            ViewBag.Categories = _categoryManager.ListCategory(Username) ?? new List<Category>();
             ViewBag.Products = _productManager.ListProduct(Username) ?? new List<Product>();
 
-            // Generate Unique Id
             var prodgUid = $"Item-{Utilities.gUid}";
             product.product_id = prodgUid;
             product.user_id = UserId;
@@ -228,10 +245,8 @@ namespace UCGrab.Controllers
 
             if (ModelState.IsValid)
             {
-                // Iterating through multiple file collection   
                 foreach (HttpPostedFileBase file in files)
                 {
-                    // Checking file is available to save.  
                     if (file != null)
                     {
                         var InputFileName = Path.GetFileName(file.FileName);
@@ -239,7 +254,6 @@ namespace UCGrab.Controllers
                             Directory.CreateDirectory(Server.MapPath("~/UploadedFiles/"));
 
                         var ServerSavePath = Path.Combine(Server.MapPath("~/UploadedFiles/") + InputFileName);
-                        // Save file to server folder  
                         file.SaveAs(ServerSavePath);
 
                         Image_Product imgproduct = new Image_Product
@@ -251,18 +265,72 @@ namespace UCGrab.Controllers
                         if (_imageManager.CreateImgProduct(imgproduct, ref ErrorMessage) == ErrorCode.Error)
                         {
                             ModelState.AddModelError(String.Empty, ErrorMessage);
-                            // Remove created product and set error 
                             _productManager.DeleteProduct(product.id, ref ErrorMessage);
-                            // Remove created image attachment
                             _imageManager.DeleteImgByProductId(product.id, ref ErrorMessage);
                             return View(product);
                         }
                     }
+                }
+
+                // Add initial stock
+                Stock stock = new Stock
+                {
+                    product_id = product.id,
+                    quantity = stock_quantity
+                };
+
+                if (_productManager.AddStock(stock, ref ErrorMessage) == ErrorCode.Error)
+                {
+                    ModelState.AddModelError(String.Empty, ErrorMessage);
+                    _productManager.DeleteProduct(product.id, ref ErrorMessage);
+                    _imageManager.DeleteImgByProductId(product.id, ref ErrorMessage);
+                    return View(product);
+                }
+
+                product.status = (stock_quantity > 0) ? (Int32)ProductStatus.HasStock : (Int32)ProductStatus.NoStock;
+                if (_productManager.UpdateProduct(product, ref ErrorMessage) == ErrorCode.Error)
+                {
+                    ModelState.AddModelError(String.Empty, ErrorMessage);
+                    return View(product);
                 }
             }
 
             TempData["Message"] = $"Product {product.product_name} added!";
             return RedirectToAction("ProductInfo");
         }
+
+        public JsonResult ProductDelete(int? id)
+        {
+            var res = new Response();
+            res.code = (Int32)_productManager.DeleteProduct(id, ref ErrorMessage);
+            res.message = ErrorMessage;
+
+            return Json(res, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult ProductStockAdd(int id, int qty)
+        {
+            Stock stock = new Stock
+            {
+                product_id = id,
+                quantity = qty
+            };
+
+            var res = new Response();
+
+            if (qty == 0)
+            {
+                res.code = (Int32)ErrorCode.Error;
+                res.message = "Quantity Not Valid!";
+
+                return Json(res, JsonRequestBehavior.AllowGet);
+            }
+
+            res.code = (Int32)_productManager.AddStock(stock, ref ErrorMessage);
+            res.message = ErrorMessage;
+
+            return Json(res, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

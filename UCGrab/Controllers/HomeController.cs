@@ -351,7 +351,7 @@ namespace UCGrab.Controllers
 
             if (store != null)
             {
-                var products = _productManager.ListActiveProduct(storeId);
+                var products = _productManager.ListActiveProduct(store.user_id) ?? new List<Product>();
                 return View(products);
             }
 
@@ -379,11 +379,65 @@ namespace UCGrab.Controllers
 
             return HttpNotFound("Product not found");
         }
+        [AllowAnonymous]
+        public JsonResult AddCart(int prodId, int qty)
+        {
+            var res = new Response();
+
+            if (_orderManager.AddCart(UserId, prodId, qty, ref ErrorMessage) == ErrorCode.Error)
+            {
+                res.code = (Int32)ErrorCode.Error;
+                res.message = ErrorMessage;
+                return Json(res, JsonRequestBehavior.AllowGet);
+            }
+
+            res.code = (Int32)ErrorCode.Success;
+            res.message = "Item Added!";
+
+            return Json(res, JsonRequestBehavior.AllowGet);
+        }
 
         [AllowAnonymous]
         public ActionResult Cart()
         {
-            return View();
+            return View(_orderManager.GetOrderByUserId(UserId));
+        }
+        [HttpPost]
+        [AllowAnonymous]
+        public ActionResult Cart(int qty, int orderDtId, String action)
+        {
+            switch (action)
+            {
+                case "&plus;":
+                    qty++;
+                    break;
+                case "&minus;":
+                    qty--;
+                    break;
+                case "X":
+                    _orderManager.DeleteOrderDetail(orderDtId, ref ErrorMessage);
+                    return View(_orderManager.GetOrderByUserId(UserId));
+            }
+
+            if (qty <= 0)
+            {
+                _orderManager.DeleteOrderDetail(orderDtId, ref ErrorMessage);
+                return View(_orderManager.GetOrderByUserId(UserId));
+            }
+
+            var orderDt = _orderManager.GetOrderDetailById(orderDtId);
+            orderDt.quatity = qty;
+
+            _orderManager.UpdateOrderDetail(orderDt.id, orderDt, ref ErrorMessage);
+
+            return View(_orderManager.GetOrderByUserId(UserId));
+        }
+
+        public JsonResult GetCartCount()
+        {
+            var count = _orderManager.GetCartCountByUserId(UserId);
+            var res = new { count = count };
+            return Json(res, JsonRequestBehavior.AllowGet);
         }
 
         [AllowAnonymous]

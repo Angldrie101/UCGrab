@@ -237,7 +237,9 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Product_Image_Product">
-          <End Role="Product" Type="Self.Product" Multiplicity="0..1" />
+          <End Role="Product" Type="Self.Product" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="Image_Product" Type="Self.Image_Product" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Product">
@@ -308,6 +310,40 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Function Name="fn_diagramobjects" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="int" />
+        <Function Name="sp_alterdiagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+          <Parameter Name="version" Type="int" Mode="In" />
+          <Parameter Name="definition" Type="varbinary(max)" Mode="In" />
+        </Function>
+        <Function Name="sp_creatediagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+          <Parameter Name="version" Type="int" Mode="In" />
+          <Parameter Name="definition" Type="varbinary(max)" Mode="In" />
+        </Function>
+        <Function Name="sp_dropdiagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+        </Function>
+        <Function Name="sp_getCartCountByUserId" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="user_id" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="sp_helpdiagramdefinition" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+        </Function>
+        <Function Name="sp_helpdiagrams" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+        </Function>
+        <Function Name="sp_renamediagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+          <Parameter Name="new_diagramname" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="sp_upgraddiagrams" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <EntityContainer Name="UCGrabModelStoreContainer">
           <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ContactUs" EntityType="Self.ContactUs" Schema="dbo" store:Type="Tables" />
@@ -384,10 +420,14 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
     <edmx:ConceptualModels>
       <Schema Namespace="UCGrabModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="UCGrabEntities" annotation:LazyLoadingEnabled="true">
+          <FunctionImport Name="sp_getCartCountByUserId" ReturnType="Collection(Int32)">
+          <Parameter Name="user_id" Mode="In" Type="String" />
+          </FunctionImport>
           <EntitySet Name="Category" EntityType="UCGrabModel.Category" />
           <EntitySet Name="ContactUs" EntityType="UCGrabModel.ContactUs" />
           <EntitySet Name="Image" EntityType="UCGrabModel.Image" />
           <EntitySet Name="Image_Product" EntityType="UCGrabModel.Image_Product" />
+          <EntitySet Name="Image_Store" EntityType="UCGrabModel.Image_Store" />
           <EntitySet Name="Order" EntityType="UCGrabModel.Order" />
           <EntitySet Name="Order_Detail" EntityType="UCGrabModel.Order_Detail" />
           <EntitySet Name="Product" EntityType="UCGrabModel.Product" />
@@ -409,6 +449,10 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <AssociationSet Name="FK_Product_Image_Product" Association="UCGrabModel.FK_Product_Image_Product">
             <End Role="Product" EntitySet="Product" />
             <End Role="Image_Product" EntitySet="Image_Product" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Image_Store_Image_Store" Association="UCGrabModel.FK_Image_Store_Image_Store">
+            <End Role="Store" EntitySet="Store" />
+            <End Role="Image_Store" EntitySet="Image_Store" />
           </AssociationSet>
           <AssociationSet Name="FK_Order_Detail_Order" Association="UCGrabModel.FK_Order_Detail_Order">
             <End Role="Order" EntitySet="Order" />
@@ -442,11 +486,36 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <End Role="User_Role" EntitySet="User_Role" />
             <End Role="User_Role1" EntitySet="User_Role" />
           </AssociationSet>
-          <EntitySet Name="Image_Store" EntityType="UCGrabModel.Image_Store" />
-          <AssociationSet Name="FK_Image_Store_Image_Store" Association="UCGrabModel.FK_Image_Store_Image_Store">
-            <End Role="Store" EntitySet="Store" />
-            <End Role="Image_Store" EntitySet="Image_Store" />
-          </AssociationSet>
+          <FunctionImport Name="sp_alterdiagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+            <Parameter Name="version" Mode="In" Type="Int32" />
+            <Parameter Name="definition" Mode="In" Type="Binary" />
+          </FunctionImport>
+          <FunctionImport Name="sp_creatediagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+            <Parameter Name="version" Mode="In" Type="Int32" />
+            <Parameter Name="definition" Mode="In" Type="Binary" />
+          </FunctionImport>
+          <FunctionImport Name="sp_dropdiagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="sp_helpdiagramdefinition" ReturnType="Collection(UCGrabModel.sp_helpdiagramdefinition_Result)">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="sp_helpdiagrams" ReturnType="Collection(UCGrabModel.sp_helpdiagrams_Result)">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="sp_renamediagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+            <Parameter Name="new_diagramname" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="sp_upgraddiagrams" />
         </EntityContainer>
         <EntityType Name="Category">
           <Key>
@@ -485,6 +554,15 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="product_id" Type="Int32" />
           <Property Name="image_file" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Product" Relationship="UCGrabModel.FK_Product_Image_Product" FromRole="Image_Product" ToRole="Product" />
+        </EntityType>
+        <EntityType Name="Image_Store">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="store_id" Type="Int32" />
+          <Property Name="image_file" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Image_Store_Image_Store" FromRole="Image_Store" ToRole="Store" />
         </EntityType>
         <EntityType Name="Order">
           <Key>
@@ -552,9 +630,9 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="phone" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="operating_hours" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Order" Relationship="UCGrabModel.FK_Order_Store" FromRole="Store" ToRole="Order" />
-          <NavigationProperty Name="Image_Store" Relationship="UCGrabModel.FK_Image_Store_Image_Store" FromRole="Store" ToRole="Image_Store" />
           <Property Name="status" Type="Int32" />
+          <NavigationProperty Name="Image_Store" Relationship="UCGrabModel.FK_Image_Store_Image_Store" FromRole="Store" ToRole="Image_Store" />
+          <NavigationProperty Name="Order" Relationship="UCGrabModel.FK_Order_Store" FromRole="Store" ToRole="Order" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -645,7 +723,9 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Product_Image_Product">
-          <End Type="UCGrabModel.Product" Role="Product" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Product" Role="Product" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Type="UCGrabModel.Image_Product" Role="Image_Product" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Product">
@@ -653,6 +733,18 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             </Principal>
             <Dependent Role="Image_Product">
               <PropertyRef Name="product_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Image_Store_Image_Store">
+          <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Image_Store" Role="Image_Store" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Store">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Image_Store">
+              <PropertyRef Name="store_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -752,33 +844,24 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="Image_Store">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="store_id" Type="Int32" />
-          <Property Name="image_file" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Image_Store_Image_Store" FromRole="Image_Store" ToRole="Store" />
-        </EntityType>
-        <Association Name="FK_Image_Store_Image_Store">
-          <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1" />
-          <End Type="UCGrabModel.Image_Store" Role="Image_Store" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Store">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Image_Store">
-              <PropertyRef Name="store_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
+        <ComplexType Name="sp_helpdiagramdefinition_Result">
+          <Property Type="Int32" Name="version" Nullable="true" />
+          <Property Type="Binary" Name="definition" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="sp_helpdiagrams_Result">
+          <Property Type="String" Name="Database" Nullable="true" MaxLength="128" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="128" />
+          <Property Type="Int32" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Owner" Nullable="true" MaxLength="128" />
+          <Property Type="Int32" Name="OwnerID" Nullable="false" />
+        </ComplexType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="UCGrabModelStoreContainer" CdmEntityContainer="UCGrabEntities">
+          <FunctionImportMapping FunctionImportName="sp_getCartCountByUserId" FunctionName="UCGrabModel.Store.sp_getCartCountByUserId" />
           <EntitySetMapping Name="Category">
             <EntityTypeMapping TypeName="UCGrabModel.Category">
               <MappingFragment StoreEntitySet="Category">
@@ -814,6 +897,15 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
               <MappingFragment StoreEntitySet="Image_Product">
                 <ScalarProperty Name="image_file" ColumnName="image_file" />
                 <ScalarProperty Name="product_id" ColumnName="product_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Image_Store">
+            <EntityTypeMapping TypeName="UCGrabModel.Image_Store">
+              <MappingFragment StoreEntitySet="Image_Store">
+                <ScalarProperty Name="image_file" ColumnName="image_file" />
+                <ScalarProperty Name="store_id" ColumnName="store_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -940,15 +1032,30 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Image_Store">
-            <EntityTypeMapping TypeName="UCGrabModel.Image_Store">
-              <MappingFragment StoreEntitySet="Image_Store">
-                <ScalarProperty Name="image_file" ColumnName="image_file" />
-                <ScalarProperty Name="store_id" ColumnName="store_id" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="sp_alterdiagram" FunctionName="UCGrabModel.Store.sp_alterdiagram" />
+          <FunctionImportMapping FunctionImportName="sp_creatediagram" FunctionName="UCGrabModel.Store.sp_creatediagram" />
+          <FunctionImportMapping FunctionImportName="sp_dropdiagram" FunctionName="UCGrabModel.Store.sp_dropdiagram" />
+          <FunctionImportMapping FunctionImportName="sp_helpdiagramdefinition" FunctionName="UCGrabModel.Store.sp_helpdiagramdefinition">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="UCGrabModel.sp_helpdiagramdefinition_Result">
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="definition" ColumnName="definition" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="sp_helpdiagrams" FunctionName="UCGrabModel.Store.sp_helpdiagrams">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="UCGrabModel.sp_helpdiagrams_Result">
+                <ScalarProperty Name="Database" ColumnName="Database" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Owner" ColumnName="Owner" />
+                <ScalarProperty Name="OwnerID" ColumnName="OwnerID" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="sp_renamediagram" FunctionName="UCGrabModel.Store.sp_renamediagram" />
+          <FunctionImportMapping FunctionImportName="sp_upgraddiagrams" FunctionName="UCGrabModel.Store.sp_upgraddiagrams" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

@@ -1,4 +1,5 @@
-﻿@model UCGrab.Database.Product
+﻿@using UCGrab.Utils
+@model List<UCGrab.Models.ProductViewModel>
 
 @{
     ViewBag.Title = "ProductInfo";
@@ -13,11 +14,10 @@
         height: 300px;
     }
 </style>
-<!-- Product Management Start -->
+
 <div class="container-fluid">
     <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Product Management</span></h2>
     <div class="row px-xl-5">
-        <!-- Product Category Section Start -->
         <div class="col-lg-6 mb-5">
             <div class="bg-light p-30 mb-30">
                 <h5 class="card-title"><i class="fas fa-tags mr-2"></i>Product Categories</h5>
@@ -31,12 +31,12 @@
                             <option value="Snack">Snack</option>
                             <option value="Beverage">Beverage</option>
                             <option value="Breakfast">Breakfast</option>
+                            <option value="Lunch">Lunch</option>
                             <option value="Uniform">Uniform</option>
                             <option value="Departmental Shirts">Departmental Shirts</option>
-                            <option value="Books
-                                    ">Books</option>
-                            <!-- Add more options as needed -->
-                        </select>                    </div>
+                            <option value="Books">Books</option>
+                        </select>
+                    </div>
                     <button type="submit" class="btn btn-primary">Add Category</button>
                 }
                 <hr>
@@ -76,8 +76,7 @@
                 </table>
             </div>
         </div>
-        <!-- Product Category Section End -->
-        <!-- Product Section Start -->
+
         <div class="col-lg-6 mb-5">
             <div class="bg-light p-30 mb-30">
                 <h5 class="card-title"><i class="fas fa-box mr-2"></i>Products</h5>
@@ -86,14 +85,14 @@
                     @Html.AntiForgeryToken()
                     <div class="form-group">
                         <label class="form-label">Product Image</label>
-                        <div alt="Product" class="img-fluid" id="preview"></div>
+                        <div alt="Product Picture" class="img-fluid" id="preview"></div>
                         <div class="form-group">
                             <input id="files" name="files" type="file" accept="image/*">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="productName" class="form-label">Product Name</label>
-                        <input type="text" class="form-control" id="productName" name="product_name" placeholder="Enter product name">
+                        <input type="text" class="form-control" id="productName" name="product_name" placeholder="Enter product name" required>
                     </div>
                     <div class="form-group">
                         <label for="productCategory" class="form-label">Category</label>
@@ -101,15 +100,19 @@
                     </div>
                     <div class="form-group">
                         <label for="productPrice" class="form-label">Price</label>
-                        <input type="text" class="form-control" id="productPrice" name="price" placeholder="Enter product price">
+                        <input type="text" class="form-control" id="productPrice" name="price" placeholder="Enter product price" required>
                     </div>
                     <div class="form-group">
                         <label for="productDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="productDescription" name="product_description" rows="3" placeholder="Enter product description"></textarea>
+                        <textarea class="form-control" id="productDescription" name="product_description" rows="3" placeholder="Enter product description" required></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="productSize" class="form-label">Product Size (If applicable)</label>
-                        <input type="text" class="form-control" id="productPrice" name="size" placeholder="Enter product size">
+                        <label for="productSize" class="form-label">Product Size</label>
+                        <input type="text" class="form-control" id="productSize" name="size" placeholder="Enter product size" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productStock" class="form-label">Initial Stock Quantity</label>
+                        <input type="number" class="form-control" id="productStock" name="stock_quantity" placeholder="Enter initial stock quantity" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Add Product</button>
                 }
@@ -122,24 +125,24 @@
                             <th>Name</th>
                             <th>Category</th>
                             <th>Price</th>
-                            <th>Date Created</th>
+                            <th>Stock</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (ViewBag.Products != null && ViewBag.Products.Count > 0)
                         {
-                            foreach (var product in ViewBag.Products)
+                            foreach (var productViewModel in ViewBag.Products)
                             {
                                 <tr>
-                                    <td>@product.id</td>
-                                    <td>@product.product_name</td>
-                                    <td>@product.Category.category_name</td>
-                                    <td>@product.price</td>
-                                    <td>@product.date_created.ToString("yyyy-MM-dd")</td>
+                                    <td>@productViewModel.Product.id</td>
+                                    <td>@productViewModel.Product.product_name</td>
+                                    <td>@productViewModel.Product.Category.category_name</td>
+                                    <td>@productViewModel.Product.price</td>
+                                    <td>@productViewModel.TotalStock</td>
                                     <td>
                                         <button class="btn btn-sm btn-warning">Edit</button>
-                                        <button class="btn btn-sm btn-danger">Delete</button>
+                                        <button class="btn btn-sm btn-danger" onclick="onDelete(@productViewModel.Product.product_id)">Delete</button>
                                     </td>
                                 </tr>
                             }
@@ -154,21 +157,15 @@
                 </table>
             </div>
         </div>
-        <!-- Product Section End -->
     </div>
 </div>
-<!-- Product Management End -->
-<!-- JavaScript Libraries -->
+
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 <script src="/Assets/Shop/lib/easing/easing.min.js"></script>
 <script src="/Assets/Shop/lib/owlcarousel/owl.carousel.min.js"></script>
-
-<!-- Contact Javascript File -->
 <script src="/Assets/Shop/mail/jqBootstrapValidation.min.js"></script>
 <script src="/Assets/Shop/mail/contact.js"></script>
-
-<!-- Template Javascript -->
 <script src="/Assets/Shop/js/main.js"></script>
 
 <script type="text/javascript">
@@ -176,17 +173,94 @@
         const fr = new FileReader();
         fr.onload = () => {
             const img = document.createElement("img");
-            img.src = fr.result;  // String Base64
+            img.src = fr.result;
             img.alt = file.name;
             const previewDiv = document.querySelector('#preview');
-            previewDiv.innerHTML = ''; // Clear any existing images
+            previewDiv.innerHTML = '';
             previewDiv.append(img);
         };
         fr.readAsDataURL(file);
     };
 
     document.querySelector("#files").addEventListener("change", (ev) => {
-        if (!ev.target.files) return; // Do nothing if no files are selected
-        preview(ev.target.files[0]); // Preview the first file only
+        if (!ev.target.files) return;
+        preview(ev.target.files[0]);
     });
+
+    function AddStock(id, name) {
+        var htmlBody = "<input type='number' class='form-control' id='qty' value='' required />";
+        $('#modalTitle').html("Add Stock (" + name + ")");
+        $('#modalBody').html(htmlBody);
+        $('#modalBtnOk').html("Save");
+        $('#modalBtnCancel').html("Cancel");
+        $('#modalBtnCancel').click(function () {
+            $('#myModal').modal('hide');
+        });
+        $('#modalBtnOk').click(function () {
+            var qty = $('#qty').val();
+            if (qty == "") {
+                $('#qty').css("border", "1px solid red");
+                return;
+            }
+            $('#qty').css("border", "1px solid #ced4da");
+            Swal.fire({
+                title: "Are you sure?",
+                icon: "question",
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                showCancelButton: true,
+                confirmButtonText: "Save",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post("/Shop/ProductStockAdd",
+                      {
+                          id: id,
+                          qty: qty
+                      },
+                      function (data, status) {
+                          if (data.code == 0) {
+                              Swal.fire(data.message, "", "success").then((result) => {
+                                  if (result.isConfirmed) {
+                                      window.location = "/Shop/ProductInfo";
+                                  }
+                              });
+                              $('#myModal').modal('hide');
+                          } else {
+                              Swal.fire(data.message, "", "danger");
+                          }
+                      });
+                }
+            });
+        });
+        $('#myModal').modal('show');
+    }
+
+    function onDelete(id) {
+        Swal.fire({
+            title: "Are you sure?",
+            icon: "question",
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            showCancelButton: true,
+            confirmButtonText: "OK",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post("/Shop/ProductDelete",
+                  {
+                      id: id
+                  },
+                  function (data, status) {
+                      if (data.code == 0) {
+                          Swal.fire(data.message, "", "success").then((result) => {
+                              if (result.isConfirmed) {
+                                  window.location = "/Shop/ProductInfo";
+                              }
+                          });
+                      } else {
+                          Swal.fire(data.message, "", "danger");
+                      }
+                  });
+            }
+        });
+    }
 </script>

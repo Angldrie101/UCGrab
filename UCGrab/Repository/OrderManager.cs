@@ -105,11 +105,11 @@ namespace UCGrab.Repository
             return _order._table.Where(m => m.user_id == userId && m.order_status == (Int32)OrderStatus.Pending).ToList();
         }
 
-        //public int GetCartCountByUserId(String userId)
-        //{
-        //    var count = _db.sp_getCartCountByUserId(userId).FirstOrDefault();
-        //    return (Int32)count;
-        //}
+        public int GetCartCountByUserId(String userId)
+        {
+            var count = _db.sp_getCartCountByUserId(userId).FirstOrDefault();
+            return (Int32)count;
+        }
         public Order_Detail GetOrderDetailById(int id)
         {
             return _orderDetail.Get(id);

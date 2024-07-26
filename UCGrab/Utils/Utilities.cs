@@ -53,6 +53,10 @@ namespace UCGrab.Utils
         public const string Role_Provider = "Provider";
         public const string Role_Admin = "Admin";
 
+        public const string X = "X";
+        public const string MINUS = "−";
+        public const string PLUS = "+";
+
         public const int ERROR = 1;
         public const int SUCCESS = 0;
     }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using UCGrab.Database;
@@ -20,7 +22,11 @@ namespace UCGrab.Repository
         }
         public List<Product> ListActiveProduct(String storeId)
         {
-            return _product._table.Where(m => m.status == (Int32)ProductStatus.HasStock).ToList();
+            using (var context = new UCGrabEntities())
+            {
+                return context.Product
+                    .Where(p => p.user_id == storeId && p.status == (int)ProductStatus.HasStock).Include(p => p.Image_Product).ToList();
+            }
         }
         public List<Product> ListProduct(String username)
         {
@@ -55,6 +61,24 @@ namespace UCGrab.Repository
         public ErrorCode AddStock(Stock s, ref String err)
         {
             return _stock.Create(s, out err);
+        }
+
+        public ErrorCode UpdateProduct(Product product, ref string errorMessage)
+        {
+            try
+            {
+                using (var db = new UCGrabEntities())
+                {
+                    db.Entry(product).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+                return ErrorCode.Success;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = ex.Message;
+                return ErrorCode.Error;
+            }
         }
     }
 }

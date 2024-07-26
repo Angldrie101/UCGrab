@@ -16,8 +16,8 @@ namespace UCGrab.Database
     {
         public Store()
         {
-            this.Order = new HashSet<Order>();
             this.Image_Store = new HashSet<Image_Store>();
+            this.Order = new HashSet<Order>();
         }
     
         public int id { get; set; }
@@ -31,7 +31,7 @@ namespace UCGrab.Database
         public string operating_hours { get; set; }
         public Nullable<int> status { get; set; }
     
-        public virtual ICollection<Order> Order { get; set; }
         public virtual ICollection<Image_Store> Image_Store { get; set; }
+        public virtual ICollection<Order> Order { get; set; }
     }
 }
