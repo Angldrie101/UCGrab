@@ -380,6 +380,7 @@ namespace UCGrab.Controllers
             return HttpNotFound("Product not found");
         }
         [AllowAnonymous]
+        [HttpPost]
         public JsonResult AddCart(int prodId, int qty)
         {
             var res = new Response();

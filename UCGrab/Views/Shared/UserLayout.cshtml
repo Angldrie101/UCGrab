@@ -103,13 +103,13 @@
                             </div>
                         </div>
                         <div class="navbar-nav ml-auto py-0 d-none d-lg-block">
-                            <a href="/Home/FavoritedProduct" class="btn px-0">
+                            <a href="~/Home/FavoritedProduct" class="btn px-0">
                                 <i class="fas fa-heart text-primary"></i>
                                 <span class="badge text-secondary border border-secondary rounded-circle">3</span>
                             </a>
-                            <a href="/Home/Cart" class="btn px-0 ml-3">
+                            <a href="~/Home/Cart" class="btn px-0 ml-3">
                                 <i class="fas fa-shopping-cart text-primary"></i>
-                                <span class="badge text-secondary border border-secondary rounded-circle" id="cart-count">0</span>
+                                <span class="badge text-secondary border border-secondary rounded-circle" id="lblCountCart"></span>
                             </a>
                         </div>
                     </div>
@@ -206,14 +206,15 @@
         $(document).ready(function () {
             loadCartCount();
         });
-
-        function loadCartCount() {
-            $.get("@Url.Action("GetCartCount", "Shop")",
-                function (data) {
-                    if (data.count != 0) {
-                        $('#cart-count').text(data.count);
-                    }
-                });
+        function loadCartCount()
+        {
+            $.get("/Home/GetCartCount",
+                  function (data) {
+                      console.log(data.count);
+                      if (data.count != 0) {
+                          document.getElementById("lblCountCart").innerHTML = data.count;
+                      }
+                  });
         }
     </script>
 </body>

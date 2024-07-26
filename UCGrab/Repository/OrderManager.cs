@@ -48,9 +48,9 @@ namespace UCGrab.Repository
             return order;
         }
 
-        public ErrorCode AddCart(String userId, int product_id, int qty, ref String error)
+        public ErrorCode AddCart(String userId, int productId, int qty, ref String error)
         {
-            var product = _productMgr.GetProductById(product_id);
+            var product = _productMgr.GetProductById(productId);
             if (product == null)
             {
                 error = "Not Found";
@@ -60,7 +60,7 @@ namespace UCGrab.Repository
             var order = GetOrCreateOrderByUserId(userId, product, ref error);
             var orDetail = new Order_Detail();
             orDetail.order_id = order.order_id;
-            orDetail.product_id = product_id;
+            orDetail.product_id = productId;
             orDetail.quatity = qty;
             orDetail.price = product.price;
 
