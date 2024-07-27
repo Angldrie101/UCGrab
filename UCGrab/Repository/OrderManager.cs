@@ -32,11 +32,11 @@ namespace UCGrab.Repository
             var user = _userMgr.GetUserInfoByUserId(prod.user_id);
 
             var order = _order._table.Where(m => m.user_id == userId && m.store_id == user.store_id).FirstOrDefault();
-            if (order == null || order.order_status != (Int32)OrderStatus.Pending)
+            if (order == null || order.order_status != (Int32)OrderStatus.Open)
             {
                 order = new Order();
                 order.user_id = userId;
-                order.order_status = (Int32)OrderStatus.Pending;
+                order.order_status = (Int32)OrderStatus.Open;
                 order.store_id = user.store_id;
                 order.order_date = DateTime.Now;
 
@@ -102,7 +102,7 @@ namespace UCGrab.Repository
 
         public List<Order> GetOrderByUserId(String userId)
         {
-            return _order._table.Where(m => m.user_id == userId && m.order_status == (Int32)OrderStatus.Pending).ToList();
+            return _order._table.Where(m => m.user_id == userId && m.order_status == (Int32)OrderStatus.Open).ToList();
         }
 
         public int GetCartCountByUserId(String userId)

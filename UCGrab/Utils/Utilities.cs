@@ -38,11 +38,22 @@ namespace UCGrab.Utils
         Active
     }
 
+    public enum Categories
+    {
+        Beverage,
+        Breakfast,
+        Snack,
+        Lunch,
+        Uniform,
+        DepartmentalShirts,
+        Books
+    }
+
     public enum OrderStatus
     {
+        Open,
         Pending,
         Confirmed,
-        InProgress,
         Delivered,
         Done
     }

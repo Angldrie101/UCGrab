@@ -33,5 +33,6 @@ namespace UCGrab.Database
     
         public virtual ICollection<Image_Store> Image_Store { get; set; }
         public virtual ICollection<Order> Order { get; set; }
+        public virtual ICollection<Category> Category { get; set; }
     }
 }

@@ -368,36 +368,74 @@ namespace UCGrab.Controllers
         }
 
         [AllowAnonymous]
-        public ActionResult Detail(String productId)
+        public ActionResult ShopAll()
         {
-            var product = _productManager.GetProductInfo(productId);
-
-            if (product != null)
-            {
-                return View(product);
-            }
-
-            return HttpNotFound("Product not found");
+            var products = _productManager.ListAll();
+            return View(products);
+ 
         }
+
+        [AllowAnonymous]
+        public ActionResult Detail(int? id)
+        {
+            if (id == null || id == 0)
+                return RedirectToAction("PageNotFound");
+
+            var product = _productManager.GetProductById(id);
+
+            return View(product);
+
+        }
+
         [AllowAnonymous]
         [HttpPost]
         public JsonResult AddCart(int prodId, int qty)
         {
             var res = new Response();
 
-            if (_orderManager.AddCart(UserId, prodId, qty, ref ErrorMessage) == ErrorCode.Error)
+            try
             {
-                res.code = (Int32)ErrorCode.Error;
-                res.message = ErrorMessage;
-                return Json(res, JsonRequestBehavior.AllowGet);
-            }
+                if (_orderManager.AddCart(UserId, prodId, qty, ref ErrorMessage) == ErrorCode.Error)
+                {
+                    throw new Exception(ErrorMessage);
+                }
 
-            res.code = (Int32)ErrorCode.Success;
-            res.message = "Item Added!";
+                res.code = (int)ErrorCode.Success;
+                res.message = "Item Added!";
+            }
+            catch (Exception ex)
+            {
+                res.code = (int)ErrorCode.Error;
+                res.message = "An error occurred while adding the item to the cart: " + ex.Message;
+
+                // Log the inner exception if it exists
+                if (ex.InnerException != null)
+                {
+                    res.message += " Inner exception: " + ex.InnerException.Message;
+                }
+
+                LogError(ex);
+                // Optionally log the exception to a file or monitoring system
+                // Example: System.IO.File.WriteAllText("path/to/logfile.txt", ex.ToString());
+            }
 
             return Json(res, JsonRequestBehavior.AllowGet);
         }
+        private void LogError(Exception ex)
+        {
+            string logFilePath = Server.MapPath("~/Logs/errorlog.txt");
+            string errorMessage = DateTime.Now.ToString() + " - " + ex.ToString();
 
+            if (!System.IO.File.Exists(logFilePath))
+            {
+                System.IO.File.Create(logFilePath).Dispose();
+            }
+
+            using (StreamWriter writer = new StreamWriter(logFilePath, true))
+            {
+                writer.WriteLine(errorMessage);
+            }
+        }
         [AllowAnonymous]
         public ActionResult Cart()
         {
@@ -436,8 +474,8 @@ namespace UCGrab.Controllers
 
         public JsonResult GetCartCount()
         {
-            var count = _orderManager.GetCartCountByUserId(UserId);
-            var res = new { count = count };
+            var res = new { count = _orderManager.GetCartCountByUserId(UserId) };
+
             return Json(res, JsonRequestBehavior.AllowGet);
         }
 

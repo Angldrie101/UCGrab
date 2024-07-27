@@ -28,6 +28,11 @@ namespace UCGrab.Repository
                     .Where(p => p.user_id == storeId && p.status == (int)ProductStatus.HasStock).Include(p => p.Image_Product).ToList();
             }
         }
+
+        public List<Product> ListAll()
+        {
+            return _product._table.Where(m => m.status == (Int32)ProductStatus.HasStock).ToList();
+        }
         public List<Product> ListProduct(String username)
         {
             var user = _userMgr.GetUserByUsername(username);

@@ -23,8 +23,8 @@ namespace UCGrab.Database
         public string user_id { get; set; }
         public Nullable<int> order_status { get; set; }
         public Nullable<int> store_id { get; set; }
-        public System.DateTime order_date { get; set; }
-        public System.DateTime shipped_date { get; set; }
+        public Nullable<System.DateTime> order_date { get; set; }
+        public Nullable<System.DateTime> shipped_date { get; set; }
     
         public virtual ICollection<Order_Detail> Order_Detail { get; set; }
         public virtual Store Store { get; set; }
