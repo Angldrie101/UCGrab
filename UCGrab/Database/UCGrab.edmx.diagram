@@ -9,7 +9,7 @@
         <EntityTypeShape EntityType="UCGrabModel.ContactUs" Width="1.5" PointX="5.75" PointY="7.75" />
         <EntityTypeShape EntityType="UCGrabModel.Image" Width="1.5" PointX="3" PointY="7.5" />
         <EntityTypeShape EntityType="UCGrabModel.Image_Product" Width="1.5" PointX="10.25" PointY="2.75" />
-        <EntityTypeShape EntityType="UCGrabModel.Image_Store" Width="1.5" PointX="11" PointY="15" />
+        <EntityTypeShape EntityType="UCGrabModel.Image_Store" Width="1.5" PointX="6.625" PointY="12.5" />
         <EntityTypeShape EntityType="UCGrabModel.Order" Width="1.5" PointX="11" PointY="11.625" />
         <EntityTypeShape EntityType="UCGrabModel.Order_Detail" Width="1.5" PointX="13.25" PointY="3.75" />
         <EntityTypeShape EntityType="UCGrabModel.Product" Width="1.5" PointX="8" PointY="3" />

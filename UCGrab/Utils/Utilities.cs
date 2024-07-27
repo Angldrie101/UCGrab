@@ -49,6 +49,12 @@ namespace UCGrab.Utils
         Books
     }
 
+    public enum CheckoutOption
+    {
+        PickUp,
+        Deliver
+    }
+
     public enum OrderStatus
     {
         Open,

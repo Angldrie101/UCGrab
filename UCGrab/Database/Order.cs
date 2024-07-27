@@ -25,6 +25,17 @@ namespace UCGrab.Database
         public Nullable<int> store_id { get; set; }
         public Nullable<System.DateTime> order_date { get; set; }
         public Nullable<System.DateTime> shipped_date { get; set; }
+        public string building { get; set; }
+        public string room { get; set; }
+        public string shipping_address { get; set; }
+        public string billing_address { get; set; }
+        public string payment_method { get; set; }
+        public string additional_info { get; set; }
+        public Nullable<int> checkOut_option { get; set; }
+        public string firstname { get; set; }
+        public string lastname { get; set; }
+        public string phone { get; set; }
+        public string email { get; set; }
     
         public virtual ICollection<Order_Detail> Order_Detail { get; set; }
         public virtual Store Store { get; set; }

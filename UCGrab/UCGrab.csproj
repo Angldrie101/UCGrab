@@ -559,6 +559,7 @@
     <Content Include="Views\Home\MyProfile.cshtml" />
     <Content Include="Views\Shop\ChangeLogo.cshtml" />
     <Content Include="Views\Home\ShopAll.cshtml" />
+    <Content Include="Views\Shop\DisplayProfile.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

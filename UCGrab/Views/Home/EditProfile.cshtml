@@ -5,6 +5,12 @@
     Layout = "~/Views/Shared/UserLayout.cshtml";
 }
 
+<style>
+    h5 {
+        color: red;
+    }
+</style>
+
 @using (Html.BeginForm("EditProfile", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
@@ -13,6 +19,8 @@
         <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Edit Profile</span></h2>
         <div class="row px-xl-5">
             <div class="col-lg-7 mb-5">
+                <h5>Note: Please fill in this information before purchasing products!</h5>
+
                 <div class="bg-light p-30">
                     @if (!String.IsNullOrEmpty(TempData["ErrorMessage"] as String))
                     {

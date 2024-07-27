@@ -124,5 +124,50 @@ namespace UCGrab.Repository
         {
             return _orderDetail.Delete(id, out err);
         }
+
+        public ErrorCode PlaceOrder(string userId, Order model, ref string error)
+        {
+            try
+            {
+                // Get the open order for the user
+                var order = _order._table.FirstOrDefault(m => m.user_id == userId && m.order_status == (int)OrderStatus.Open);
+
+                if (order != null)
+                {
+                    // Update the order details
+                    order.order_status = (int)OrderStatus.Pending;
+                    order.payment_method = model.payment_method;
+                    order.order_date = DateTime.Now;
+                    // Update additional fields from the model
+                    order.checkOut_option = model.checkOut_option;
+                    order.shipping_address = model.shipping_address;
+                    order.building = model.building;
+                    order.room = model.room;
+                    order.firstname = model.firstname;
+                    order.lastname = model.lastname;
+                    order.phone = order.phone;
+                    order.email = order.email;
+                    order.additional_info = model.additional_info;
+                    
+
+                    // Save changes
+                    _order.Update(order.order_id, order, out error);
+
+                    return ErrorCode.Success;
+                }
+                else
+                {
+                    error = "No open order found for the user.";
+                    return ErrorCode.Error;
+                }
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
+
     }
+
 }

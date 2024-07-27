@@ -27,22 +27,137 @@ namespace UCGrab.Controllers
         public ActionResult MyProfile()
         {
             IsUserLoggedSession();
-            var user = _userManager.CreateOrRetrieve(User.Identity.Name, ref ErrorMessage);
 
-            return View(user);
+            var user = User.Identity.Name;
+            var usrinfo = _userManager.GetUserInfoByUsername(user);
+
+            if (usrinfo == null)
+            {
+                TempData["ErrorMessage"] = "Failed retrieving user information.";
+                return RedirectToAction("MyProfile");
+            }
+
+            return View(usrinfo);
         }
 
         [HttpPost]
-        public ActionResult MyProfile(User_Information userInf)
+        public ActionResult MyProfile(User_Information userInf, HttpPostedFileBase profilePicture)
         {
-            if (_userManager.UpdateUserInformation(userInf, ref ErrorMessage) == Utils.ErrorCode.Error)
+            IsUserLoggedSession();
+
+            if (ModelState.IsValid)
             {
-                //
-                ModelState.AddModelError(String.Empty, ErrorMessage);
-                //
-                return View(userInf);
+                var user = _userManager.GetUserByUserId(userInf.user_id);
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "Error updating profile: User not found.";
+                    return View(userInf);
+                }
+
+                // Handle profile picture upload
+                if (profilePicture != null && profilePicture.ContentLength > 0)
+                {
+                    var uploadsFolderPath = Server.MapPath("~/UploadedFiles/");
+                    if (!Directory.Exists(uploadsFolderPath))
+                        Directory.CreateDirectory(uploadsFolderPath);
+
+                    var profileFileName = Path.GetFileName(profilePicture.FileName);
+                    var profileSavePath = Path.Combine(uploadsFolderPath, profileFileName);
+                    profilePicture.SaveAs(profileSavePath);
+
+                    // Log the save path
+                    System.Diagnostics.Debug.WriteLine("Profile picture saved at: " + profileSavePath);
+
+                    var existingImage = _imageManager.ListImgAttachByImageId(userInf.id).FirstOrDefault();
+                    if (existingImage != null)
+                    {
+                        existingImage.image_file = profileFileName;
+                        if (_imageManager.UpdateImg(existingImage, ref ErrorMessage) == ErrorCode.Error)
+                        {
+                            ModelState.AddModelError(String.Empty, ErrorMessage);
+                            return View(userInf);
+                        }
+                    }
+                    else
+                    {
+                        Image img = new Image
+                        {
+                            image_file = profileFileName,
+                            image_id = userInf.id
+                        };
+
+                        if (_imageManager.CreateImg(img, ref ErrorMessage) == ErrorCode.Error)
+                        {
+                            ModelState.AddModelError(String.Empty, ErrorMessage);
+                            return View(userInf);
+                        }
+                    }
+                }
+
+                if (_userManager.UpdateUserInformation(userInf, ref ErrorMessage) == ErrorCode.Error)
+                {
+                    ModelState.AddModelError(String.Empty, ErrorMessage);
+                    return View(userInf);
+
+                }
+                TempData["SuccessMessage"] = "Profile updated successfully.";
+                return RedirectToAction("DisplayProfile");
             }
-            TempData["Message"] = $"User Information {ErrorMessage}!";
+
+            return View(userInf);
+        }
+
+        public ActionResult DisplayProfile()
+        {
+            IsUserLoggedSession();
+            var user = User.Identity.Name;
+            var userinfo = _userManager.GetUserInfoByUsername(user);
+
+            if (userinfo == null)
+            {
+                TempData["ErrorMessage"] = "Failed retreiving user information.";
+                return RedirectToAction("MyProfile");
+
+            }
+            return View(userinfo);
+        }
+        [HttpPost]
+        public ActionResult DisplayProfile(User_Information userInf, HttpPostedFileBase profilePicture)
+        {
+
+            IsUserLoggedSession();
+
+            if (ModelState.IsValid)
+            {
+                var user = _userManager.GetUserByUserId(userInf.user_id);
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "User Not Found,";
+                    return View(userInf);
+                }
+            }
+            if (profilePicture != null && profilePicture.ContentLength > 0)
+            {
+                var uploadsFolderPath = Server.MapPath("~/UploadedFiles/");
+                if (!Directory.Exists(uploadsFolderPath))
+                    Directory.CreateDirectory(uploadsFolderPath);
+
+                var profileFileName = Path.GetFileName(profilePicture.FileName);
+                var profileSavePath = Path.Combine(uploadsFolderPath, profileFileName);
+                profilePicture.SaveAs(profileSavePath);
+
+                var existingImage = _imageManager.ListImgAttachByImageId(userInf.id).FirstOrDefault();
+                if (existingImage != null)
+                {
+                    existingImage.image_file = profileFileName;
+                    if (_imageManager.UpdateImg(existingImage, ref ErrorMessage) == ErrorCode.Error)
+                    {
+                        ModelState.AddModelError(String.Empty, ErrorMessage);
+                        return View(userInf);
+                    }
+                }
+
+            }
             return View(userInf);
         }
 

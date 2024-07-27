@@ -45,6 +45,7 @@ namespace UCGrab.Controllers
             if (_userManager.SignIn(username, password, ref ErrorMessage) == ErrorCode.Success)
             {
                 var user = _userManager.GetUserByUsername(username);
+                var info = _userManager.GetUserInfoByUsername(username);
 
                 if (user.status != (int)Status.Active)
                 {
@@ -60,11 +61,20 @@ namespace UCGrab.Controllers
                 switch (user.User_Role.rolename)
                 {
                     case Constant.Role_Customer:
-                        return RedirectToAction("Index");
+                        if(info.first_name == null)
+                        {
+                            return RedirectToAction("EditProfile");
+                        }
+                        else
+                        {
+                            return RedirectToAction("Index");
+                        }
+                        
                     case Constant.Role_Provider:
                         return RedirectToAction("Index", "Shop");
                     default:
                         return RedirectToAction("Index", "Admin");
+                        
                 }
             }
             ViewBag.Error = ErrorMessage;
@@ -488,7 +498,49 @@ namespace UCGrab.Controllers
         [AllowAnonymous]
         public ActionResult CheckOut()
         {
-            return View();
+            IsUserLoggedSession();
+
+            var userId = UserId; // Assuming you have a way to get the logged-in user's ID
+            var userInfo = _userManager.GetUserInfoByUserId(userId);
+
+            var model = new Order
+            {
+                firstname = userInfo.first_name,
+                lastname = userInfo.last_name,
+                phone = userInfo.phone,
+                email = userInfo.email
+            };
+
+            return View(model);
+        }
+        [HttpPost]
+        [AllowAnonymous]
+        public ActionResult CheckOut(Order model, string checkoutOption)
+        {
+            IsUserLoggedSession();
+
+            try
+            {
+                string errorMessage = string.Empty;
+                var result = _orderManager.PlaceOrder(UserId, model, ref errorMessage);
+
+                if (result == ErrorCode.Success)
+                {
+                    return RedirectToAction("MyOrders");
+                }
+                else
+                {
+                    // Handle error
+                    ViewBag.Error = errorMessage;
+                    return View(model);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                ViewBag.Error = ex.Message;
+                return View(model);
+            }
         }
 
         [AllowAnonymous]

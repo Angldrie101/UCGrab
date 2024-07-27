@@ -25,7 +25,5 @@ namespace UCGrab.Database
         public string user_id { get; set; }
     
         public virtual ICollection<Product> Product { get; set; }
-
-        public virtual ICollection<Store> Store { get; set; }
     }
 }
