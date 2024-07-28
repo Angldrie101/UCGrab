@@ -5,6 +5,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using UCGrab.Database;
+using UCGrab.Models;
 using UCGrab.Utils;
 
 namespace UCGrab.Repository
@@ -84,6 +85,29 @@ namespace UCGrab.Repository
                 errorMessage = ex.Message;
                 return ErrorCode.Error;
             }
+        }
+
+        public int GetTotalProducts(string userId)
+        {
+            return _product._table.Count(p => p.user_id == userId && p.status == (int)ProductStatus.HasStock);
+        }
+
+        public List<ProductViewModel> GetTopSellingProducts(string userId)
+        {
+            var _db = new UCGrabEntities();
+            return _db.Order_Detail
+                      .Where(od => od.Order.user_id == userId)
+                      .GroupBy(od => od.product_id)
+                      .Select(g => new ProductViewModel
+                      {
+                          ProductId = g.Key,
+                          ProductName = g.FirstOrDefault().Product.product_name,
+                          Quantity = g.Sum(od => od.quatity),
+                          Total = g.Sum(od => od.price * od.quatity)
+                      })
+                      .OrderByDescending(p => p.Quantity)
+                      .Take(10)
+                      .ToList();
         }
     }
 }

@@ -83,6 +83,10 @@
                 @using (Html.BeginForm("ProductInfo", "Shop", FormMethod.Post, new { enctype = "multipart/form-data" }))
                 {
                     @Html.AntiForgeryToken()
+                    if (!String.IsNullOrEmpty(TempData["Message"] as String))
+                    {
+                        <div class="alert alert-success" role="alert">@TempData["Message"]</div>
+                    }
                     <div class="form-group">
                         <label class="form-label">Product Image</label>
                         <div alt="Product Picture" class="img-fluid" id="preview"></div>

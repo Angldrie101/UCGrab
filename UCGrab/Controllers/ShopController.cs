@@ -20,7 +20,54 @@ namespace UCGrab.Controllers
         {
             IsUserLoggedSession();
 
-            return View();
+            var userId = UserId; // Assuming you have a way to get the logged-in user's ID
+
+            var totalProducts = _productManager.GetTotalProducts(userId);
+            var totalOrders = _orderManager.GetTotalOrders(userId);
+            var recentOrders = _orderManager.GetRecentOrders(userId);
+            var topSellingProducts = _productManager.GetTopSellingProducts(userId);
+
+            var model = new ProviderDashboardViewModel
+            {
+                TotalProducts = totalProducts,
+                TotalOrders = totalOrders,
+                RecentOrders = recentOrders.Select(order => new OrderViewModel
+                {
+                    OrderId = order.order_id,
+                    OrderNumber = order.order_id.ToString(),
+                    OrderDate = order.order_date.HasValue ? order.order_date.Value : DateTime.MinValue,
+                    Status = ((OrderStatus)order.order_status).ToString(),
+                    Products = order.Order_Detail.Select(od => new ProductViewModel
+                    {
+                        ProductName = od.Product.product_name,
+                        Quantity = od.quatity,
+                        Price = od.price,
+                        ImageFilePath = od.Product.Image_Product.FirstOrDefault()?.image_file // Set the image file path
+                    }).ToList(),
+                    Total = order.Order_Detail.Sum(od => (od.price * od.quatity))
+                }).ToList(),
+                TopSellingProducts = topSellingProducts
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public ActionResult ConfirmOrder(int orderId)
+        {
+            IsUserLoggedSession();
+
+            var result = _orderManager.ConfirmOrder(orderId, UserId);
+            if (result == ErrorCode.Success)
+            {
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                ViewBag.Error = "Failed to confirm the order.";
+                return RedirectToAction("Index");
+            }
         }
 
         [AllowAnonymous]

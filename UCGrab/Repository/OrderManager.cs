@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using UCGrab.Database;
+using UCGrab.Models;
 using UCGrab.Utils;
 
 namespace UCGrab.Repository
@@ -125,30 +126,30 @@ namespace UCGrab.Repository
             return _orderDetail.Delete(id, out err);
         }
 
-        public ErrorCode PlaceOrder(string userId, Order model, ref string error)
+        public ErrorCode PlaceOrder(string userId, OrderViewModel model, ref string error)
         {
             try
             {
                 // Get the open order for the user
+                // Fetch the order details for the open order
                 var order = _order._table.FirstOrDefault(m => m.user_id == userId && m.order_status == (int)OrderStatus.Open);
+                var orderDetails = _orderDetail._table.Where(od => od.order_id == order.order_id).ToList();
 
                 if (order != null)
                 {
                     // Update the order details
                     order.order_status = (int)OrderStatus.Pending;
-                    order.payment_method = model.payment_method;
+                    order.payment_method = model.PaymentMethod; // Add this line to save the payment method
                     order.order_date = DateTime.Now;
-                    // Update additional fields from the model
-                    order.checkOut_option = model.checkOut_option;
-                    order.shipping_address = model.shipping_address;
-                    order.building = model.building;
-                    order.room = model.room;
-                    order.firstname = model.firstname;
-                    order.lastname = model.lastname;
-                    order.phone = order.phone;
-                    order.email = order.email;
-                    order.additional_info = model.additional_info;
-                    
+                    order.checkOut_option = model.CheckOutOption;
+                    order.shipping_address = model.ShippingAddress;
+                    order.building = model.Building;
+                    order.room = model.Room;
+                    order.firstname = model.Firstname;
+                    order.lastname = model.Lastname;
+                    order.phone = model.Phone;
+                    order.email = model.Email;
+                    order.additional_info = model.AdditionalInfo;
 
                     // Save changes
                     _order.Update(order.order_id, order, out error);
@@ -164,6 +165,75 @@ namespace UCGrab.Repository
             catch (Exception ex)
             {
                 error = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
+
+        public List<Order_Detail> GetOrderDetailsByOrderId(int orderId)
+        {
+            return _orderDetail._table.Where(od => od.order_id == orderId).ToList();
+        }
+
+        public List<Order> GetUserOrderByUserId(String userId)
+        {
+            return _order._table.Where(m => m.user_id == userId).ToList();
+        }
+
+        public ErrorCode CancelOrder(int orderId, string userId)
+        {
+            try
+            {
+                var order = _order.Get(orderId);
+                if (order != null && order.user_id == userId && order.order_status == (int)OrderStatus.Pending)
+                {
+                    order.order_status = (int)OrderStatus.Cancelled; // or whatever status you use for cancelled orders
+                    string error;
+                    _order.Update(order.order_id, order, out error);
+                    return ErrorCode.Success;
+                }
+                else
+                {
+                    return ErrorCode.Error;
+                }
+            }
+            catch (Exception ex)
+            {
+                Message = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
+
+
+        public int GetTotalOrders(string userId)
+        {
+            return _order._table.Count(o => o.user_id == userId && o.order_status != (int)OrderStatus.Pending);
+        }
+
+        public List<Order> GetRecentOrders(string userId)
+        {
+            return _order._table.Where(o => o.user_id == userId && o.order_status != (int)OrderStatus.Pending).OrderByDescending(o => o.order_date).Take(10).ToList();
+        }
+
+        public ErrorCode ConfirmOrder(int orderId, string userId)
+        {
+            try
+            {
+                var order = _order.Get(orderId);
+                if (order != null && order.user_id == userId && order.order_status == (int)OrderStatus.Pending)
+                {
+                    order.order_status = (int)OrderStatus.Confirmed; // Update the status to confirmed
+                    string error;
+                    _order.Update(order.order_id, order, out error);
+                    return ErrorCode.Success;
+                }
+                else
+                {
+                    return ErrorCode.Error;
+                }
+            }
+            catch (Exception ex)
+            {
+                Message = ex.Message;
                 return ErrorCode.Error;
             }
         }

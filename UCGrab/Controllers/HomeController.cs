@@ -502,20 +502,32 @@ namespace UCGrab.Controllers
 
             var userId = UserId; // Assuming you have a way to get the logged-in user's ID
             var userInfo = _userManager.GetUserInfoByUserId(userId);
+            var order = _orderManager.GetOrderByUserId(userId).FirstOrDefault();
+            var orderDetails = _orderManager.GetOrderDetailsByOrderId(order.order_id);
 
-            var model = new Order
+            var model = new OrderViewModel
             {
-                firstname = userInfo.first_name,
-                lastname = userInfo.last_name,
-                phone = userInfo.phone,
-                email = userInfo.email
+                OrderId = order.order_id,
+                Firstname = userInfo.first_name,
+                Lastname = userInfo.last_name,
+                Phone = userInfo.phone,
+                Email = userInfo.email,
+                Products = orderDetails.Select(od => new ProductViewModel
+                {
+                    ProductName = od.Product.product_name,
+                    Quantity = od.quatity,
+                    Price = od.price
+                }).ToList(),
+                Total = orderDetails.Sum(od => od.price * od.quatity)
             };
 
             return View(model);
+
         }
+
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult CheckOut(Order model, string checkoutOption)
+        public ActionResult CheckOut(OrderViewModel model)
         {
             IsUserLoggedSession();
 
@@ -543,6 +555,7 @@ namespace UCGrab.Controllers
             }
         }
 
+
         [AllowAnonymous]
         public ActionResult Contact()
         {
@@ -558,7 +571,56 @@ namespace UCGrab.Controllers
         [AllowAnonymous]
         public ActionResult MyOrders()
         {
-            return View();
+            IsUserLoggedSession();
+
+            var userId = UserId; // Assuming you have a way to get the logged-in user's ID
+            var orders = _orderManager.GetUserOrderByUserId(userId);
+
+            var model = orders.Select(order => new OrderViewModel
+            {
+                OrderId = order.order_id,
+                OrderNumber = order.order_id.ToString(),
+                OrderDate = order.order_date.HasValue ? order.order_date.Value : DateTime.MinValue,
+                Status = ((OrderStatus)order.order_status).ToString(),
+                Products = order.Order_Detail.Select(od => new ProductViewModel
+                {
+                    ProductName = od.Product.product_name,
+                    Quantity = od.quatity,
+                    Price = od.price,
+                    ImageFilePath = od.Product.Image_Product.FirstOrDefault().image_file
+                }).ToList(),
+                Total = order.Order_Detail.Sum(od => od.price * od.quatity)
+            }).ToList();
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public ActionResult CancelOrder(int orderId)
+        {
+            IsUserLoggedSession();
+
+            try
+            {
+                var result = _orderManager.CancelOrder(orderId, UserId);
+                if (result == ErrorCode.Success)
+                {
+                    return RedirectToAction("MyOrders");
+                }
+                else
+                {
+                    // Handle error
+                    ViewBag.Error = "Failed to cancel the order.";
+                    return RedirectToAction("MyOrders");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                ViewBag.Error = ex.Message;
+                return RedirectToAction("MyOrders");
+            }
         }
 
         [AllowAnonymous]

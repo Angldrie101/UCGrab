@@ -61,7 +61,6 @@
           <Property Name="building" Type="varchar" MaxLength="255" />
           <Property Name="room" Type="varchar" MaxLength="255" />
           <Property Name="shipping_address" Type="varchar" MaxLength="255" />
-          <Property Name="billing_address" Type="varchar" MaxLength="255" />
           <Property Name="payment_method" Type="varchar" MaxLength="255" />
           <Property Name="additional_info" Type="nvarchar(max)" />
           <Property Name="checkOut_option" Type="int" />
@@ -600,12 +599,9 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="store_id" Type="Int32" />
           <Property Name="order_date" Type="DateTime" Precision="3" />
           <Property Name="shipped_date" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="Order_Detail" Relationship="UCGrabModel.FK_Order_Detail_Order" FromRole="Order" ToRole="Order_Detail" />
-          <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Order_Store" FromRole="Order" ToRole="Store" />
           <Property Name="building" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="room" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="shipping_address" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
-          <Property Name="billing_address" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="payment_method" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="additional_info" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="checkOut_option" Type="Int32" />
@@ -613,6 +609,8 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="lastname" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="phone" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Order_Detail" Relationship="UCGrabModel.FK_Order_Detail_Order" FromRole="Order" ToRole="Order_Detail" />
+          <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Order_Store" FromRole="Order" ToRole="Store" />
         </EntityType>
         <EntityType Name="Order_Detail">
           <Key>
@@ -786,7 +784,9 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Order_Detail_Order">
-          <End Type="UCGrabModel.Order" Role="Order" Multiplicity="1" />
+          <End Type="UCGrabModel.Order" Role="Order" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Type="UCGrabModel.Order_Detail" Role="Order_Detail" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Order">
@@ -972,7 +972,6 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
                 <ScalarProperty Name="checkOut_option" ColumnName="checkOut_option" />
                 <ScalarProperty Name="additional_info" ColumnName="additional_info" />
                 <ScalarProperty Name="payment_method" ColumnName="payment_method" />
-                <ScalarProperty Name="billing_address" ColumnName="billing_address" />
                 <ScalarProperty Name="shipping_address" ColumnName="shipping_address" />
                 <ScalarProperty Name="room" ColumnName="room" />
                 <ScalarProperty Name="building" ColumnName="building" />

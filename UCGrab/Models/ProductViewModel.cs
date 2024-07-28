@@ -8,7 +8,17 @@ namespace UCGrab.Models
 {
     public class ProductViewModel
     {
-          public Product Product { get; set; }
-          public int TotalStock { get; set; }
+        public Product Product { get; set; }
+        public int TotalStock { get; set; }
+
+        public string ProductName { get; set; }
+        public int Quantity { get; set; }
+        public decimal Price { get; set; }
+
+        public string ImageFilePath { get; set; }
+
+        public decimal Total { get; set; }
+        
+        public int ProductId { get; set; }
     }
 }

@@ -59,6 +59,7 @@ namespace UCGrab.Utils
     {
         Open,
         Pending,
+        Cancelled,
         Confirmed,
         Delivered,
         Done
