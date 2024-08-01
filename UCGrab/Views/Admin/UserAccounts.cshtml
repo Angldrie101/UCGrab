@@ -63,7 +63,7 @@
                                 <td>@user.status</td>
                                 <td>
                                     <a href="/Admin/EditUser/@user.user_id" class="btn btn-primary btn-sm">Edit</a>
-                                    <a class="btn btn-danger btn-sm" onclick="confirmDelete('@user.id')">Delete</a>
+                                    <a class="btn btn-danger btn-sm" onclick="confirmDelete('@user.user_id')">Delete</a>
                                 </td>
                             </tr>
                         }
@@ -85,7 +85,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    function confirmDelete(Id) {
+    function confirmDelete(userId) {
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",

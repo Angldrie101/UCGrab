@@ -41,11 +41,10 @@ namespace UCGrab.Controllers
         [HttpPost]
         public ActionResult Login(String username, String password, String ReturnUrl)
         {
-
             if (_userManager.SignIn(username, password, ref ErrorMessage) == ErrorCode.Success)
             {
                 var user = _userManager.GetUserByUsername(username);
-                var info = _userManager.GetUserInfoByUsername(username);
+                var info = _userManager.CreateOrRetrieve(username, ref ErrorMessage);
 
                 if (user.status != (int)Status.Active)
                 {
