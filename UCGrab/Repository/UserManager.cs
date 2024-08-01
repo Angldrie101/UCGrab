@@ -189,7 +189,11 @@ namespace UCGrab.Repository
         {
             return _userAcc.GetAll().ToList();
         }
-        
+
+        public ErrorCode DeleteUser(int userId, ref string errorMessage)
+        {
+            return _userAcc.Delete(userId, out errorMessage);
+        }
 
 
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using UCGrab.Database;
+using UCGrab.Models;
 using UCGrab.Repository;
 using UCGrab.Utils;
 
@@ -74,6 +75,16 @@ namespace UCGrab.Controllers
 
             TempData["username"] = ua.username;
             return RedirectToAction("UserAccounts");
+        }
+
+        [AllowAnonymous]
+        public JsonResult UserDelete(int id)
+        {
+            var res = new Response();
+            res.code = (Int32)_userManager.DeleteUser(id, ref ErrorMessage);
+            res.message = ErrorMessage;
+
+            return Json(res, JsonRequestBehavior.AllowGet);
         }
 
         [AllowAnonymous]

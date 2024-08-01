@@ -59,11 +59,11 @@
                                 <td>@user.id</td>
                                 <td>@user.username</td>
                                 <td>@user.email</td>
-                                <td>@user.role_id</td>
+                                <td>@user.User_Role.rolename</td>
                                 <td>@user.status</td>
                                 <td>
                                     <a href="/Admin/EditUser/@user.user_id" class="btn btn-primary btn-sm">Edit</a>
-                                    <a href="/Admin/DeleteUser/@user.user_id" class="btn btn-danger btn-sm">Delete</a>
+                                    <a class="btn btn-danger btn-sm" onclick="confirmDelete('@user.id')">Delete</a>
                                 </td>
                             </tr>
                         }
@@ -80,3 +80,24 @@
 <script src="/Assets/Shop/mail/jqBootstrapValidation.min.js"></script>
 <script src="/Assets/Shop/mail/contact.js"></script>
 <script src="/Assets/Shop/js/main.js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function confirmDelete(Id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/Admin/UserDelete';
+            }
+        })
+    }
+</script>

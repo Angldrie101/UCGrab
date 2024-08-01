@@ -1,6 +1,4 @@
-﻿@model UCGrab.Models.ProviderDashboardViewModel
-
-@{
+﻿@{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/ShopPageLayout.cshtml";
 }
@@ -14,7 +12,7 @@
                 <h5 class="card-title text-dark">
                     <i class="fas fa-dollar-sign mr-2"></i>Total Sales
                 </h5>
-                <p class="display-4 text-dark">$<span id="total-sales">@Model.TotalSales</span></p>
+                <p class="display-4 text-dark">$<span id="total-sales">12,345</span></p>
                 <p class="text-dark">Last 30 days</p>
             </div>
         </div>
@@ -23,7 +21,7 @@
                 <h5 class="card-title text-dark">
                     <i class="fas fa-boxes mr-2"></i>Total Products
                 </h5>
-                <p class="display-4 text-dark"><span id="total-products">@Model.TotalProducts</span></p>
+                <p class="display-4 text-dark"><span id="total-products">150</span></p>
                 <p class="text-dark">In your store</p>
             </div>
         </div>
@@ -32,7 +30,7 @@
                 <h5 class="card-title text-dark">
                     <i class="fas fa-shopping-cart mr-2"></i>Orders
                 </h5>
-                <p class="display-4 text-dark"><span id="total-orders">@Model.TotalOrders</span></p>
+                <p class="display-4 text-dark"><span id="total-orders">120</span></p>
                 <p class="text-dark">Last 30 days</p>
             </div>
         </div>
@@ -41,7 +39,7 @@
                 <h5 class="card-title text-dark">
                     <i class="fas fa-users mr-2"></i>New Customers
                 </h5>
-                <p class="display-4 text-dark"><span id="new-customers">@Model.NewCustomers</span></p>
+                <p class="display-4 text-dark"><span id="new-customers">50</span></p>
                 <p class="text-dark">Last 30 days</p>
             </div>
         </div>
@@ -57,25 +55,28 @@
                             <th>Date</th>
                             <th>Amount</th>
                             <th>Status</th>
-                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="recent-orders">
-                        @foreach (var order in Model.RecentOrders)
-                        {
-                            <tr>
-                                <td>@order.OrderId</td>
-                                <td>@order.OrderDate.ToString("yyyy-MM-dd")</td>
-                                <td>$@order.Total</td>
-                                <td>@order.Status</td>
-                                <td>
-                                    @if (order.Status == "Pending")
-                                    {
-                                        <button class="btn btn-success" onclick="confirmOrder(@order.OrderId)">Confirm</button>
-                                    }
-                                </td>
-                            </tr>
-                        }
+                        <tr>
+                            <td>#12345</td>
+                            <td>2024-06-01</td>
+                            <td>$100.00</td>
+                            <td>Pending</td>
+                        </tr>
+                        <tr>
+                            <td>#12346</td>
+                            <td>2024-06-10</td>
+                            <td>$150.00</td>
+                            <td>Shipped</td>
+                        </tr>
+                        <tr>
+                            <td>#12347</td>
+                            <td>2024-06-15</td>
+                            <td>$200.00</td>
+                            <td>Delivered</td>
+                        </tr>
+                        <!-- Additional orders -->
                     </tbody>
                 </table>
             </div>
@@ -93,15 +94,25 @@
                         </tr>
                     </thead>
                     <tbody id="top-selling-products">
-                        @foreach (var product in Model.TopSellingProducts)
-                        {
-                            <tr>
-                                <td>@product.ProductId</td>
-                                <td>@product.ProductName</td>
-                                <td>@product.Quantity</td>
-                                <td>$@product.Total</td>
-                            </tr>
-                        }
+                        <tr>
+                            <td>#P123</td>
+                            <td>Product A</td>
+                            <td>500</td>
+                            <td>$5,000</td>
+                        </tr>
+                        <tr>
+                            <td>#P124</td>
+                            <td>Product B</td>
+                            <td>300</td>
+                            <td>$3,000</td>
+                        </tr>
+                        <tr>
+                            <td>#P125</td>
+                            <td>Product C</td>
+                            <td>200</td>
+                            <td>$2,000</td>
+                        </tr>
+                        <!-- Additional top-selling products -->
                     </tbody>
                 </table>
             </div>
@@ -109,35 +120,15 @@
     </div>
 </div>
 <!-- Dashboard End -->
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="/Assets/Shop/lib/easing/easing.min.js"></script>
+<script src="/Assets/Shop/lib/owlcarousel/owl.carousel.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    function confirmOrder(orderId) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to confirm this order?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, confirm it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Create a form and submit it
-                var form = document.createElement("form");
-                form.setAttribute("method", "post");
-                form.setAttribute("action", "/Home/ConfirmOrder");
+<!-- Contact Javascript File -->
+<script src="/Assets/Shop/mail/jqBootstrapValidation.min.js"></script>
+<script src="/Assets/Shop/mail/contact.js"></script>
 
-                var hiddenField = document.createElement("input");
-                hiddenField.setAttribute("type", "hidden");
-                hiddenField.setAttribute("name", "orderId");
-                hiddenField.setAttribute("value", orderId);
-
-                form.appendChild(hiddenField);
-
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
-</script>
+<!-- Template Javascript -->
+<script src="/Assets/Shop/js/main.js"></script>

@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using UCGrab.Database;
 using UCGrab.Models;
+using UCGrab.Repository;
 using UCGrab.Utils;
 
 namespace UCGrab.Controllers
@@ -20,53 +22,89 @@ namespace UCGrab.Controllers
         {
             IsUserLoggedSession();
 
+            return View();
+        }
+
+        [Authorize]
+        public ActionResult ListOrders()
+        {
+            IsUserLoggedSession();
+
             var userId = UserId; // Assuming you have a way to get the logged-in user's ID
+            System.Diagnostics.Debug.WriteLine($"Logged in UserId: {userId}");
 
-            var totalProducts = _productManager.GetTotalProducts(userId);
-            var totalOrders = _orderManager.GetTotalOrders(userId);
-            var recentOrders = _orderManager.GetRecentOrders(userId);
-            var topSellingProducts = _productManager.GetTopSellingProducts(userId);
-
-            var model = new ProviderDashboardViewModel
+            var store = _storeManager.GetStoreByUserId(userId);
+            if (store == null)
             {
-                TotalProducts = totalProducts,
-                TotalOrders = totalOrders,
-                RecentOrders = recentOrders.Select(order => new OrderViewModel
+                // Handle the case where the store is not found
+                return HttpNotFound("Store not found.");
+            }
+
+            var storeId = Convert.ToInt32(store.id); // Convert store ID to integer
+            System.Diagnostics.Debug.WriteLine($"StoreId: {storeId}");
+
+            var orders = _orderManager.GetOrdersByStoreId(storeId); // Retrieve orders for the store
+            System.Diagnostics.Debug.WriteLine($"Orders count: {orders.Count}");
+
+            if (orders.Count == 0)
+            {
+                System.Diagnostics.Debug.WriteLine($"No orders found for StoreId: {storeId}");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"Order IDs: {string.Join(", ", orders.Select(o => o.order_id))}");
+            }
+
+            var model = orders.Select(order => new OrderViewModel
+            {
+                OrderId = order.order_id,
+                OrderNumber = order.order_id.ToString(),
+                OrderDate = order.order_date.HasValue ? order.order_date.Value : DateTime.MinValue,
+                Status = ((OrderStatus)order.order_status).ToString(),
+                Products = order.Order_Detail.Select(od => new ProductViewModel
                 {
-                    OrderId = order.order_id,
-                    OrderNumber = order.order_id.ToString(),
-                    OrderDate = order.order_date.HasValue ? order.order_date.Value : DateTime.MinValue,
-                    Status = ((OrderStatus)order.order_status).ToString(),
-                    Products = order.Order_Detail.Select(od => new ProductViewModel
-                    {
-                        ProductName = od.Product.product_name,
-                        Quantity = od.quatity,
-                        Price = od.price,
-                        ImageFilePath = od.Product.Image_Product.FirstOrDefault()?.image_file // Set the image file path
-                    }).ToList(),
-                    Total = order.Order_Detail.Sum(od => (od.price * od.quatity))
+                    ProductName = od.Product.product_name,
+                    Quantity = od.quatity,
+                    Price = od.price,
+                    ImageFilePath = od.Product.Image_Product.FirstOrDefault()?.image_file
                 }).ToList(),
-                TopSellingProducts = topSellingProducts
-            };
+                Total = order.Order_Detail.Sum(od => od.price * od.quatity)
+            }).ToList();
 
             return View(model);
         }
 
         [HttpPost]
-        [AllowAnonymous]
+        [Authorize]
         public ActionResult ConfirmOrder(int orderId)
         {
-            IsUserLoggedSession();
+            var result = _orderManager.ConfirmOrder(orderId);
 
-            var result = _orderManager.ConfirmOrder(orderId, UserId);
             if (result == ErrorCode.Success)
             {
-                return RedirectToAction("Index");
+                return RedirectToAction("ListOrders");
             }
             else
             {
-                ViewBag.Error = "Failed to confirm the order.";
-                return RedirectToAction("Index");
+                // Handle the error case as needed
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Unable to confirm the order.");
+            }
+        }
+
+        [HttpPost]
+        [Authorize]
+        public ActionResult ReadyToDeliver(int orderId)
+        {
+            var result = _orderManager.ReadyToDeliver(orderId);
+
+            if (result == ErrorCode.Success)
+            {
+                return RedirectToAction("ListOrders");
+            }
+            else
+            {
+                // Handle the error case as needed
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Unable to mark the order as ready to deliver.");
             }
         }
 
@@ -81,7 +119,7 @@ namespace UCGrab.Controllers
             if (usrinfo == null)
             {
                 TempData["ErrorMessage"] = "Failed retrieving user information.";
-                return RedirectToAction("MyProfile");
+                return RedirectToAction("MyProfile", "Shop");
             }
 
             return View(usrinfo);
@@ -148,7 +186,7 @@ namespace UCGrab.Controllers
 
                 }
                 TempData["SuccessMessage"] = "Profile updated successfully.";
-                return RedirectToAction("DisplayProfile");
+                return RedirectToAction("DisplayProfile", "Shop");
             }
 
             return View(userInf);
@@ -163,7 +201,7 @@ namespace UCGrab.Controllers
             if (userinfo == null)
             {
                 TempData["ErrorMessage"] = "Failed retreiving user information.";
-                return RedirectToAction("MyProfile");
+                return RedirectToAction("MyProfile", "Shop");
 
             }
             return View(userinfo);
@@ -465,6 +503,15 @@ namespace UCGrab.Controllers
         {
             var res = new Response();
             res.code = (Int32)_productManager.DeleteProduct(id, ref ErrorMessage);
+            res.message = ErrorMessage;
+
+            return Json(res, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult CategoryDelete(int? id)
+        {
+            var res = new Response();
+            res.code = (Int32)_categoryManager.DeleteCategory(id, ref ErrorMessage);
             res.message = ErrorMessage;
 
             return Json(res, JsonRequestBehavior.AllowGet);

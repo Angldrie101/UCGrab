@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using UCGrab.Database;
@@ -209,19 +210,50 @@ namespace UCGrab.Repository
             return _order._table.Count(o => o.user_id == userId && o.order_status != (int)OrderStatus.Pending);
         }
 
-        public List<Order> GetRecentOrders(string userId)
+        public List<Order> GetOrdersByStoreId(int storeId)
         {
-            return _order._table.Where(o => o.user_id == userId && o.order_status != (int)OrderStatus.Pending).OrderByDescending(o => o.order_date).Take(10).ToList();
+            // Assuming _dbContext is your database context
+            var orders = _db.Order
+           .Where(o => o.store_id == storeId)
+           .Include(o => o.Order_Detail.Select(od => od.Product))
+           .ToList();
+
+            System.Diagnostics.Debug.WriteLine($"Filtered Orders: {string.Join(", ", orders.Select(o => o.order_id))}");
+            return orders;
         }
 
-        public ErrorCode ConfirmOrder(int orderId, string userId)
+        public ErrorCode ConfirmOrder(int orderId)
         {
             try
             {
                 var order = _order.Get(orderId);
-                if (order != null && order.user_id == userId && order.order_status == (int)OrderStatus.Pending)
+                if (order != null && order.order_status == (int)OrderStatus.Pending)
                 {
                     order.order_status = (int)OrderStatus.Confirmed; // Update the status to confirmed
+                    string error;
+                    _order.Update(order.order_id, order, out error);
+                    return ErrorCode.Success;
+                }
+                else
+                {
+                    return ErrorCode.Error;
+                }
+            }
+            catch (Exception ex)
+            {
+                Message = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
+
+        public ErrorCode ReadyToDeliver(int orderId)
+        {
+            try
+            {
+                var order = _order.Get(orderId);
+                if (order != null && order.order_status == (int)OrderStatus.Confirmed)
+                {
+                    order.order_status = (int)OrderStatus.ReadyToDeliver; // Update the status to ready to deliver
                     string error;
                     _order.Update(order.order_id, order, out error);
                     return ErrorCode.Success;
