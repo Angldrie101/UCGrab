@@ -23,7 +23,8 @@ namespace UCGrab.Utils
     {
         Customer,
         Provider,
-        Admin
+        Admin,
+        DeliveryMan
     }
 
     public enum ProductStatus
@@ -71,6 +72,7 @@ namespace UCGrab.Utils
         public const string Role_Customer = "Customer";
         public const string Role_Provider = "Provider";
         public const string Role_Admin = "Admin";
+        public const string Role_DeliveryMan = "DeliveryMan";
 
         public const string X = "X";
         public const string MINUS = "−";

@@ -238,6 +238,7 @@
     <Compile Include="Contracts\IBaseRepository.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\DeliveryController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ShopController.cs" />
     <Compile Include="Database\Category.cs">
@@ -309,6 +310,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\OrderDeliver.cs" />
     <Compile Include="Models\OrderViewModel.cs" />
     <Compile Include="Models\ProductViewModel.cs" />
     <Compile Include="Models\ProviderDashboardViewModel.cs" />
@@ -541,7 +543,6 @@
     <Content Include="Views\Home\CheckOut.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Shop.cshtml" />
-    <Content Include="Views\Home\Ewallet.cshtml" />
     <Content Include="Views\Home\EditProfile.cshtml" />
     <Content Include="Views\Home\FavoritedProduct.cshtml" />
     <Content Include="Views\Home\MyOrders.cshtml" />
@@ -550,8 +551,6 @@
     <Content Include="Views\Shop\ProductInfo.cshtml" />
     <Content Include="Views\Shop\MyProfile.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
-    <Content Include="Views\Admin\ManageWallet.cshtml" />
-    <Content Include="Views\Admin\Transaction.cshtml" />
     <Content Include="Views\Admin\ManageStore.cshtml" />
     <Content Include="Views\Admin\UserAccounts.cshtml" />
     <Content Include="Views\Home\Verify.cshtml" />
@@ -563,6 +562,10 @@
     <Content Include="Views\Home\ShopAll.cshtml" />
     <Content Include="Views\Shop\DisplayProfile.cshtml" />
     <Content Include="Views\Shop\ListOrders.cshtml" />
+    <Content Include="Views\Home\SelectRole.cshtml" />
+    <Content Include="Views\Shared\_DeliveryLayoutPage.cshtml" />
+    <Content Include="Views\Delivery\Orders.cshtml" />
+    <Content Include="Views\Delivery\OrderDetails.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -23,6 +23,11 @@ namespace UCGrab.Controllers
 
             return View();
         }
+        [AllowAnonymous]
+        public ActionResult SelectRole()
+        {
+            return View();
+        }
 
         [AllowAnonymous]
         public ActionResult Login(String ReturnUrl)
@@ -71,6 +76,8 @@ namespace UCGrab.Controllers
                         
                     case Constant.Role_Provider:
                         return RedirectToAction("Index", "Shop");
+                    case Constant.Role_DeliveryMan:
+                        return RedirectToAction("Orders", "Delivery");
                     default:
                         return RedirectToAction("Index", "Admin");
                         

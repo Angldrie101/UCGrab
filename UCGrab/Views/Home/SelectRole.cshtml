@@ -1,0 +1,78 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <title>UC Grab - Select Role</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/Assets/login/css/style.css">
+    <style>
+        .login-wrap {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: white;
+            max-width: 800px; /* Expanded width */
+            margin: 50px auto;
+        }
+
+        .role-selection {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 50px;
+        }
+
+        .role-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            width: 30%;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+            .role-card:hover {
+                transform: scale(1.05);
+            }
+
+            .role-card i {
+                font-size: 50px;
+                margin-bottom: 20px;
+            }
+    </style>
+</head>
+<body>
+    <section class="ftco-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-8">
+                    <!-- Adjusted column size for centering -->
+                    <div class="login-wrap p-4 p-md-5">
+                        <img class="icon d-flex align-items-center justify-content-center" src="~/Assets/login/images/UCGRAB.jpg" />
+                        <h3 class="text-center mb-4">Registered as</h3>
+                        <div class="role-selection">
+                            <div class="role-card">
+                                <i class="fa fa-user"></i>
+                                <h4>Customer</h4>
+                            </div>
+                            <div class="role-card">
+                                <i class="fa fa-briefcase"></i>
+                                <h4>Provider</h4>
+                            </div>
+                            <div class="role-card">
+                                <i class="fa fa-motorcycle"></i>
+                                <h4>Delivery Man</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="Assets/login/js/jquery.min.js"></script>
+    <script src="Assets/login/js/popper.js"></script>
+    <script src="Assets/login/js/bootstrap.min.js"></script>
+    <script src="Assets/login/js/main.js"></script>
+</body>
+</html>

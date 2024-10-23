@@ -1,0 +1,95 @@
+﻿@{
+    ViewBag.Title = "OrderDetails";
+    Layout = "~/Views/Shared/_DeliveryLayoutPage.cshtml";
+}
+<style>
+    .order-details-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 20px auto;
+        max-width: 1000px;
+    }
+
+    .order-details-card, .image-card {
+        flex: 1;
+        min-width: 400px;
+        margin: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-radius: 8px;
+    }
+
+        .order-details-card .card-header, .image-card .card-header {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .order-details-card .card-body, .image-card .card-body {
+            font-size: 1.2em;
+        }
+
+        .order-details-card .list-group-item {
+            font-size: 1.1em;
+        }
+
+    .back-button {
+        margin-top: 20px;
+        display: block;
+        text-align: center;
+    }
+
+    .store-image {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
+</style>
+
+<div class="order-details-container">
+    <div class="card order-details-card">
+        <div class="card-header">
+            Order #12345
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Customer: John Doe</h5>
+            <p class="card-text">
+                Address: 123 Main St, Springfield<br />
+                Total: $79.99
+            </p>
+            <h5>Items</h5>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <strong>Item 1</strong><br />
+                    Quantity: 1<br />
+                    Price: $19.99
+                </li>
+                <li class="list-group-item">
+                    <strong>Item 2</strong><br />
+                    Quantity: 2<br />
+                    Price: $29.99
+                </li>
+                <li class="list-group-item">
+                    <strong>Item 3</strong><br />
+                    Quantity: 1<br />
+                    Price: $29.99
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card image-card">
+        <div class="card-header">
+            Store Location
+        </div>
+        <div class="card-body">
+            <img src="https://via.placeholder.com/400x300" alt="Store Location" class="store-image">
+        </div>
+    </div>
+</div>
+
+<a href="#" class="btn btn-secondary back-button">Back to Orders</a>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

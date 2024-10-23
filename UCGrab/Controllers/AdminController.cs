@@ -34,50 +34,6 @@ namespace UCGrab.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        public ActionResult UserAccounts(User_Accounts ua, String ConfirmPass)
-        {
-            ViewBag.Role = Utilities.ListRole;
-
-            if (!ua.password.Equals(ConfirmPass))
-            {
-                ModelState.AddModelError(String.Empty, "Password does not match");
-
-                var user = new UserManager();
-                var allUsers = user.GetAllBUserInfo();
-                return View(allUsers);
-            }
-
-            if (_userManager.SignUp(ua, ref ErrorMessage) != ErrorCode.Success)
-            {
-                ModelState.AddModelError(String.Empty, ErrorMessage);
-
-                var user = new UserManager();
-                var allUsers = user.GetAllBUserInfo();
-                return View(allUsers);
-            }
-
-            string verificationCode = ua.verify_code;
-            string emailBody = $"Your verification code is: {verificationCode}";
-            string errorMessage = "";
-
-            var mailManager = new MailManager();
-            bool emailSent = mailManager.SendEmail(ua.email, "Verification Code", emailBody, ref errorMessage);
-
-            if (!emailSent)
-            {
-                ModelState.AddModelError(String.Empty, errorMessage);
-
-                var user = new UserManager();
-                var allUsers = user.GetAllBUserInfo();
-                return View(allUsers);
-            }
-
-            TempData["username"] = ua.username;
-            return RedirectToAction("UserAccounts");
-        }
-
-        [AllowAnonymous]
         public JsonResult UserDelete(int id)
         {
             var res = new Response();
@@ -100,19 +56,8 @@ namespace UCGrab.Controllers
         [Authorize]
         public ActionResult ManageStore()
         {
-            return View(new Store());
-        }
-        [HttpPost]
-        public ActionResult ManageStore(Store store, string user_id)
-        {
-            if (_storeManager.AddStoreForUser(store, user_id, ref ErrorMessage) == Utils.ErrorCode.Error)
-            {
-                ModelState.AddModelError(String.Empty, ErrorMessage);
-                return View(store);
-            }
-
-            TempData["Message"] = $"Store {store.store_name} added successfully!";
-            return View(store);
+            var stores = _storeManager.ListStore(); // Assuming this method retrieves all stores from the database
+            return View(stores); 
         }
     }
 }
