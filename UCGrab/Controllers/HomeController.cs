@@ -207,6 +207,96 @@ namespace UCGrab.Controllers
             TempData["username"] = ua.username;
             return RedirectToAction("Verify");
         }
+
+        [AllowAnonymous]
+        public ActionResult SignUpForProvider()
+        {
+            if (User.Identity.IsAuthenticated)
+                return RedirectToAction("Index");
+
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public ActionResult SignUpForProvider(User_Accounts ua, string ConfirmPass)
+        {
+            if (!ua.password.Equals(ConfirmPass))
+            {
+                ModelState.AddModelError(String.Empty, "Password does not match");
+                return View(ua);
+            }
+
+            if (_userManager.SignUp(ua, ref ErrorMessage) != ErrorCode.Success)
+            {
+                ModelState.AddModelError(String.Empty, ErrorMessage);
+                return View(ua);
+            }
+
+            var user = _userManager.GetUserByEmail(ua.email);
+            string verificationCode = ua.verify_code;
+
+            string emailBody = $"Your verification code is: {verificationCode}";
+            string errorMessage = "";
+
+            var mailManager = new MailManager();
+            bool emailSent = mailManager.SendEmail(ua.email, "Verification Code", emailBody, ref errorMessage);
+
+            if (!emailSent)
+            {
+                ModelState.AddModelError(String.Empty, errorMessage);
+                return View(ua);
+            }
+
+            TempData["username"] = ua.username;
+            return RedirectToAction("Verify");
+        }
+
+        [AllowAnonymous]
+        public ActionResult SignUpForDriver()
+        {
+            if (User.Identity.IsAuthenticated)
+                return RedirectToAction("Index");
+
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public ActionResult SignUpForDriver(User_Accounts ua, string ConfirmPass)
+        {
+            if (!ua.password.Equals(ConfirmPass))
+            {
+                ModelState.AddModelError(String.Empty, "Password does not match");
+                return View(ua);
+            }
+
+            if (_userManager.SignUp(ua, ref ErrorMessage) != ErrorCode.Success)
+            {
+                ModelState.AddModelError(String.Empty, ErrorMessage);
+                return View(ua);
+            }
+
+            var user = _userManager.GetUserByEmail(ua.email);
+            string verificationCode = ua.verify_code;
+
+            string emailBody = $"Your verification code is: {verificationCode}";
+            string errorMessage = "";
+
+            var mailManager = new MailManager();
+            bool emailSent = mailManager.SendEmail(ua.email, "Verification Code", emailBody, ref errorMessage);
+
+            if (!emailSent)
+            {
+                ModelState.AddModelError(String.Empty, errorMessage);
+                return View(ua);
+            }
+
+            TempData["username"] = ua.username;
+            return RedirectToAction("Verify");
+
+        }
+        
         [Authorize]
         public ActionResult MyProfile()
         {

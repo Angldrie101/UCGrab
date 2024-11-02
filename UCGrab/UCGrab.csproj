@@ -566,6 +566,8 @@
     <Content Include="Views\Shared\_DeliveryLayoutPage.cshtml" />
     <Content Include="Views\Delivery\Orders.cshtml" />
     <Content Include="Views\Delivery\OrderDetails.cshtml" />
+    <Content Include="Views\Home\SignUpForProvider.cshtml" />
+    <Content Include="Views\Home\SignUpForDriver.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
