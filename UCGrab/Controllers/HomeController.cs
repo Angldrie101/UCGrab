@@ -119,6 +119,7 @@ namespace UCGrab.Controllers
 
             user.status = (Int32)Status.Active;
             _userManager.UpdateUser(user, ref ErrorMessage);
+            var store = _storeManager.CreateOrRetrieve(username, ref ErrorMessage);
 
             SendActivationNotificationEmail(user.email);
             
@@ -232,7 +233,7 @@ namespace UCGrab.Controllers
                 ModelState.AddModelError(String.Empty, ErrorMessage);
                 return View(ua);
             }
-
+      
             var user = _userManager.GetUserByEmail(ua.email);
             string verificationCode = ua.verify_code;
 
@@ -247,6 +248,7 @@ namespace UCGrab.Controllers
                 ModelState.AddModelError(String.Empty, errorMessage);
                 return View(ua);
             }
+            var userinfo = _userManager.CreateOrRetrieve(ua.username, ref ErrorMessage);
 
             TempData["username"] = ua.username;
             return RedirectToAction("Verify");
@@ -521,8 +523,6 @@ namespace UCGrab.Controllers
                 }
 
                 LogError(ex);
-                // Optionally log the exception to a file or monitoring system
-                // Example: System.IO.File.WriteAllText("path/to/logfile.txt", ex.ToString());
             }
 
             return Json(res, JsonRequestBehavior.AllowGet);
@@ -611,10 +611,11 @@ namespace UCGrab.Controllers
                 Products = orderDetails.Select(od => new ProductViewModel
                 {
                     ProductName = od.Product.product_name,
-                    Quantity = od.quatity,
-                    Price = od.price
+                    Quantity = (Int32)od.quatity,
+                    Price = (Int32)od.price
                 }).ToList(),
-                Total = orderDetails.Sum(od => od.price * od.quatity)
+                Total = (Int32)orderDetails.Sum(od => od.price * od.quatity),
+                CheckOutOption = (Int32)CheckoutOption.PickUp // Set a default value
             };
 
             return View(model);
@@ -681,11 +682,11 @@ namespace UCGrab.Controllers
                 Products = order.Order_Detail.Select(od => new ProductViewModel
                 {
                     ProductName = od.Product.product_name,
-                    Quantity = od.quatity,
-                    Price = od.price,
+                    Quantity = (Int32)od.quatity,
+                    Price = (Int32)od.price,
                     ImageFilePath = od.Product.Image_Product.FirstOrDefault().image_file
                 }).ToList(),
-                Total = order.Order_Detail.Sum(od => od.price * od.quatity)
+                Total = (Int32)order.Order_Detail.Sum(od => od.price * od.quatity)
             }).ToList();
 
             return View(model);

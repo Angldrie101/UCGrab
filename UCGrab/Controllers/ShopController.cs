@@ -64,11 +64,11 @@ namespace UCGrab.Controllers
                 Products = order.Order_Detail.Select(od => new ProductViewModel
                 {
                     ProductName = od.Product.product_name,
-                    Quantity = od.quatity,
-                    Price = od.price,
+                    Quantity = (Int32)od.quatity,
+                    Price = (Int32)od.price,
                     ImageFilePath = od.Product.Image_Product.FirstOrDefault()?.image_file
                 }).ToList(),
-                Total = order.Order_Detail.Sum(od => od.price * od.quatity)
+                Total = (Int32)order.Order_Detail.Sum(od => od.price * od.quatity)
             }).ToList();
 
             return View(model);

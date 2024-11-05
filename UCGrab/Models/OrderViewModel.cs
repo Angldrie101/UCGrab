@@ -18,8 +18,7 @@ namespace UCGrab.Models
         public string Email { get; set; }
         public List<ProductViewModel> Products { get; set; }
         public decimal Total { get; set; }
-        public string PaymentMethod { get; set; } // Add this property
-        public string ShippingAddress { get; set; }
+        public string PaymentMethod { get; set; } 
         public string Building { get; set; }
         public string Room { get; set; }
         public string AdditionalInfo { get; set; }

@@ -27,7 +27,6 @@ namespace UCGrab.Database
         public Nullable<System.DateTime> shipped_date { get; set; }
         public string building { get; set; }
         public string room { get; set; }
-        public string shipping_address { get; set; }
         public string payment_method { get; set; }
         public string additional_info { get; set; }
         public Nullable<int> checkOut_option { get; set; }

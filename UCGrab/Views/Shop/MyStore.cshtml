@@ -49,31 +49,44 @@
                 <h5 class="card-title"><i class="fas fa-store mr-2"></i>Store Details</h5>
                 <div class="mb-3">
                     <label for="storeName" class="form-label">Store Name</label>
-                    <h4 id="storeName" class="font-weight-normal">@Html.DisplayFor(model => model.store_name)</h4>
+                    <h4 id="storeName" class="font-weight-normal">
+                        @(string.IsNullOrEmpty(Model.store_name) ? "No Value" : Model.store_name)
+                    </h4>
                 </div>
                 <div class="mb-3">
                     <label for="storeAddress" class="form-label">Store Address</label>
-                    <h4 id="storeAddress" class="font-weight-normal">@Html.DisplayFor(model => model.store_address)</h4>
+                    <h4 id="storeAddress" class="font-weight-normal">
+                        @(string.IsNullOrEmpty(Model.store_address) ? "No Value" : Model.store_address)
+                    </h4>
                 </div>
                 <div class="mb-3">
                     <label for="storeEmail" class="form-label">Email</label>
-                    <h4 id="storeEmail" class="font-weight-normal">@Html.DisplayFor(model => model.email)</h4>
+                    <h4 id="storeEmail" class="font-weight-normal">
+                        @(string.IsNullOrEmpty(Model.email) ? "No Value" : Model.email)
+                    </h4>
                 </div>
                 <div class="mb-3">
                     <label for="storePhone" class="form-label">Phone</label>
-                    <h4 id="storePhone" class="font-weight-normal">@Html.DisplayFor(model => model.phone)</h4>
+                    <h4 id="storePhone" class="font-weight-normal">
+                        @(string.IsNullOrEmpty(Model.phone) ? "No Value" : Model.phone)
+                    </h4>
                 </div>
                 <div class="mb-3">
-                    <label for="storePhone" class="form-label">Operating Hours</label>
-                    <h4 id="storehours" class="font-weight-normal">@Html.DisplayFor(model => model.operating_hours)</h4>
+                    <label for="storehours" class="form-label">Operating Hours</label>
+                    <h4 id="storehours" class="font-weight-normal">
+                        @(string.IsNullOrEmpty(Model.operating_hours) ? "No Value" : Model.operating_hours)
+                    </h4>
                 </div>
                 <div class="mb-3">
-                    <label for="storePhone" class="form-label">Description</label>
-                    <h4 id="storehours" class="font-weight-normal">@Html.DisplayFor(model => model.store_description)</h4>
+                    <label for="storeDescription" class="form-label">Description</label>
+                    <h4 id="storeDescription" class="font-weight-normal">
+                        @(string.IsNullOrEmpty(Model.store_description) ? "No Value" : Model.store_description)
+                    </h4>
                 </div>
                 <div class="edit-store-button">
                     <a class="btn btn-primary py-2 px-4" href="~/Shop/ChangeLogo">Edit Store</a>
                 </div>
+
             </div>
         </div>
     </div>

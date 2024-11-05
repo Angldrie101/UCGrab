@@ -13,12 +13,12 @@
             <div class="bg-light p-30 mb-5">
                 <div class="col-md-12">
                     <div class="custom-control custom-radio">
-                        <input type="radio" class="custom-control-input" id="pick-up" name="checkout_option" value="0" onclick="toggleForms()" checked>
+                        <input type="radio" class="custom-control-input" id="pick-up" name="CheckOutOption" value="0" onclick="toggleForms()" checked>
                         <label class="custom-control-label" for="pick-up">Pick-Up</label>
                     </div>
                     <div class="custom-control custom-radio">
-                        <input type="radio" class="custom-control-input" id="shipto" name="checkout_option" value="1" onclick="toggleForms()">
-                        <label class="custom-control-label" for="shipto">Deliver</label>
+                        <input type="radio" class="custom-control-input" id="deliver" name="CheckOutOption" value="1" onclick="toggleForms()">
+                        <label class="custom-control-label" for="deliver">Deliver</label>
                     </div>
                 </div>
             </div>
@@ -50,7 +50,7 @@
                     </div>
                 </div>
 
-                <div id="shipping-address" class="mb-5" style="display: none;">
+                <div id="shipping-info" class="mb-5" style="display: none;">
                     <h5 class="section-title position-relative text-uppercase mb-3">
                         <span class="bg-secondary pr-3">Shipping Address</span>
                     </h5>
@@ -73,12 +73,8 @@
                                 <input class="form-control" type="text" name="phone" value="@Model.Phone">
                             </div>
                             <div class="col-md-6 form-group">
-                                <label>Shipping Address</label>
-                                <input class="form-control" type="text" name="shipping_address" value="University of Cebu Lapu-lapu Mandaue">
-                            </div>
-                            <div class="col-md-6 form-group">
                                 <label>Building</label>
-                                <select class="custom-select" name="building">
+                                <select class="custom-select" name="building" required>
                                     <option disabled selected>Select a Building</option>
                                     <option value="Annex 1">Annex 1</option>
                                     <option value="Annex 2">Annex 2</option>
@@ -110,24 +106,24 @@
                     {
                         <div class="d-flex justify-content-between">
                             <p>@product.ProductName (@product.Quantity pcs)</p>
-                            <p>$@product.Price</p>
+                            <p>₱@product.Price</p>
                         </div>
                     }
                 </div>
                 <div class="border-bottom pt-3 pb-2">
                     <div class="d-flex justify-content-between mb-3">
                         <h6>Subtotal</h6>
-                        <h6>$@Model.Total</h6>
+                        <h6>₱@Model.Total</h6>
                     </div>
                     <div class="d-flex justify-content-between">
                         <h6 class="font-weight-medium">Shipping</h6>
-                        <h6 class="font-weight-medium">$10</h6>
+                        <h6 class="font-weight-medium">₱10</h6>
                     </div>
                 </div>
                 <div class="pt-2">
                     <div class="d-flex justify-content-between mt-2">
                         <h5>Total</h5>
-                        <h5>$@(Model.Total + 10)</h5>
+                        <h5>₱@(Model.Total + 10)</h5>
                     </div>
                 </div>
             </div>
@@ -161,7 +157,7 @@
 <script>
     function toggleForms() {
         var pickUp = document.getElementById("pick-up");
-        var shippingAddress = document.getElementById("shipping-address");
+        var shippingAddress = document.getElementById("shipping-info");
         var pickUpInfo = document.getElementById("pick-up-info");
 
         if (pickUp.checked) {

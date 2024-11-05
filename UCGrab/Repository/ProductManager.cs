@@ -100,10 +100,10 @@ namespace UCGrab.Repository
                       .GroupBy(od => od.product_id)
                       .Select(g => new ProductViewModel
                       {
-                          ProductId = g.Key,
+                          ProductId = (Int32)g.Key,
                           ProductName = g.FirstOrDefault().Product.product_name,
-                          Quantity = g.Sum(od => od.quatity),
-                          Total = g.Sum(od => od.price * od.quatity)
+                          Quantity = (Int32)g.Sum(od => od.quatity),
+                          Total = (Int32)g.Sum(od => od.price * od.quatity)
                       })
                       .OrderByDescending(p => p.Quantity)
                       .Take(10)

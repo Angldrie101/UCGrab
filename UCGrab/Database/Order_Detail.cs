@@ -15,10 +15,10 @@ namespace UCGrab.Database
     public partial class Order_Detail
     {
         public int id { get; set; }
-        public int order_id { get; set; }
-        public int product_id { get; set; }
-        public int quatity { get; set; }
-        public decimal price { get; set; }
+        public Nullable<int> order_id { get; set; }
+        public Nullable<int> product_id { get; set; }
+        public Nullable<int> quatity { get; set; }
+        public Nullable<decimal> price { get; set; }
     
         public virtual Order Order { get; set; }
         public virtual Product Product { get; set; }

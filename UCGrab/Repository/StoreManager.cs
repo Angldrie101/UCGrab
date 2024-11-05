@@ -75,10 +75,12 @@ namespace UCGrab.Repository
                 return _store.Get(userInf.store_id);
 
             var store = new Store();
-            store.store_id = Utilities.gUid;
-            store.store_name = $"{user.username}.Store";
 
-            if (_store.Create(store, out err) != ErrorCode.Success)
+            if (AddStoreForUser(store, user.user_id, ref err) != ErrorCode.Success)
+            
+
+
+                if (_store.Create(store, out err) != ErrorCode.Success)
             {
                 // Return Error
                 return null;

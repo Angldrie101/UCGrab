@@ -107,6 +107,11 @@ namespace UCGrab.Repository
             return _order._table.Where(m => m.user_id == userId && m.order_status == (Int32)OrderStatus.Open).ToList();
         }
 
+        public List<Order> GetAllOrders()
+        {
+            return _order._table.ToList();
+        }
+
         public int GetCartCountByUserId(String userId)
         {
             var count = _db.sp_getCartCountByUserId(userId).FirstOrDefault();
@@ -143,7 +148,6 @@ namespace UCGrab.Repository
                     order.payment_method = model.PaymentMethod; // Add this line to save the payment method
                     order.order_date = DateTime.Now;
                     order.checkOut_option = model.CheckOutOption;
-                    order.shipping_address = model.ShippingAddress;
                     order.building = model.Building;
                     order.room = model.Room;
                     order.firstname = model.Firstname;

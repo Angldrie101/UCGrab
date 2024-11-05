@@ -60,7 +60,6 @@
           <Property Name="shipped_date" Type="datetime" />
           <Property Name="building" Type="varchar" MaxLength="255" />
           <Property Name="room" Type="varchar" MaxLength="255" />
-          <Property Name="shipping_address" Type="varchar" MaxLength="255" />
           <Property Name="payment_method" Type="varchar" MaxLength="255" />
           <Property Name="additional_info" Type="nvarchar(max)" />
           <Property Name="checkOut_option" Type="int" />
@@ -74,10 +73,10 @@
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="order_id" Type="int" Nullable="false" />
-          <Property Name="product_id" Type="int" Nullable="false" />
-          <Property Name="quatity" Type="int" Nullable="false" />
-          <Property Name="price" Type="decimal" Precision="10" Scale="2" Nullable="false" />
+          <Property Name="order_id" Type="int" />
+          <Property Name="product_id" Type="int" />
+          <Property Name="quatity" Type="int" />
+          <Property Name="price" Type="decimal" Precision="10" Scale="2" />
         </EntityType>
         <EntityType Name="Product">
           <Key>
@@ -109,9 +108,9 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="store_id" Type="varchar" MaxLength="255" />
           <Property Name="user_id" Type="varchar(max)" />
-          <Property Name="store_name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="store_name" Type="varchar" MaxLength="50" />
           <Property Name="store_description" Type="varchar(max)" />
-          <Property Name="store_address" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="store_address" Type="nvarchar" MaxLength="255" />
           <Property Name="phone" Type="varchar" MaxLength="255" />
           <Property Name="email" Type="nvarchar" MaxLength="255" />
           <Property Name="operating_hours" Type="varchar" MaxLength="50" />
@@ -173,7 +172,9 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
           <Property Name="rolename" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <Association Name="FK_Image_Store_Image_Store">
-          <End Role="Store" Type="Self.Store" Multiplicity="0..1" />
+          <End Role="Store" Type="Self.Store" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="Image_Store" Type="Self.Image_Store" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Store">
@@ -197,7 +198,7 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Order_Detail_Order">
-          <End Role="Order" Type="Self.Order" Multiplicity="1">
+          <End Role="Order" Type="Self.Order" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
           </End>
           <End Role="Order_Detail" Type="Self.Order_Detail" Multiplicity="*" />
@@ -211,7 +212,9 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Order_Detail_Product">
-          <End Role="Product" Type="Self.Product" Multiplicity="1" />
+          <End Role="Product" Type="Self.Product" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="Order_Detail" Type="Self.Order_Detail" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Product">
@@ -599,7 +602,6 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="shipped_date" Type="DateTime" Precision="3" />
           <Property Name="building" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="room" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
-          <Property Name="shipping_address" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="payment_method" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="additional_info" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="checkOut_option" Type="Int32" />
@@ -615,10 +617,10 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="order_id" Type="Int32" Nullable="false" />
-          <Property Name="product_id" Type="Int32" Nullable="false" />
-          <Property Name="quatity" Type="Int32" Nullable="false" />
-          <Property Name="price" Type="Decimal" Nullable="false" Precision="10" Scale="2" />
+          <Property Name="order_id" Type="Int32" />
+          <Property Name="product_id" Type="Int32" />
+          <Property Name="quatity" Type="Int32" />
+          <Property Name="price" Type="Decimal" Precision="10" Scale="2" />
           <NavigationProperty Name="Order" Relationship="UCGrabModel.FK_Order_Detail_Order" FromRole="Order_Detail" ToRole="Order" />
           <NavigationProperty Name="Product" Relationship="UCGrabModel.FK_Order_Detail_Product" FromRole="Order_Detail" ToRole="Product" />
         </EntityType>
@@ -657,9 +659,9 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="store_id" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="user_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="store_name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="store_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="store_description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="store_address" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="store_address" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="phone" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="operating_hours" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
@@ -768,7 +770,9 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Image_Store_Image_Store">
-          <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Type="UCGrabModel.Image_Store" Role="Image_Store" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Store">
@@ -780,7 +784,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Order_Detail_Order">
-          <End Type="UCGrabModel.Order" Role="Order" Multiplicity="1">
+          <End Type="UCGrabModel.Order" Role="Order" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
           </End>
           <End Type="UCGrabModel.Order_Detail" Role="Order_Detail" Multiplicity="*" />
@@ -806,7 +810,9 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Order_Detail_Product">
-          <End Type="UCGrabModel.Product" Role="Product" Multiplicity="1" />
+          <End Type="UCGrabModel.Product" Role="Product" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Type="UCGrabModel.Order_Detail" Role="Order_Detail" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Product">
@@ -968,7 +974,6 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
                 <ScalarProperty Name="checkOut_option" ColumnName="checkOut_option" />
                 <ScalarProperty Name="additional_info" ColumnName="additional_info" />
                 <ScalarProperty Name="payment_method" ColumnName="payment_method" />
-                <ScalarProperty Name="shipping_address" ColumnName="shipping_address" />
                 <ScalarProperty Name="room" ColumnName="room" />
                 <ScalarProperty Name="building" ColumnName="building" />
                 <ScalarProperty Name="shipped_date" ColumnName="shipped_date" />

@@ -12,5 +12,6 @@ namespace UCGrab.Models
         public string DeliveryAddress { get; set; }
         public int ItemCount { get; set; }
         public decimal TotalAmount { get; set; }
+        public string ImgUrl { get; set; }
     }
 }
