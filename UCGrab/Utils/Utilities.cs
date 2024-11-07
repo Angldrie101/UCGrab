@@ -67,6 +67,12 @@ namespace UCGrab.Utils
         Done
     }
 
+    public enum PayMethod
+    {
+        GCash,
+        CashOnDelivery
+    }
+
     public class Constant
     {
         public const string Role_Customer = "Customer";

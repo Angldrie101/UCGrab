@@ -60,7 +60,7 @@
           <Property Name="shipped_date" Type="datetime" />
           <Property Name="building" Type="varchar" MaxLength="255" />
           <Property Name="room" Type="varchar" MaxLength="255" />
-          <Property Name="payment_method" Type="varchar" MaxLength="255" />
+          <Property Name="payment_method" Type="int" />
           <Property Name="additional_info" Type="nvarchar(max)" />
           <Property Name="checkOut_option" Type="int" />
           <Property Name="firstname" Type="varchar" MaxLength="255" />
@@ -602,7 +602,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="shipped_date" Type="DateTime" Precision="3" />
           <Property Name="building" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="room" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
-          <Property Name="payment_method" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="payment_method" Type="Int32" />
           <Property Name="additional_info" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="checkOut_option" Type="Int32" />
           <Property Name="firstname" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />

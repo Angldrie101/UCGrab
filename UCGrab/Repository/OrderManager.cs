@@ -109,7 +109,7 @@ namespace UCGrab.Repository
 
         public List<Order> GetAllOrders()
         {
-            return _order._table.ToList();
+            return _order._table.Where(m => m.checkOut_option == (Int32)CheckoutOption.Deliver).ToList();
         }
 
         public int GetCartCountByUserId(String userId)

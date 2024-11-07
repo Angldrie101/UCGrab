@@ -596,7 +596,7 @@ namespace UCGrab.Controllers
         {
             IsUserLoggedSession();
 
-            var userId = UserId; // Assuming you have a way to get the logged-in user's ID
+            var userId = UserId;
             var userInfo = _userManager.GetUserInfoByUserId(userId);
             var order = _orderManager.GetOrderByUserId(userId).FirstOrDefault();
             var orderDetails = _orderManager.GetOrderDetailsByOrderId(order.order_id);
@@ -615,7 +615,8 @@ namespace UCGrab.Controllers
                     Price = (Int32)od.price
                 }).ToList(),
                 Total = (Int32)orderDetails.Sum(od => od.price * od.quatity),
-                CheckOutOption = (Int32)CheckoutOption.PickUp // Set a default value
+                CheckOutOption = (Int32)CheckoutOption.PickUp,
+                PaymentMethod = (Int32)PayMethod.GCash
             };
 
             return View(model);
