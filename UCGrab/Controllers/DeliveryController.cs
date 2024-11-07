@@ -19,7 +19,7 @@ namespace UCGrab.Controllers
         {
             IsUserLoggedSession();
 
-            var orders = _orderManager.GetAllOrders(); // Retrieve all orders without filtering by user
+            var orders = _orderManager.GetAllOrders();
 
             System.Diagnostics.Debug.WriteLine($"Total Orders count: {orders.Count}");
 
@@ -53,15 +53,13 @@ namespace UCGrab.Controllers
         [AllowAnonymous]
         public ActionResult OrderDetails(int id)
         {
-            // Assuming you have a method to get the full order details by order ID
             var order = _orderManager.GetOrderbyId(id);
 
             if (order == null)
             {
                 return HttpNotFound();
             }
-
-            // Map the Order entity to OrderViewModel
+            
             var orderViewModel = new OrderViewModel
             {
                 OrderId = order.order_id,
@@ -74,14 +72,9 @@ namespace UCGrab.Controllers
                     ProductId = (Int32)p.id,
                     Total = (Int32)order.Order_Detail.Sum(od => od.price * od.quatity),
                     Price = p.price,
-                    // other properties if needed
                 }).ToList(),
-
-                // Add other necessary mappings, like the store image URL
-                StoreImageUrl = "/path/to/store/image.jpg"  // Example, change as needed
+                StoreImageUrl = "/path/to/store/image.jpg" 
             };
-
-            // Return the view with the view model
             return View(orderViewModel);
         }
 
@@ -94,7 +87,6 @@ namespace UCGrab.Controllers
 
             if (order != null)
             {
-                // Assuming "Confirmed" is the new status
                 order.order_status = (Int32)OrderStatus.ReadyToDeliver;
                 _db.SaveChanges();
 
@@ -102,6 +94,12 @@ namespace UCGrab.Controllers
             }
 
             return Json(new { success = false });
+        }
+
+        [AllowAnonymous]
+        public ActionResult ToDeliver()
+        {
+            return View();
         }
 
 

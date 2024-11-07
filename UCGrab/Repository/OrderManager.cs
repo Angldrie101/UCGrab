@@ -111,6 +111,11 @@ namespace UCGrab.Repository
         {
             return _order._table.Where(m => m.order_status == (Int32)OrderStatus.Confirmed && m.checkOut_option == (Int32)CheckoutOption.Deliver).ToList();
         }
+
+        public List<Order> GetAllOrderToDeliver(String userId)
+        {
+            return _order._table.Where(m => m.user_id == userId && m.order_status == (Int32)OrderStatus.ReadyToDeliver).ToList();
+        }
         
         public Order GetOrderbyId(int id)
         {

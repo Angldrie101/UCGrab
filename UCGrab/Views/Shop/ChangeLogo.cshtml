@@ -61,6 +61,7 @@
                     <label for="storePhone" class="form-label">Description</label>
                     @Html.TextAreaFor(model => model.store_description, new { @class = "form-control", placeholder = "Description", required = "required", data_validation_required_message = "Please enter store description" })
                 </div>
+                    @Html.TextBoxFor(model => model.status, new { @class = "form-control", @Value = 1, style = "visibility:hidden;" })
                 <div>
                     <button class="btn btn-primary py-2 px-4" type="submit" id="saveProfileButton">Save Changes</button>
                 </div>
