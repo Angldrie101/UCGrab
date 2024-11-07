@@ -78,9 +78,7 @@ namespace UCGrab.Repository
 
             if (AddStoreForUser(store, user.user_id, ref err) != ErrorCode.Success)
             
-
-
-                if (_store.Create(store, out err) != ErrorCode.Success)
+            if (_store.Create(store, out err) != ErrorCode.Success)
             {
                 // Return Error
                 return null;

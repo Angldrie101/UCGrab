@@ -51,10 +51,59 @@ namespace UCGrab.Controllers
             return View(model);
         }
         [AllowAnonymous]
-        public ActionResult OrderDetails()
+        public ActionResult OrderDetails(int id)
         {
-            return View();
+            // Assuming you have a method to get the full order details by order ID
+            var order = _orderManager.GetOrderbyId(id);
+
+            if (order == null)
+            {
+                return HttpNotFound();
+            }
+
+            // Map the Order entity to OrderViewModel
+            var orderViewModel = new OrderViewModel
+            {
+                OrderId = order.order_id,
+                Firstname = order.firstname,
+                Lastname = order.lastname,
+                Building = order.building,
+                Room = order.room,
+                Products = order.Products.Select(p => new ProductViewModel
+                {
+                    ProductId = (Int32)p.id,
+                    Total = (Int32)order.Order_Detail.Sum(od => od.price * od.quatity),
+                    Price = p.price,
+                    // other properties if needed
+                }).ToList(),
+
+                // Add other necessary mappings, like the store image URL
+                StoreImageUrl = "/path/to/store/image.jpg"  // Example, change as needed
+            };
+
+            // Return the view with the view model
+            return View(orderViewModel);
         }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public JsonResult ChangeOrderStatus(int orderId)
+        {
+            var _db = new UCGrabEntities();
+            var order = _db.Order.FirstOrDefault(o => o.order_id == orderId);
+
+            if (order != null)
+            {
+                // Assuming "Confirmed" is the new status
+                order.order_status = (Int32)OrderStatus.ReadyToDeliver;
+                _db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+
+            return Json(new { success = false });
+        }
+
 
         [AllowAnonymous]
         public ActionResult Logout()

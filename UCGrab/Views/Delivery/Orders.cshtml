@@ -56,10 +56,9 @@
                             <p class="card-text">
                                 Delivery Address: @order.Building at room @order.Room<br />
                                 Items: @order.Products.Count<br />
-                                Total: Php @order.Total
+                                Total: Php @order.Total<br />
                             </p>
-                            <p class="card-text">Message: @order.AdditionalInfo</p>
-                            <a class="btn btn-primary">Accept</a>
+                            <a href="#" class="btn btn-primary" onclick="changeOrderStatus(@order.OrderId)">Accept</a>
                             <a href="@Url.Action("OrderDetails", "Delivery", new { id = order.OrderId })" class="btn btn-primary">View Details</a>
                         </div>
                     </div>
@@ -86,3 +85,52 @@ else
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function changeOrderStatus(orderId) {
+        // SweetAlert confirmation
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to accept this order?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, accept it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // If confirmed, make the AJAX request to change the status
+                $.ajax({
+                    url: '@Url.Action("ChangeOrderStatus", "Delivery")',
+                    type: 'POST',
+                    data: { orderId: orderId },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire(
+                                'Accepted!',
+                                'The order status has been updated.',
+                                'success'
+                            );
+                            location.reload();  // Reload the page to reflect changes
+                        } else {
+                            Swal.fire(
+                                'Failed!',
+                                'There was an issue updating the order status.',
+                                'error'
+                            );
+                        }
+                    },
+                    error: function() {
+                        Swal.fire(
+                            'Error!',
+                            'An error occurred while updating the order status.',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    }
+</script>
+
+

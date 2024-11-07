@@ -1,105 +1,79 @@
 ﻿@model List<UCGrab.Models.OrderViewModel>
-
 @{
     ViewBag.Title = "ListOrders";
     Layout = "~/Views/Shared/ShopPageLayout.cshtml";
+
+    // Check if the store name is null or empty
+    var storeName = "YourStoreName"; // Replace with actual store name variable if available
 }
 
-<!-- Orders Start -->
 <div class="container-fluid">
     <!-- Navigation Bar Start -->
     <div class="row px-xl-5">
         <div class="col-lg-12 mb-4">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">All</a>
+                    <a class="nav-link active" data-toggle="tab" href="#toConfirm">To Confirm</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">To Confirm</a>
+                    <a class="nav-link" data-toggle="tab" href="#toDeliver">To Deliver</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">To Deliver</a>
+                    <a class="nav-link" data-toggle="tab" href="#toReceive">To Receive</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">To Receive</a>
+                    <a class="nav-link" data-toggle="tab" href="#received">Received</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Received</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Cancelled</a>
+                    <a class="nav-link" data-toggle="tab" href="#cancelled">Cancelled</a>
                 </li>
             </ul>
         </div>
     </div>
     <!-- Navigation Bar End -->
-    <!-- Order Content Start -->
-    <div class="row px-xl-5">
-        <div class="col-lg-12 mb-5">
-            <div class="bg-light p-30">
-                @if (Model.Any())
-                {
-                    foreach (var order in Model)
-                    {
-                        <div class="order-item mb-4">
-                            <div class="d-flex justify-content-between align-items-center bg-lightgray text-dark p-3" style="background-color: lightgray;">
-                                <div>
-                                    <span>Order Number: </span><strong>@order.OrderNumber</strong>
-                                </div>
-                                <div>
-                                    <span>Order Date: </span><strong>@order.OrderDate.ToString("yyyy-MM-dd")</strong>
-                                </div>
-                                <div>
-                                    <span>Status: </span><strong>@order.Status</strong>
-                                </div>
-                            </div>
-                            <div class="p-3" style="background-color: white;">
-                                @foreach (var product in order.Products)
-                                {
-                                    <div class="d-flex align-items-center border-bottom pb-3 mb-3">
-                                        <img src="~/UploadedFiles/@product.ImageFilePath" alt="@product.ProductName" style="width: 100px; height: 100px; object-fit: cover;">
-                                        <div class="ml-3">
-                                            <a href="#" class="h6 text-decoration-none text-truncate">@product.ProductName</a>
-                                            <div class="text-muted">Quantity: @product.Quantity</div>
-                                            <div class="text-muted">Price: $@product.Price</div>
-                                        </div>
-                                    </div>
-                                }
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <div></div>
-                                    <div>
-                                        <strong>Total: $@order.Total</strong>
-                                    </div>
-                                </div>
-                            </div>
-                            @if (order.Status == "Pending")
-                            {
-                                <div class="p-3 text-center" style="background-color: #E8E742 ; width: 100%;">
-                                    <button class="btn btn-link" style="display: block; width: 100%; text-align: center; color: #000;" onclick="confirmOrder(@order.OrderId)">Confirm Order</button>
-                                </div>
-                            }
-                            else if (order.Status == "Confirmed")
-                            {
-                                <div class="p-3 text-center" style="background-color: #42E8A7 ; width: 100%;">
-                                    <button class="btn btn-link" style="display: block; width: 100%; text-align: center; color: #000;" onclick="readyToDeliver(@order.OrderId)">Ready to Deliver</button>
-                                </div>
-                            }
-                        </div>
-                    }
-                }
-                else
-                {
-                    <div class="text-center mt-5">
-                        <img src="~/Content/Images/no-orders.png" alt="No Orders" class="mb-3" style="max-width: 100px; display: block; margin: 0 auto;">
-                        <h4>No orders yet</h4>
+    <!-- Store Name Check -->
+    @if (string.IsNullOrEmpty(storeName))
+    {
+        <div class="alert alert-warning text-center mt-4">
+            Create your store first.
+        </div>
+    }
+    else
+    {
+        <!-- Order Content Start -->
+        <div class="row px-xl-5">
+            <div class="col-lg-12 mb-5">
+                <div class="bg-light p-30 tab-content">
+                    <!-- To Confirm Tab -->
+                    <div id="toConfirm" class="tab-pane fade show active">
+                        @RenderOrders(Model.Where(o => o.Status == "Pending"), "Confirm Order", true)
                     </div>
-                }
+
+                    <!-- To Deliver Tab -->
+                    <div id="toDeliver" class="tab-pane fade">
+                        @RenderOrders(Model.Where(o => o.Status == "Confirmed"), "Ready for Delivery")
+                    </div>
+
+                    <!-- To Receive Tab -->
+                    <div id="toReceive" class="tab-pane fade">
+                        @RenderOrders(Model.Where(o => o.Status == "ReadyToDeliver"), "To Receive")
+                    </div>
+
+                    <!-- Received Tab -->
+                    <div id="received" class="tab-pane fade">
+                        @RenderOrders(Model.Where(o => o.Status == "Delivered"), "Order Completed")
+                    </div>
+
+                    <!-- Cancelled Tab -->
+                    <div id="cancelled" class="tab-pane fade">
+                        @RenderOrders(Model.Where(o => o.Status == "Cancelled"), "Order Cancelled")
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <!-- Order Content End -->
+        <!-- Order Content End -->
+    }
 </div>
-<!-- Orders End -->
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -114,7 +88,6 @@
             confirmButtonText: 'Yes, confirm it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Create a form and submit it
                 var form = document.createElement("form");
                 form.setAttribute("method", "post");
                 form.setAttribute("action", "/Shop/ConfirmOrder");
@@ -125,39 +98,54 @@
                 hiddenField.setAttribute("value", orderId);
 
                 form.appendChild(hiddenField);
-
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
-
-    function readyToDeliver(orderId) {
-        Swal.fire({
-            title: 'Ready to Deliver?',
-            text: "Are you ready to deliver this order?",
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, ready to deliver!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Create a form and submit it
-                var form = document.createElement("form");
-                form.setAttribute("method", "post");
-                form.setAttribute("action", "/Shop/ReadyToDeliver");
-
-                var hiddenField = document.createElement("input");
-                hiddenField.setAttribute("type", "hidden");
-                hiddenField.setAttribute("name", "orderId");
-                hiddenField.setAttribute("value", orderId);
-
-                form.appendChild(hiddenField);
-
                 document.body.appendChild(form);
                 form.submit();
             }
         });
     }
 </script>
+
+@helper RenderOrders(IEnumerable<UCGrab.Models.OrderViewModel> orders, string buttonText, bool showConfirmButton = false)
+{
+if (!orders.Any())
+{
+        <div class="text-center mt-5">
+            <img src="~/Content/Images/no-orders.png" alt="No Orders" class="mb-3" style="max-width: 100px; display: block; margin: 0 auto;">
+            <h4>No orders found</h4>
+        </div>
+}
+else
+{
+    foreach (var order in orders)
+    {
+            <div class="order-item mb-4">
+                <div class="d-flex justify-content-between align-items-center bg-lightgray text-dark p-3" style="background-color: lightgray;">
+                    <div><strong>Order Number: </strong>@order.OrderNumber</div>
+                    <div><strong>Order Date: </strong>@order.OrderDate.ToString("yyyy-MM-dd")</div>
+                </div>
+                <div class="p-3" style="background-color: white;">
+                    @foreach (var product in order.Products)
+                    {
+                        <div class="d-flex align-items-center border-bottom pb-3 mb-3">
+                            <img src="~/UploadedFiles/@product.ImageFilePath" alt="@product.ProductName" style="width: 100px; height: 100px; object-fit: cover;">
+                            <div class="ml-3">
+                                <a href="#" class="h6 text-decoration-none text-truncate">@product.ProductName</a>
+                                <div class="text-muted">Quantity: @product.Quantity</div>
+                                <div class="text-muted">Price: $@product.Price</div>
+                            </div>
+                        </div>
+                    }
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <strong>Total: $@order.Total</strong>
+                    </div>
+                </div>
+                @if (showConfirmButton)
+                {
+                    <div class="p-3 text-center" style="background-color: #E8E742 ; width: 100%;">
+                        <button class="btn btn-link" onclick="confirmOrder(@order.OrderId)" style="color: #000;">@buttonText</button>
+                    </div>
+                }
+            </div>
+    }
+}
+}

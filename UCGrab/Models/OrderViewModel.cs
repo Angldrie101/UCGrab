@@ -23,5 +23,6 @@ namespace UCGrab.Models
         public string Room { get; set; }
         public string AdditionalInfo { get; set; }
         public int CheckOutOption { get; set; }
+        public string StoreImageUrl { get; set; }
     }
 }

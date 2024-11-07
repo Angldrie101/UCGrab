@@ -46,8 +46,7 @@ namespace UCGrab.Utils
         Snack,
         Lunch,
         Uniform,
-        DepartmentalShirts,
-        Books
+        DepartmentalShirts
     }
 
     public enum CheckoutOption

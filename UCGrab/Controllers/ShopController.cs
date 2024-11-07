@@ -91,23 +91,6 @@ namespace UCGrab.Controllers
             }
         }
 
-        [HttpPost]
-        [Authorize]
-        public ActionResult ReadyToDeliver(int orderId)
-        {
-            var result = _orderManager.ReadyToDeliver(orderId);
-
-            if (result == ErrorCode.Success)
-            {
-                return RedirectToAction("ListOrders");
-            }
-            else
-            {
-                // Handle the error case as needed
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Unable to mark the order as ready to deliver.");
-            }
-        }
-
         [AllowAnonymous]
         public ActionResult MyProfile()
         {

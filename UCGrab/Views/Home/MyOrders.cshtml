@@ -5,57 +5,46 @@
     Layout = "~/Views/Shared/UserLayout.cshtml";
 }
 
+<div class="row px-xl-5">
+    <div class="col-lg-12 mb-4">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#toReceive">To Receive</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#toReview">To Review</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#cancelled">Cancelled</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
 <!-- Orders Start -->
 <div class="container-fluid">
     <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">My Orders</span></h2>
     <div class="row px-xl-5">
         <div class="col-lg-12 mb-5">
             <div class="bg-light p-30">
-                @if (Model.Any())
-                {
-                    foreach (var order in Model)
-                    {
-                        <div class="order-item mb-4">
-                            <div class="d-flex justify-content-between align-items-center bg-lightgray text-dark p-3" style="background-color: lightgray;">
-                                <div>
-                                    <span>Order Number: </span><strong>@order.OrderNumber</strong>
-                                </div>
-                                <div>
-                                    <span>Order Date: </span><strong>@order.OrderDate.ToString("yyyy-MM-dd")</strong>
-                                </div>
-                                <div>
-                                    <span>Status: </span><strong>@order.Status</strong>
-                                </div>
-                            </div>
-                            <div class="p-3" style="background-color: white;">
-                                @foreach (var product in order.Products)
-                                {
-                                    <div class="d-flex align-items-center border-bottom pb-3 mb-3">
-                                        <img src="~/UploadedFiles/@product.ImageFilePath" alt="@product.ProductName" style="width: 100px; height: 100px; object-fit: cover;">
-                                        <div class="ml-3">
-                                            <a href="#" class="h6 text-decoration-none text-truncate">@product.ProductName</a>
-                                            <div class="text-muted">Quantity: @product.Quantity</div>
-                                            <div class="text-muted">Price: $@product.Price</div>
-                                        </div>
-                                    </div>
-                                }
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <div></div>
-                                    <div>
-                                        <strong>Total: $@order.Total</strong>
-                                    </div>
-                                </div>
-                            </div>
-                            @if (order.Status == "Pending")
-                            {
-                                <div class="p-3 text-center" style="background-color: #E8E742 ; width: 100%;">
-                                    <button class="btn btn-link" style="display: block; width: 100%; text-align: center; color: #000;" onclick="confirmCancel(@order.OrderId)">Cancel Order</button>
-                                </div>
-                            }
-                        </div>
-                    }
-                }
-                else
+                <div class="tab-content">
+                    <!-- To Receive Tab -->
+                    <div class="tab-pane fade show active" id="toReceive">
+                        @RenderOrders(Model.Where(o => o.Status == "Pending" || o.Status == "Confirmed" || o.Status == "ReadyToDeliver"), "To Receive")
+                    </div>
+
+                    <!-- To Review Tab -->
+                    <div class="tab-pane fade" id="toReview">
+                        @RenderOrders(Model.Where(o => o.Status == "Delivered"), "Order Completed")
+                    </div>
+
+                    <!-- Cancelled Tab -->
+                    <div class="tab-pane fade" id="cancelled">
+                        @RenderOrders(Model.Where(o => o.Status == "Cancelled"), "Order Cancelled")
+                    </div>
+                </div>
+
+                @if (Model == null || !Model.Any())
                 {
                     <div class="alert alert-info text-left" role="alert">
                         You have no orders.
@@ -66,6 +55,7 @@
     </div>
 </div>
 <!-- Orders End -->
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function confirmCancel(orderId) {
@@ -97,3 +87,43 @@
         });
     }
 </script>
+
+@helper RenderOrders(IEnumerable<UCGrab.Models.OrderViewModel> orders, string buttonText)
+{
+if (!orders.Any())
+{
+        <div class="text-center mt-5">
+            <img src="~/Content/Images/no-orders.png" alt="No Orders" class="mb-3" style="max-width: 100px; display: block; margin: 0 auto;">
+            <h4>No orders found</h4>
+        </div>
+}
+else
+{
+    foreach (var order in orders)
+    {
+            <div class="order-item mb-4">
+                <div class="d-flex justify-content-between align-items-center bg-lightgray text-dark p-3" style="background-color: lightgray;">
+                    <div><strong>Order Number: </strong>@order.OrderNumber</div>
+                    <div><strong>Order Date: </strong>@order.OrderDate.ToString("yyyy-MM-dd")</div>
+                    <div><strong>Status: </strong>@order.Status</div>
+                </div>
+                <div class="p-3" style="background-color: white;">
+                    @foreach (var product in order.Products)
+                    {
+                        <div class="d-flex align-items-center border-bottom pb-3 mb-3">
+                            <img src="~/UploadedFiles/@product.ImageFilePath" alt="@product.ProductName" style="width: 100px; height: 100px; object-fit: cover;">
+                            <div class="ml-3">
+                                <a href="#" class="h6 text-decoration-none text-truncate">@product.ProductName</a>
+                                <div class="text-muted">Quantity: @product.Quantity</div>
+                                <div class="text-muted">Price: $@product.Price</div>
+                            </div>
+                        </div>
+                    }
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <strong>Total: $@order.Total</strong>
+                    </div>
+                </div>
+            </div>
+    }
+}
+}

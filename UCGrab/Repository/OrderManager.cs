@@ -109,7 +109,14 @@ namespace UCGrab.Repository
 
         public List<Order> GetAllOrders()
         {
-            return _order._table.Where(m => m.checkOut_option == (Int32)CheckoutOption.Deliver).ToList();
+            return _order._table.Where(m => m.order_status == (Int32)OrderStatus.Confirmed && m.checkOut_option == (Int32)CheckoutOption.Deliver).ToList();
+        }
+        
+        public Order GetOrderbyId(int id)
+        {
+            return _db.Order
+              .Include(o => o.Products) // Eager load the Products collection
+              .FirstOrDefault(o => o.order_id == id);
         }
 
         public int GetCartCountByUserId(String userId)
