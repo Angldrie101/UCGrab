@@ -2,13 +2,11 @@
 @{
     ViewBag.Title = "ListOrders";
     Layout = "~/Views/Shared/ShopPageLayout.cshtml";
-
-    // Check if the store name is null or empty
-    var storeName = "YourStoreName"; // Replace with actual store name variable if available
+    
+    var storeName = "YourStoreName"; 
 }
 
 <div class="container-fluid">
-    <!-- Navigation Bar Start -->
     <div class="row px-xl-5">
         <div class="col-lg-12 mb-4">
             <ul class="nav nav-tabs">
@@ -30,8 +28,6 @@
             </ul>
         </div>
     </div>
-    <!-- Navigation Bar End -->
-    <!-- Store Name Check -->
     @if (string.IsNullOrEmpty(storeName))
     {
         <div class="alert alert-warning text-center mt-4">
@@ -40,38 +36,31 @@
     }
     else
     {
-        <!-- Order Content Start -->
         <div class="row px-xl-5">
             <div class="col-lg-12 mb-5">
                 <div class="bg-light p-30 tab-content">
-                    <!-- To Confirm Tab -->
                     <div id="toConfirm" class="tab-pane fade show active">
                         @RenderOrders(Model.Where(o => o.Status == "Pending"), "Confirm Order", true)
                     </div>
 
-                    <!-- To Deliver Tab -->
                     <div id="toDeliver" class="tab-pane fade">
                         @RenderOrders(Model.Where(o => o.Status == "Confirmed"), "Ready for Delivery")
                     </div>
 
-                    <!-- To Receive Tab -->
                     <div id="toReceive" class="tab-pane fade">
                         @RenderOrders(Model.Where(o => o.Status == "ReadyToDeliver"), "To Receive")
                     </div>
 
-                    <!-- Received Tab -->
                     <div id="received" class="tab-pane fade">
                         @RenderOrders(Model.Where(o => o.Status == "Delivered"), "Order Completed")
                     </div>
 
-                    <!-- Cancelled Tab -->
                     <div id="cancelled" class="tab-pane fade">
                         @RenderOrders(Model.Where(o => o.Status == "Cancelled"), "Order Cancelled")
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Order Content End -->
     }
 </div>
 
@@ -131,12 +120,12 @@ else
                             <div class="ml-3">
                                 <a href="#" class="h6 text-decoration-none text-truncate">@product.ProductName</a>
                                 <div class="text-muted">Quantity: @product.Quantity</div>
-                                <div class="text-muted">Price: $@product.Price</div>
+                                <div class="text-muted">Price: Php @product.Price</div>
                             </div>
                         </div>
                     }
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <strong>Total: $@order.Total</strong>
+                        <strong>Total: Php @order.Total</strong>
                     </div>
                 </div>
                 @if (showConfirmButton)

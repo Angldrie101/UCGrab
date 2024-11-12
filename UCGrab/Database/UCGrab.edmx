@@ -67,6 +67,7 @@
           <Property Name="lastname" Type="varchar" MaxLength="255" />
           <Property Name="phone" Type="varchar" MaxLength="255" />
           <Property Name="email" Type="varchar" MaxLength="255" />
+          <Property Name="delivery_id" Type="varchar(max)" />
         </EntityType>
         <EntityType Name="Order_Detail">
           <Key>
@@ -611,6 +612,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Order_Detail" Relationship="UCGrabModel.FK_Order_Detail_Order" FromRole="Order" ToRole="Order_Detail" />
           <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Order_Store" FromRole="Order" ToRole="Store" />
+          <Property Name="delivery_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Order_Detail">
           <Key>
@@ -967,6 +969,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <EntitySetMapping Name="Order">
             <EntityTypeMapping TypeName="UCGrabModel.Order">
               <MappingFragment StoreEntitySet="Order">
+                <ScalarProperty Name="delivery_id" ColumnName="delivery_id" />
                 <ScalarProperty Name="email" ColumnName="email" />
                 <ScalarProperty Name="phone" ColumnName="phone" />
                 <ScalarProperty Name="lastname" ColumnName="lastname" />

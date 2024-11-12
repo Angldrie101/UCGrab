@@ -30,20 +30,19 @@ namespace UCGrab.Controllers
         {
             IsUserLoggedSession();
 
-            var userId = UserId; // Assuming you have a way to get the logged-in user's ID
+            var userId = UserId; 
             System.Diagnostics.Debug.WriteLine($"Logged in UserId: {userId}");
 
             var store = _storeManager.GetStoreByUserId(userId);
             if (store == null)
             {
-                // Handle the case where the store is not found
                 return HttpNotFound("Store not found.");
             }
 
-            var storeId = Convert.ToInt32(store.id); // Convert store ID to integer
+            var storeId = Convert.ToInt32(store.id); 
             System.Diagnostics.Debug.WriteLine($"StoreId: {storeId}");
 
-            var orders = _orderManager.GetOrdersByStoreId(storeId); // Retrieve orders for the store
+            var orders = _orderManager.GetOrdersByStoreId(storeId); 
             System.Diagnostics.Debug.WriteLine($"Orders count: {orders.Count}");
 
             if (orders.Count == 0)
@@ -86,7 +85,6 @@ namespace UCGrab.Controllers
             }
             else
             {
-                // Handle the error case as needed
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Unable to confirm the order.");
             }
         }
@@ -121,8 +119,6 @@ namespace UCGrab.Controllers
                     TempData["ErrorMessage"] = "Error updating profile: User not found.";
                     return View(userInf);
                 }
-
-                // Handle profile picture upload
                 if (profilePicture != null && profilePicture.ContentLength > 0)
                 {
                     var uploadsFolderPath = Server.MapPath("~/UploadedFiles/");
@@ -132,8 +128,7 @@ namespace UCGrab.Controllers
                     var profileFileName = Path.GetFileName(profilePicture.FileName);
                     var profileSavePath = Path.Combine(uploadsFolderPath, profileFileName);
                     profilePicture.SaveAs(profileSavePath);
-
-                    // Log the save path
+                    
                     System.Diagnostics.Debug.WriteLine("Profile picture saved at: " + profileSavePath);
 
                     var existingImage = _imageManager.ListImgAttachByImageId(userInf.id).FirstOrDefault();
@@ -297,8 +292,7 @@ namespace UCGrab.Controllers
                     TempData["ErrorMessage"] = "Error updating profile: User not found.";
                     return View(store);
                 }
-
-                // Handle profile picture upload
+                
                 if (profilePicture != null && profilePicture.ContentLength > 0)
                 {
                     var uploadsFolderPath = Server.MapPath("~/UploadedFiles/");
@@ -309,7 +303,7 @@ namespace UCGrab.Controllers
                     var profileSavePath = Path.Combine(uploadsFolderPath, profileFileName);
                     profilePicture.SaveAs(profileSavePath);
 
-                    // Log the save path
+                   
                     System.Diagnostics.Debug.WriteLine("Profile picture saved at: " + profileSavePath);
 
                     var existingImage = _imageManager.ListImgAttachByImageStoreId(store.id).FirstOrDefault();
@@ -355,7 +349,6 @@ namespace UCGrab.Controllers
         {
             ViewBag.Category = Utilities.SelectListItemCategoryByUser(Username);
             ViewBag.Categories = _categoryManager.ListCategory(Username) ?? new List<Category>();
-            //ViewBag.Products = _productManager.ListProduct(Username) ?? new List<Product>();
 
             var products = _productManager.ListProduct(Username) ?? new List<Product>();
             var productViewModels = products.Select(product => new ProductViewModel
@@ -393,7 +386,6 @@ namespace UCGrab.Controllers
 
             ViewBag.Category = Utilities.SelectListItemCategoryByUser(Username);
             ViewBag.Categories = _categoryManager.ListCategory(Username) ?? new List<Category>();
-            //ViewBag.Products = _productManager.ListProduct(Username) ?? new List<Product>();
             var products = _productManager.ListProduct(Username) ?? new List<Product>();
 
             var productViewModels = products.Select(product => new ProductViewModel
@@ -454,8 +446,7 @@ namespace UCGrab.Controllers
                         }
                     }
                 }
-
-                // Add initial stock
+                
                 Stock stock = new Stock
                 {
                     product_id = product.id,

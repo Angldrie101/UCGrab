@@ -120,7 +120,7 @@ namespace UCGrab.Controllers
             user.status = (Int32)Status.Active;
             _userManager.UpdateUser(user, ref ErrorMessage);
             var store = _storeManager.CreateOrRetrieve(username, ref ErrorMessage);
-            store.user_id = user.user_id;  // Assuming 'Id' is the UserId field of your user model
+            store.user_id = user.user_id; 
             _storeManager.UpdateStore(store.id,store, ref ErrorMessage);
 
 

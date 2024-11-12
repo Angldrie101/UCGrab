@@ -34,9 +34,11 @@ namespace UCGrab.Database
         public string lastname { get; set; }
         public string phone { get; set; }
         public string email { get; set; }
+        public string delivery_id { get; set; }
     
         public virtual ICollection<Order_Detail> Order_Detail { get; set; }
         public virtual Store Store { get; set; }
         public virtual ICollection<Product> Products { get; set; }
+        
     }
 }

@@ -238,6 +238,16 @@ namespace UCGrab.Repository
             return orders;
         }
 
+        public List<Order> GetOrdersByDeliveryId(string deliveryId)
+        {
+            var orders = _db.Order
+           .Where(o => o.delivery_id == deliveryId)
+           .Include(o => o.Order_Detail.Select(od => od.Product))
+           .ToList();
+
+            return orders;
+        }
+
         public ErrorCode ConfirmOrder(int orderId)
         {
             try
@@ -246,6 +256,30 @@ namespace UCGrab.Repository
                 if (order != null && order.order_status == (int)OrderStatus.Pending)
                 {
                     order.order_status = (int)OrderStatus.Confirmed; // Update the status to confirmed
+                    string error;
+                    _order.Update(order.order_id, order, out error);
+                    return ErrorCode.Success;
+                }
+                else
+                {
+                    return ErrorCode.Error;
+                }
+            }
+            catch (Exception ex)
+            {
+                Message = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
+
+        public ErrorCode ToDeliverOrder(int orderId)
+        {
+            try
+            {
+                var order = _order.Get(orderId);
+                if (order != null && order.order_status == (int)OrderStatus.ReadyToDeliver)
+                {
+                    order.order_status = (int)OrderStatus.Delivered;
                     string error;
                     _order.Update(order.order_id, order, out error);
                     return ErrorCode.Success;
