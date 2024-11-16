@@ -6,9 +6,31 @@
 }
 
 <div class="container-fluid">
-    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">User Accounts</span></h2>
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
+        <span class="bg-secondary pr-3">User Accounts Management</span>
+    </h2>
     <div class="row px-xl-5">
-        <div class="col-lg-12 mb-5">
+        <div class="col-lg-5 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title">Add New Customer</h5>
+                <form method="post" action="/Admin/AddUser">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Enter customer's ID number" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Password</label>
+                        <input type="text" id="password" name="password" class="form-control" placeholder="Enter default password" required />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="role_id" name="role_id" class="form-control" value="1" hidden />
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Add Account</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-7 mb-5">
             <div class="bg-light p-30 mb-30">
                 <h5 class="card-title">User Accounts List</h5>
                 <table class="table table-striped">
@@ -30,10 +52,17 @@
                                 <td>@user.username</td>
                                 <td>@user.email</td>
                                 <td>@user.User_Role.rolename</td>
-                                <td>@user.status</td>
+                                <td>@(user.status == 1 ? "Active" : "Inactive")</td>
                                 <td>
-                                    <a href="/Admin/EditUser/@user.user_id" class="btn btn-primary btn-sm">Edit</a>
-                                    <a class="btn btn-danger btn-sm" onclick="confirmDelete('@user.user_id')">Delete</a>
+                                    @if (user.status == 0)
+                                    {
+                                        <a href="@Url.Action("ViewUser", "Admin", new { userId = user.id })" class="btn btn-info btn-sm">View</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="/Admin/EditUser/@user.user_id" class="btn btn-primary btn-sm">Edit</a>
+                                        <a class="btn btn-danger btn-sm" onclick="confirmDelete('@user.user_id')">Delete</a>
+                                    }
                                 </td>
                             </tr>
                         }
@@ -43,16 +72,6 @@
         </div>
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-<script src="/Assets/Shop/lib/easing/easing.min.js"></script>
-<script src="/Assets/Shop/lib/owlcarousel/owl.carousel.min.js"></script>
-<script src="/Assets/Shop/mail/jqBootstrapValidation.min.js"></script>
-<script src="/Assets/Shop/mail/contact.js"></script>
-<script src="/Assets/Shop/js/main.js"></script>
-
-<!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     function confirmDelete(userId) {
@@ -66,8 +85,17 @@
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = '/Admin/UserDelete';
+                fetch(`/Admin/UserDelete/${userId}`, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Deleted!', 'The user has been deleted.', 'success')
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire('Error!', data.message, 'error');
+                        }
+                    });
             }
-        })
+        });
     }
 </script>

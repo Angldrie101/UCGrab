@@ -88,7 +88,6 @@ namespace UCGrab.Repository
 
                     return _orderDetail.Create(orderItem, out Message);
                 }
-                // retrieve the order detail to update qty
                 var orDt = _orderDetail.Get(lOrderItem.id);
                 orDt.quatity += orderItem.quatity;
 
@@ -120,7 +119,7 @@ namespace UCGrab.Repository
         public Order GetOrderbyId(int id)
         {
             return _db.Order
-              .Include(o => o.Products) // Eager load the Products collection
+              .Include(o => o.Products)
               .FirstOrDefault(o => o.order_id == id);
         }
 
@@ -148,16 +147,13 @@ namespace UCGrab.Repository
         {
             try
             {
-                // Get the open order for the user
-                // Fetch the order details for the open order
                 var order = _order._table.FirstOrDefault(m => m.user_id == userId && m.order_status == (int)OrderStatus.Open);
                 var orderDetails = _orderDetail._table.Where(od => od.order_id == order.order_id).ToList();
 
                 if (order != null)
                 {
-                    // Update the order details
                     order.order_status = (int)OrderStatus.Pending;
-                    order.payment_method = model.PaymentMethod; // Add this line to save the payment method
+                    order.payment_method = model.PaymentMethod;
                     order.order_date = DateTime.Now;
                     order.checkOut_option = model.CheckOutOption;
                     order.building = model.Building;
@@ -167,8 +163,7 @@ namespace UCGrab.Repository
                     order.phone = model.Phone;
                     order.email = model.Email;
                     order.additional_info = model.AdditionalInfo;
-
-                    // Save changes
+                    
                     _order.Update(order.order_id, order, out error);
 
                     return ErrorCode.Success;
@@ -203,7 +198,7 @@ namespace UCGrab.Repository
                 var order = _order.Get(orderId);
                 if (order != null && order.user_id == userId && order.order_status == (int)OrderStatus.Pending)
                 {
-                    order.order_status = (int)OrderStatus.Cancelled; // or whatever status you use for cancelled orders
+                    order.order_status = (int)OrderStatus.Cancelled;
                     string error;
                     _order.Update(order.order_id, order, out error);
                     return ErrorCode.Success;
@@ -228,7 +223,6 @@ namespace UCGrab.Repository
 
         public List<Order> GetOrdersByStoreId(int storeId)
         {
-            // Assuming _dbContext is your database context
             var orders = _db.Order
            .Where(o => o.store_id == storeId)
            .Include(o => o.Order_Detail.Select(od => od.Product))
@@ -255,7 +249,7 @@ namespace UCGrab.Repository
                 var order = _order.Get(orderId);
                 if (order != null && order.order_status == (int)OrderStatus.Pending)
                 {
-                    order.order_status = (int)OrderStatus.Confirmed; // Update the status to confirmed
+                    order.order_status = (int)OrderStatus.Confirmed;
                     string error;
                     _order.Update(order.order_id, order, out error);
                     return ErrorCode.Success;
@@ -303,7 +297,7 @@ namespace UCGrab.Repository
                 var order = _order.Get(orderId);
                 if (order != null && order.order_status == (int)OrderStatus.Confirmed)
                 {
-                    order.order_status = (int)OrderStatus.ReadyToDeliver; // Update the status to ready to deliver
+                    order.order_status = (int)OrderStatus.ReadyToDeliver;
                     string error;
                     _order.Update(order.order_id, order, out error);
                     return ErrorCode.Success;

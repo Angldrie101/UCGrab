@@ -57,8 +57,8 @@
                             <h5 class="card-title">Customer: @order.Firstname @order.Lastname</h5>
                             <p class="card-text">
                                 Delivery Address: @order.Building at room @order.Room<br />
-                                Items: @order.Products.Count<br />
-                                Total: Php @order.Total<br />
+                                Items: @order.Products.Count piece<br />
+                                Total Amount: Php @order.Total<br />
                             </p>
                             <a href="javascript:void(0);" class="btn btn-primary" onclick="changeOrderStatus(@order.OrderId)">Accept</a>
                             <a href="@Url.Action("OrderDetails", "Delivery", new { id = order.OrderId })" class="btn btn-primary">View Details</a>
@@ -107,12 +107,10 @@ else
                     success: function(response) {
                         if (response.success) {
                             Swal.fire('Accepted!', 'The order has been accepted', 'success');
-                            // Remove the order from the carousel
                             $('#order_' + orderId).remove();
-                            // Check if the carousel is empty after removing an item
                             if ($('#orderCarousel .carousel-item').length === 0) {
                                 $('#orderCarousel').hide();
-                                $('.text-center').show();  // Show "No orders to deliver."
+                                $('.text-center').show();
                             }
                         } else {
                             Swal.fire('Failed!', 'There was an issue accepting the order', 'error');

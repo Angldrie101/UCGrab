@@ -51,21 +51,26 @@ namespace UCGrab.Controllers
                 var user = _userManager.GetUserByUsername(username);
                 var info = _userManager.CreateOrRetrieve(username, ref ErrorMessage);
 
-                if (user.status != (int)Status.Active)
+                if (user.email == null)
+                {
+                    TempData["username"] = username;
+                    return RedirectToAction("ChangePass");
+                }
+                else if (user.status != (int)Status.Active)
                 {
                     TempData["username"] = username;
                     return RedirectToAction("Verify");
                 }
 
                 FormsAuthentication.SetAuthCookie(username, false);
-                //
-                if (!String.IsNullOrEmpty(ReturnUrl))
+
+                if (!string.IsNullOrEmpty(ReturnUrl))
                     return Redirect(ReturnUrl);
 
                 switch (user.User_Role.rolename)
                 {
                     case Constant.Role_Customer:
-                        if(info.first_name == null)
+                        if (info.first_name == null)
                         {
                             return RedirectToAction("EditProfile");
                         }
@@ -73,18 +78,79 @@ namespace UCGrab.Controllers
                         {
                             return RedirectToAction("Index");
                         }
-                        
+
                     case Constant.Role_Provider:
                         return RedirectToAction("Index", "Shop");
+
                     case Constant.Role_DeliveryMan:
                         return RedirectToAction("Orders", "Delivery");
+
                     default:
                         return RedirectToAction("Index", "Admin");
-                        
                 }
             }
-            ViewBag.Error = ErrorMessage;
 
+            ViewBag.Error = ErrorMessage;
+            return View();
+        }
+
+        [AllowAnonymous]
+        public ActionResult ChangePass()
+        {
+            return View();
+        }
+        [AllowAnonymous]
+        [HttpPost]
+        public ActionResult ChangePass(string username, string email, string password)
+        {
+            var user = _userManager.GetUserByUsername(username);
+
+            if (user != null)
+            {
+                user.email = email;
+                user.password = password;
+                
+                User_Accounts updatedUser = new User_Accounts
+                {
+                    id = user.id,
+                    user_id = user.user_id,
+                    username = user.username,
+                    role_id = user.role_id,
+                    status = user.status,
+                    verify_code = user.verify_code,
+                    date_created = user.date_created,
+                    email = email,
+                    password = password
+                };
+                
+                string errMsg = string.Empty;
+                var result = _userManager.UpdateUser(updatedUser, ref errMsg);
+
+                if (result == ErrorCode.Success)
+                {
+                    string verificationCode = user.verify_code;
+                    
+                    string emailBody = $"Your verification code is: {verificationCode}";
+                    string errorMessage = "";
+
+                    var mailManager = new MailManager();
+                    bool emailSent = mailManager.SendEmail(email, "Verification Code", emailBody, ref errorMessage);
+
+                    if (!emailSent)
+                    {
+                        ModelState.AddModelError(String.Empty, errorMessage);
+                        return View();
+                    }
+                    TempData["username"] = updatedUser.username;
+
+                    return RedirectToAction("Verify");
+                }
+                else
+                {
+                    TempData["error"] = "Failed to update the user details. " + errMsg;
+                }
+            }
+            TempData["error"] = "User not found or invalid details.";
             return View();
         }
 
@@ -216,7 +282,7 @@ namespace UCGrab.Controllers
         public ActionResult SignUpForProvider()
         {
             if (User.Identity.IsAuthenticated)
-                return RedirectToAction("Index");
+                return RedirectToAction("MyProfile");
 
             return View();
         }

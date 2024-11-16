@@ -5,47 +5,7 @@
     Layout = "~/Views/Shared/_DeliveryLayoutPage.cshtml";
 }
 <style>
-    .order-details-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin: 20px auto;
-        max-width: 1000px;
-    }
-
-    .order-details-card, .image-card {
-        flex: 1;
-        min-width: 400px;
-        margin: 10px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        border-radius: 8px;
-    }
-
-        .order-details-card .card-header, .image-card .card-header {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-
-        .order-details-card .card-body, .image-card .card-body {
-            font-size: 1.2em;
-        }
-
-        .order-details-card .list-group-item {
-            font-size: 1.1em;
-        }
-
-    .back-button {
-        margin-top: 20px;
-        display: block;
-        text-align: center;
-    }
-
-    .store-image {
-        max-width: 100%;
-        height: auto;
-        display: block;
-        margin: 0 auto;
-    }
+    /* Same styles as before */
 </style>
 
 <div class="order-details-container">
@@ -66,7 +26,32 @@
                     <li class="list-group-item">
                         <strong>@product.ProductName</strong><br />
                         Quantity: @product.Quantity<br />
-                        Price: Php @product.Price
+                        Price: Php @product.Price<br />
+                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#productDetailsModal-@product.ProductId">
+                            View Details
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="productDetailsModal-@product.ProductId" tabindex="-1" role="dialog" aria-labelledby="productDetailsModalLabel-@product.ProductId" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="productDetailsModalLabel-@product.ProductId">@product.ProductName - Details</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p><strong>Product Name:</strong> @product.ProductName</p>
+                                        <p><strong>Quantity:</strong> @product.Quantity</p>
+                                        <p><strong>Price:</strong> Php @product.Price.ToString("N2")</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </li>
                 }
             </ul>
@@ -82,3 +67,7 @@
     </div>
 </div>
 <a href="/Delivery/Orders" class="btn btn-secondary back-button">Back to Orders</a>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>

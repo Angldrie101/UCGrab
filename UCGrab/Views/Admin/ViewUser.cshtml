@@ -1,0 +1,40 @@
+﻿
+@model UCGrab.Database.User_Accounts
+
+@{
+    ViewBag.Title = "User Details";
+    Layout = "~/Views/Shared/AdminPageLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
+        <span class="bg-secondary pr-3">User Details</span>
+    </h2>
+    <div class="row px-xl-5">
+        <div class="col-lg-8 mb-5">
+            <div class="bg-light p-30 mb-30">
+                <h5 class="card-title">User Information</h5>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="form-control" value="@Model.username" readonly />
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" class="form-control" value="@Model.email" readonly />
+                </div>
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <input type="text" id="role" class="form-control" value="@Model.User_Role.rolename" readonly />
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <input type="text" id="status" class="form-control" value="@(Model.status == 1 ? "Active" : "Inactive")" readonly />
+                </div>
+                <a href="/Admin/UserAccounts" class="btn btn-primary">Back to User Accounts</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

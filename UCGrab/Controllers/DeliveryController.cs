@@ -61,7 +61,7 @@ namespace UCGrab.Controllers
             {
                 return HttpNotFound();
             }
-            
+
             var orderViewModel = new OrderViewModel
             {
                 OrderId = order.order_id,
@@ -69,14 +69,17 @@ namespace UCGrab.Controllers
                 Lastname = order.lastname,
                 Building = order.building,
                 Room = order.room,
-                Products = order.Products.Select(p => new ProductViewModel
+                Products = order.Order_Detail.Select(od => new ProductViewModel
                 {
-                    ProductId = (Int32)p.id,
-                    Total = (Int32)order.Order_Detail.Sum(od => od.price * od.quatity),
-                    Price = p.price,
+                    ProductId = (int)od.Product.id,
+                    ProductName = od.Product.product_name,
+                    Quantity = (int)od.quatity,
+                    Price = (Int32)od.price
                 }).ToList(),
-                StoreImageUrl = "/path/to/store/image.jpg" 
+                Total = (Int32)order.Order_Detail.Sum(od => od.price * od.quatity),
+                StoreImageUrl = "/path/to/store/image.jpg"
             };
+
             return View(orderViewModel);
         }
 
@@ -85,14 +88,9 @@ namespace UCGrab.Controllers
         public JsonResult ChangeOrderStatus(int orderId)
         {
             var _db = new UCGrabEntities();
-
-            // Retrieve the current user's ID as a string from their identity
+            
             var currentUserIdStr = User.Identity.Name;
-
-            System.Diagnostics.Debug.WriteLine($"Attempting to change order status for Order ID: {orderId}");
-            System.Diagnostics.Debug.WriteLine($"Current User ID (from Identity): {currentUserIdStr}");
-
-            // Use the GetUserInfoByUserId function to get user information
+            
             var user = _userManager.GetUserInfoByUsername(currentUserIdStr);
             if (user == null)
             {
@@ -109,11 +107,9 @@ namespace UCGrab.Controllers
 
             try
             {
-                // Update order status and assign the current user's ID as the delivery_id
                 order.order_status = (int)OrderStatus.ReadyToDeliver;
                 order.delivery_id = user.user_id;
-
-                // Save changes to the database
+                
                 _db.SaveChanges();
 
                 System.Diagnostics.Debug.WriteLine("Order status updated successfully.");
@@ -131,18 +127,14 @@ namespace UCGrab.Controllers
         {
             IsUserLoggedSession();
 
-            // Get the user ID of the currently logged-in user
             var userId = UserId;
             System.Diagnostics.Debug.WriteLine($"Logged in UserId: {userId}");
-
-            // Retrieve user information based on the user ID
+            
             var userInfo = _userManager.GetUserInfoByUserId(userId);
             if (userInfo == null)
             {
                 return HttpNotFound("User not found.");
             }
-
-            // Get orders associated with the delivery_id matching the logged-in user
             var orders = _orderManager.GetOrdersByDeliveryId(userInfo.user_id);
             System.Diagnostics.Debug.WriteLine($"Orders count: {orders.Count}");
 
@@ -154,12 +146,10 @@ namespace UCGrab.Controllers
             {
                 System.Diagnostics.Debug.WriteLine($"Order IDs: {string.Join(", ", orders.Select(o => o.order_id))}");
             }
-
-            // Fetch store information by store_id and include store name
+            
             var model = orders.Select(order =>
             {
-                // Fetch the store by store_id
-                var store = _storeManager.GetStoreById(order.store_id);  // Assuming GetStoreById is a method in the store manager
+                var store = _storeManager.GetStoreById(order.store_id);
 
                 return new OrderViewModel
                 {

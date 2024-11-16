@@ -5,9 +5,53 @@
     Layout = "~/Views/Shared/UserLayout.cshtml";
 }
 
-<style>
-    h5 {
-        color: red;
+
+<<style>
+    .profile-picture {
+        border-radius: 50%;
+        width: 400px;
+        height: 400px;
+        object-fit: cover;
+        border: 5px solid #3b5998;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        margin-bottom: 15px;
+        position: relative;
+    }
+
+    .profile-container {
+        position: relative;
+    }
+
+    .camera-icon {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 28px;
+    color: #ffffff;
+    background-color: #3b5998;
+    border-radius: 50%;
+    padding: 7px;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.camera-icon:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+    .edit-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    .form-control {
+        margin-bottom: 10px;
+    }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: bold;
     }
 </style>
 
@@ -16,11 +60,28 @@
     @Html.AntiForgeryToken()
 
     <div class="container-fluid">
-        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Edit Profile</span></h2>
-        <div class="row px-xl-5">
-            <div class="col-lg-7 mb-5">
-                <h5>Note: Please fill in this information before purchasing products!</h5>
+        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
+            <span class="bg-secondary pr-3">Edit Profile</span>
+        </h2>
 
+        <div class="row px-xl-5 profile-container">
+            <div class="col-lg-3 mb-5 text-center">
+                @{
+                    string profileImage = string.IsNullOrEmpty(Model.Image.FirstOrDefault()?.image_file)
+                        ? Url.Content("~/UploadedFiles/profile.jpg")
+                        : Url.Content("~/UploadedFiles/" + Model.Image.FirstOrDefault()?.image_file);
+                }
+                <img src="@profileImage" alt="Avatar" class="profile-picture" id="currentProfileImage" />
+
+                <div class="camera-icon" onclick="document.getElementById('profilePicture').click();">
+                    <i class="fa fa-camera"></i>
+                </div>
+
+                <div class="form-group">
+                    <input type="file" accept="image/*" class="form-control" id="profilePicture" name="profilePicture" style="display: none;" onchange="previewImage(event);" />
+                </div>
+            </div>
+            <div class="col-lg-9 mb-5">
                 <div class="bg-light p-30">
                     @if (!String.IsNullOrEmpty(TempData["ErrorMessage"] as String))
                     {
@@ -30,46 +91,28 @@
                     @Html.HiddenFor(model => model.user_id)
                     @Html.HiddenFor(model => model.status)
                     @Html.HiddenFor(model => model.store_id)
-
                     <div class="control-group">
                         <label for="firstname">First Name</label>
-                        @Html.TextBoxFor(model => model.first_name, new { @class = "form-control", placeholder = "Firstname", required = "required", data_validation_required_message = "Please enter your firstname" })
-                        <p class="help-block text-danger"></p>
+                        @Html.TextBoxFor(model => model.first_name, new { @class = "form-control", placeholder = "Firstname", required = "required" })
                     </div>
                     <div class="control-group">
                         <label for="lastname">Last Name</label>
-                        @Html.TextBoxFor(model => model.last_name, new { @class = "form-control", placeholder = "Lastname", required = "required", data_validation_required_message = "Please enter your lastname" })
-                        <p class="help-block text-danger"></p>
+                        @Html.TextBoxFor(model => model.last_name, new { @class = "form-control", placeholder = "Lastname", required = "required" })
                     </div>
                     <div class="control-group">
                         <label for="email">Email</label>
-                        @Html.TextBoxFor(model => model.email, new { @class = "form-control", placeholder = "Email", required = "required", data_validation_required_message = "Please enter your email", @readonly = "readonly" })
-                        <p class="help-block text-danger"></p>
+                        @Html.TextBoxFor(model => model.email, new { @class = "form-control", placeholder = "Email", required = "required", @readonly = "readonly" })
                     </div>
                     <div class="control-group">
                         <label for="phone">Phone Number</label>
-                        @Html.TextBoxFor(model => model.phone, new { @class = "form-control", placeholder = "Phone Number", required = "required", data_validation_required_message = "Please enter your phone number", pattern = @"^09[0-9]{9}$", title = "Please enter a valid Philippine phone number, e.g., 09123456789"})
-                        <p class="help-block text-danger"></p>
+                        @Html.TextBoxFor(model => model.phone, new { @class = "form-control", placeholder = "Phone Number", required = "required", pattern = @"^09[0-9]{9}$", title = "Please enter a valid Philippine phone number" })
                     </div>
-                    <div>
-                        <button class="btn btn-primary py-2 px-4" type="submit" id="saveProfileButton">Save Changes</button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-5 mb-5">
-                <div class="bg-primary p-4" style="border-radius: 5px; text-align: center;">
-                    <h4 style="color: white;">Profile Picture</h4>
-                    <img src="~/Assets/Shop/img/profile.jpg" alt="Avatar" class="img-fluid" style="border-radius: 5px; margin-bottom: 15px" id="currentProfileImage" />
-                    <div class="form-group">
-                        <input type="file" accept="image/*" class="form-control" id="profilePicture" name="profilePicture" style="display: none;" onchange="previewImage(event);" />
-                        <button class="btn btn-warning py-2 px-4" type="button" onclick="document.getElementById('profilePicture').click();">Upload New Photo</button>
-                    </div>
+                    <button class="btn btn-primary py-2 px-4" type="submit">Save Changes</button>
                 </div>
             </div>
         </div>
     </div>
-}
-
+                    }
 <script>
     function previewImage(event) {
         var file = event.target.files[0];
