@@ -12,12 +12,14 @@ namespace UCGrab.Repository
         BaseRepository<Image> _img;
         BaseRepository<Image_Product> _imgproduct;
         BaseRepository<Image_Store> _imgstore;
+        BaseRepository<File_Documents> _filedoc;
 
         public ImageManager()
         {
             _img = new BaseRepository<Image>();
             _imgproduct = new BaseRepository<Image_Product>();
             _imgstore = new BaseRepository<Image_Store>();
+            _filedoc = new BaseRepository<File_Documents>();
         }
 
         public List<Image> ListImgAttachByImageId(int? id)
@@ -92,6 +94,32 @@ namespace UCGrab.Repository
         public ErrorCode DeleteImgProductByStoreId(int? id, ref String err)
         {
             foreach (var i in _imgstore._table.Where(m => m.store_id == id).ToList())
+            {
+                DeleteImg(i.id, ref err);
+            }
+            return ErrorCode.Success;
+        }
+
+        public List<File_Documents> ListFileAttachByImageStoreId(int? id)
+        {
+            return _filedoc._table.Where(m => m.user_id == id).ToList();
+        }
+        public ErrorCode CreateFileDocument(File_Documents filedoc, ref String err)
+        {
+            return _filedoc.Create(filedoc, out err);
+        }
+        public ErrorCode UpdateFile(File_Documents filedoc, ref String err)
+        {
+            return _filedoc.Update(filedoc.id, filedoc, out err);
+        }
+        public ErrorCode DeleteFile(int? id, ref String err)
+        {
+            return _filedoc.Delete(id, out err);
+        }
+
+        public ErrorCode DeleteFilebyId(int? id, ref String err)
+        {
+            foreach (var i in _filedoc._table.Where(m => m.user_id == id).ToList())
             {
                 DeleteImg(i.id, ref err);
             }

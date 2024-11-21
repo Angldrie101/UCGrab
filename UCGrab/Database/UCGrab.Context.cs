@@ -30,6 +30,7 @@ namespace UCGrab.Database
     
         public DbSet<Category> Category { get; set; }
         public DbSet<ContactUs> ContactUs { get; set; }
+        public DbSet<File_Documents> File_Documents { get; set; }
         public DbSet<Image> Image { get; set; }
         public DbSet<Image_Product> Image_Product { get; set; }
         public DbSet<Image_Store> Image_Store { get; set; }

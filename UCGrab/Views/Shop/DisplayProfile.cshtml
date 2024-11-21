@@ -1,28 +1,27 @@
 ﻿@model UCGrab.Database.User_Information
 @{
     ViewBag.Title = "DisplayProfile";
-    Layout = "~/Views/Shared/UserLayout.cshtml";
+    Layout = "~/Views/Shared/ShopPageLayout.cshtml";
 }
 
-<!-- Edit Profile Start -->
+
 <div class="container-fluid">
     <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3"></span>My Profile</h2>
     <div class="row px-xl-5">
-        <div class="col-lg-7 mb-5">
+        <div class="col-lg-3 mb-5 text-center">
+            @{
+                string profileImage = string.IsNullOrEmpty(Model.Image.FirstOrDefault()?.image_file) ? Url.Content("~/UploadedFiles/profile.jpg") : Url.Content("~/UploadedFiles/" + Model.Image.FirstOrDefault()?.image_file);
+            }
+            <img src="@profileImage" alt="Avatar" class="img-fluid" style="border-radius: 50%; width: 400px; height: 400px; object-fit: cover; border: 5px solid #3b5998; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); margin-bottom: 15px;" />
+        </div>
+
+        <div class="col-lg-9 mb-5">
             <div class="bg-light p-30">
 
                 @if (!String.IsNullOrEmpty(TempData["ErrorMessage"] as String))
                 {
                     <span class="alert alert-success">@TempData["ErrorMessage"]</span>
                 }
-
-                <div class="form-group" hidden>
-                    @Html.LabelFor(model => model.user_id, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.user_id, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.user_id, "", new { @class = "text-danger" })
-                    </div>
-                </div>
 
                 <div class="control-group">
                     <label for="name">Name:</label>
@@ -33,32 +32,21 @@
                 <div class="control-group">
                     <label for="email">Email</label>
                     <h5>@Model.email</h5>
-
                     <p class="help-block text-danger"></p>
                 </div>
+
                 <div class="control-group">
                     <label for="phone">Phone Number</label>
                     <h4>@Model.phone</h4>
-
                     <p class="help-block text-danger"></p>
                 </div>
+
                 <div>
-                    <a class="btn btn-primary py-2 px-4" href="~/Home/EditProfile">Edit Profile</a>
+                    <a class="btn btn-primary py-2 px-4" href="~/Shop/MyProfile">Edit Profile</a>
                 </div>
 
-            </div>
-        </div>
-        <div class="col-lg-5 mb-5">
-            <div class="bg-primary p-4" style="border-radius: 5px; text-align: center;">
-                <h4 style="color: white;">Profile Picture</h4>
-                @{
-                    string profileImage = string.IsNullOrEmpty(Model.Image.FirstOrDefault()?.image_file) ? Url.Content("~/UploadedFiles/profile.jpg") : Url.Content("~/UploadedFiles/" + Model.Image.FirstOrDefault()?.image_file);
-
-                }
-                <img src="@profileImage" alt="Avatar" class="img-fluid" style="border-radius: 5px; margin-bottom: 15px" />
-                <form id="profilePictureForm" enctype="multipart/form-data"></form>
             </div>
         </div>
     </div>
+
 </div>
-<!-- Edit Profile End -->

@@ -14,6 +14,11 @@ namespace UCGrab.Database
     
     public partial class User_Accounts
     {
+        public User_Accounts()
+        {
+            this.File_Documents = new HashSet<File_Documents>();
+        }
+    
         public int id { get; set; }
         public string user_id { get; set; }
         public string username { get; set; }
@@ -25,6 +30,7 @@ namespace UCGrab.Database
         public Nullable<System.DateTime> date_created { get; set; }
         public Nullable<System.DateTime> date_modified { get; set; }
     
+        public virtual ICollection<File_Documents> File_Documents { get; set; }
         public virtual User_Accounts User_Accounts1 { get; set; }
         public virtual User_Accounts User_Accounts2 { get; set; }
         public virtual User_Role User_Role { get; set; }

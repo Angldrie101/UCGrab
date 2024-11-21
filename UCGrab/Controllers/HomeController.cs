@@ -289,82 +289,151 @@ namespace UCGrab.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public ActionResult SignUpForProvider(User_Accounts ua, string ConfirmPass)
+        public ActionResult SignUpForProvider(User_Accounts ua, HttpPostedFileBase businessPermit, string ConfirmPass)
         {
             if (!ua.password.Equals(ConfirmPass))
             {
-                ModelState.AddModelError(String.Empty, "Password does not match");
+                ModelState.AddModelError(string.Empty, "Password does not match");
                 return View(ua);
             }
-
+            
             if (_userManager.SignUp(ua, ref ErrorMessage) != ErrorCode.Success)
             {
-                ModelState.AddModelError(String.Empty, ErrorMessage);
+                ModelState.AddModelError(string.Empty, ErrorMessage);
                 return View(ua);
             }
-      
+            
             var user = _userManager.GetUserByEmail(ua.email);
-            string verificationCode = ua.verify_code;
-
-            string emailBody = $"Your verification code is: {verificationCode}";
-            string errorMessage = "";
-
-            var mailManager = new MailManager();
-            bool emailSent = mailManager.SendEmail(ua.email, "Verification Code", emailBody, ref errorMessage);
-
-            if (!emailSent)
+            if (user == null)
             {
-                ModelState.AddModelError(String.Empty, errorMessage);
+                ModelState.AddModelError(string.Empty, "User account creation failed.");
                 return View(ua);
             }
-            var userinfo = _userManager.CreateOrRetrieve(ua.username, ref ErrorMessage);
+            
+            if (businessPermit != null && businessPermit.ContentLength > 0)
+            {
+                try
+                {
+                    string fileName = Path.GetFileName(businessPermit.FileName);
+                    string filePath = Path.Combine(Server.MapPath("~/Uploads/BusinessPermits/"), fileName);
+                    
+                    if (!Directory.Exists(Server.MapPath("~/Uploads/BusinessPermits/")))
+                    {
+                        Directory.CreateDirectory(Server.MapPath("~/Uploads/BusinessPermits/"));
+                    }
+                    
+                    businessPermit.SaveAs(filePath);
+                    
+                    var fileDocument = new File_Documents
+                    {
+                        user_id = user.id, 
+                        file_document = "/Uploads/BusinessPermits/" + fileName 
+                    };
+                    
+                    _imageManager.CreateFileDocument(fileDocument, ref ErrorMessage);
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, "Error saving business permit: " + ex.Message);
+                    return View(ua);
+                }
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Business permit is required.");
+                return View(ua);
+            }
+            
+            TempData["SuccessMessage"] = "Registration successful. Admin will validate your registration.";
+            return RedirectToAction("Login", "Home");
+        }
 
-            TempData["username"] = ua.username;
-            return RedirectToAction("Verify");
+        public bool CreateFileDocument(File_Documents fileDocument, ref string errorMessage)
+        {
+            try
+            {
+                using (var context = new UCGrabEntities())
+                {
+                    context.File_Documents.Add(fileDocument);
+                    context.SaveChanges();
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = ex.Message;
+                return false;
+            }
         }
 
         [AllowAnonymous]
         public ActionResult SignUpForDriver()
         {
             if (User.Identity.IsAuthenticated)
-                return RedirectToAction("Index");
+                return RedirectToAction("MyProfile");
 
             return View();
         }
 
         [AllowAnonymous]
         [HttpPost]
-        public ActionResult SignUpForDriver(User_Accounts ua, string ConfirmPass)
+        public ActionResult SignUpForDriver(User_Accounts ua, HttpPostedFileBase businessPermit, string ConfirmPass)
         {
             if (!ua.password.Equals(ConfirmPass))
             {
-                ModelState.AddModelError(String.Empty, "Password does not match");
+                ModelState.AddModelError(string.Empty, "Password does not match");
                 return View(ua);
             }
 
             if (_userManager.SignUp(ua, ref ErrorMessage) != ErrorCode.Success)
             {
-                ModelState.AddModelError(String.Empty, ErrorMessage);
+                ModelState.AddModelError(string.Empty, ErrorMessage);
                 return View(ua);
             }
 
             var user = _userManager.GetUserByEmail(ua.email);
-            string verificationCode = ua.verify_code;
-
-            string emailBody = $"Your verification code is: {verificationCode}";
-            string errorMessage = "";
-
-            var mailManager = new MailManager();
-            bool emailSent = mailManager.SendEmail(ua.email, "Verification Code", emailBody, ref errorMessage);
-
-            if (!emailSent)
+            if (user == null)
             {
-                ModelState.AddModelError(String.Empty, errorMessage);
+                ModelState.AddModelError(string.Empty, "User account creation failed.");
                 return View(ua);
             }
 
-            TempData["username"] = ua.username;
-            return RedirectToAction("Verify");
+            if (businessPermit != null && businessPermit.ContentLength > 0)
+            {
+                try
+                {
+                    string fileName = Path.GetFileName(businessPermit.FileName);
+                    string filePath = Path.Combine(Server.MapPath("~/Uploads/BusinessPermits/"), fileName);
+
+                    if (!Directory.Exists(Server.MapPath("~/Uploads/BusinessPermits/")))
+                    {
+                        Directory.CreateDirectory(Server.MapPath("~/Uploads/BusinessPermits/"));
+                    }
+
+                    businessPermit.SaveAs(filePath);
+
+                    var fileDocument = new File_Documents
+                    {
+                        user_id = user.id,
+                        file_document = "/Uploads/BusinessPermits/" + fileName
+                    };
+
+                    _imageManager.CreateFileDocument(fileDocument, ref ErrorMessage);
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, "Error saving business permit: " + ex.Message);
+                    return View(ua);
+                }
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Business permit is required.");
+                return View(ua);
+            }
+
+            TempData["SuccessMessage"] = "Registration successful. Admin will validate your registration.";
+            return RedirectToAction("Login", "Home");
 
         }
         

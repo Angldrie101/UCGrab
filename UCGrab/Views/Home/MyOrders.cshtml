@@ -30,17 +30,18 @@
                 <div class="tab-content">
                     <!-- To Receive Tab -->
                     <div class="tab-pane fade show active" id="toReceive">
-                        @RenderOrders(Model.Where(o => o.Status == "Pending" || o.Status == "Confirmed" || o.Status == "ReadyToDeliver"), "To Receive")
+                        @RenderOrders(Model.Where(o => o.Status == "Pending" || o.Status == "Confirmed" || o.Status == "ReadyToDeliver")
+                    .OrderByDescending(o => o.OrderDate), "To Receive")
                     </div>
-
                     <!-- To Review Tab -->
                     <div class="tab-pane fade" id="toReview">
-                        @RenderOrders(Model.Where(o => o.Status == "Delivered"), "Order Completed")
+                        @RenderOrders(Model.Where(o => o.Status == "Delivered")
+                    .OrderByDescending(o => o.OrderDate), "Order Completed")
                     </div>
-
                     <!-- Cancelled Tab -->
                     <div class="tab-pane fade" id="cancelled">
-                        @RenderOrders(Model.Where(o => o.Status == "Cancelled"), "Order Cancelled")
+                        @RenderOrders(Model.Where(o => o.Status == "Cancelled")
+                    .OrderByDescending(o => o.OrderDate), "Order Cancelled")
                     </div>
                 </div>
 

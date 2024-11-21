@@ -24,6 +24,14 @@
           <Property Name="subject" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="description" Type="varchar(max)" Nullable="false" />
         </EntityType>
+        <EntityType Name="File_Documents">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_id" Type="int" />
+          <Property Name="file_document" Type="nvarchar(max)" />
+        </EntityType>
         <EntityType Name="Image">
           <Key>
             <PropertyRef Name="id" />
@@ -172,6 +180,18 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
           <Property Name="username" Type="nvarchar" MaxLength="50" />
           <Property Name="rolename" Type="nvarchar" MaxLength="50" />
         </EntityType>
+        <Association Name="FK_File_Documents_File_Documents">
+          <End Role="User_Accounts" Type="Self.User_Accounts" Multiplicity="0..1" />
+          <End Role="File_Documents" Type="Self.File_Documents" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User_Accounts">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="File_Documents">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Image_Store_Image_Store">
           <End Role="Store" Type="Self.Store" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
@@ -278,7 +298,7 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_User_Accounts_User_Accounts">
+        <Association Name="FK_User_Accounts_User_Accounts1">
           <End Role="User_Accounts" Type="Self.User_Accounts" Multiplicity="1" />
           <End Role="User_Accounts1" Type="Self.User_Accounts" Multiplicity="0..1" />
           <ReferentialConstraint>
@@ -363,6 +383,7 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
         <EntityContainer Name="UCGrabModelStoreContainer">
           <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ContactUs" EntityType="Self.ContactUs" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="File_Documents" EntityType="Self.File_Documents" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Image" EntityType="Self.Image" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Image_Product" EntityType="Self.Image_Product" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Image_Store" EntityType="Self.Image_Store" Schema="dbo" store:Type="Tables" />
@@ -382,6 +403,10 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
 [vw_Role].[rolename] AS [rolename]
 FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </EntitySet>
+          <AssociationSet Name="FK_File_Documents_File_Documents" Association="Self.FK_File_Documents_File_Documents">
+            <End Role="User_Accounts" EntitySet="User_Accounts" />
+            <End Role="File_Documents" EntitySet="File_Documents" />
+          </AssociationSet>
           <AssociationSet Name="FK_Image_Store_Image_Store" Association="Self.FK_Image_Store_Image_Store">
             <End Role="Store" EntitySet="Store" />
             <End Role="Image_Store" EntitySet="Image_Store" />
@@ -414,7 +439,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <End Role="Product" EntitySet="Product" />
             <End Role="Stock" EntitySet="Stock" />
           </AssociationSet>
-          <AssociationSet Name="FK_User_Accounts_User_Accounts" Association="Self.FK_User_Accounts_User_Accounts">
+          <AssociationSet Name="FK_User_Accounts_User_Accounts1" Association="Self.FK_User_Accounts_User_Accounts1">
             <End Role="User_Accounts" EntitySet="User_Accounts" />
             <End Role="User_Accounts1" EntitySet="User_Accounts" />
           </AssociationSet>
@@ -471,6 +496,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <FunctionImport Name="sp_upgraddiagrams" />
           <EntitySet Name="Category" EntityType="UCGrabModel.Category" />
           <EntitySet Name="ContactUs" EntityType="UCGrabModel.ContactUs" />
+          <EntitySet Name="File_Documents" EntityType="UCGrabModel.File_Documents" />
           <EntitySet Name="Image" EntityType="UCGrabModel.Image" />
           <EntitySet Name="Image_Product" EntityType="UCGrabModel.Image_Product" />
           <EntitySet Name="Image_Store" EntityType="UCGrabModel.Image_Store" />
@@ -487,6 +513,10 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <AssociationSet Name="FK_Product_Category" Association="UCGrabModel.FK_Product_Category">
             <End Role="Category" EntitySet="Category" />
             <End Role="Product" EntitySet="Product" />
+          </AssociationSet>
+          <AssociationSet Name="FK_File_Documents_File_Documents" Association="UCGrabModel.FK_File_Documents_File_Documents">
+            <End Role="User_Accounts" EntitySet="User_Accounts" />
+            <End Role="File_Documents" EntitySet="File_Documents" />
           </AssociationSet>
           <AssociationSet Name="FK_Image_User_Accounts" Association="UCGrabModel.FK_Image_User_Accounts">
             <End Role="User_Information" EntitySet="User_Information" />
@@ -516,7 +546,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <End Role="Product" EntitySet="Product" />
             <End Role="Stock" EntitySet="Stock" />
           </AssociationSet>
-          <AssociationSet Name="FK_User_Accounts_User_Accounts" Association="UCGrabModel.FK_User_Accounts_User_Accounts">
+          <AssociationSet Name="FK_User_Accounts_User_Accounts1" Association="UCGrabModel.FK_User_Accounts_User_Accounts1">
             <End Role="User_Accounts" EntitySet="User_Accounts" />
             <End Role="User_Accounts1" EntitySet="User_Accounts" />
           </AssociationSet>
@@ -564,6 +594,15 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="subject" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="description" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
         </EntityType>
+        <EntityType Name="File_Documents">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_id" Type="Int32" />
+          <Property Name="file_document" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="User_Accounts" Relationship="UCGrabModel.FK_File_Documents_File_Documents" FromRole="File_Documents" ToRole="User_Accounts" />
+        </EntityType>
         <EntityType Name="Image">
           <Key>
             <PropertyRef Name="id" />
@@ -610,9 +649,9 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="lastname" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="phone" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="delivery_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Order_Detail" Relationship="UCGrabModel.FK_Order_Detail_Order" FromRole="Order" ToRole="Order_Detail" />
           <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Order_Store" FromRole="Order" ToRole="Store" />
-          <Property Name="delivery_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Order_Detail">
           <Key>
@@ -695,8 +734,9 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="verify_code" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="date_created" Type="DateTime" Precision="3" />
           <Property Name="date_modified" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="User_Accounts1" Relationship="UCGrabModel.FK_User_Accounts_User_Accounts" FromRole="User_Accounts" ToRole="User_Accounts1" />
-          <NavigationProperty Name="User_Accounts2" Relationship="UCGrabModel.FK_User_Accounts_User_Accounts" FromRole="User_Accounts1" ToRole="User_Accounts" />
+          <NavigationProperty Name="File_Documents" Relationship="UCGrabModel.FK_File_Documents_File_Documents" FromRole="User_Accounts" ToRole="File_Documents" />
+          <NavigationProperty Name="User_Accounts1" Relationship="UCGrabModel.FK_User_Accounts_User_Accounts1" FromRole="User_Accounts" ToRole="User_Accounts1" />
+          <NavigationProperty Name="User_Accounts2" Relationship="UCGrabModel.FK_User_Accounts_User_Accounts1" FromRole="User_Accounts1" ToRole="User_Accounts" />
           <NavigationProperty Name="User_Role" Relationship="UCGrabModel.FK_User_Accounts_User_Role" FromRole="User_Accounts" ToRole="User_Role" />
         </EntityType>
         <EntityType Name="User_Information">
@@ -742,6 +782,18 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             </Principal>
             <Dependent Role="Product">
               <PropertyRef Name="category_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_File_Documents_File_Documents">
+          <End Type="UCGrabModel.User_Accounts" Role="User_Accounts" Multiplicity="0..1" />
+          <End Type="UCGrabModel.File_Documents" Role="File_Documents" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User_Accounts">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="File_Documents">
+              <PropertyRef Name="user_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -839,7 +891,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_User_Accounts_User_Accounts">
+        <Association Name="FK_User_Accounts_User_Accounts1">
           <End Type="UCGrabModel.User_Accounts" Role="User_Accounts" Multiplicity="1" />
           <End Type="UCGrabModel.User_Accounts" Role="User_Accounts1" Multiplicity="0..1" />
           <ReferentialConstraint>
@@ -936,6 +988,15 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
                 <ScalarProperty Name="email" ColumnName="email" />
                 <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="contact_id" ColumnName="contact_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="File_Documents">
+            <EntityTypeMapping TypeName="UCGrabModel.File_Documents">
+              <MappingFragment StoreEntitySet="File_Documents">
+                <ScalarProperty Name="file_document" ColumnName="file_document" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

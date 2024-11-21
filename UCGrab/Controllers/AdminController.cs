@@ -8,6 +8,8 @@ using UCGrab.Database;
 using UCGrab.Models;
 using UCGrab.Repository;
 using UCGrab.Utils;
+using ImageMagick;
+using System.IO;
 
 namespace UCGrab.Controllers
 {
@@ -44,16 +46,16 @@ namespace UCGrab.Controllers
             }
 
             var userManager = new UserManager();
-            
+
             var newUser = new User_Accounts
             {
                 username = username,
                 password = password,
                 role_id = role_id,
-                status = 0, 
+                status = 0,
             };
 
-            userManager.SignUp(newUser,ref ErrorMessage);
+            userManager.SignUp(newUser, ref ErrorMessage);
 
             TempData["SuccessMessage"] = "User added successfully.";
             return RedirectToAction("UserAccounts");
@@ -73,7 +75,7 @@ namespace UCGrab.Controllers
         public ActionResult ManageStore()
         {
             var stores = _storeManager.ListStore();
-            return View(stores); 
+            return View(stores);
         }
 
         [AllowAnonymous]
@@ -89,18 +91,74 @@ namespace UCGrab.Controllers
         {
             var _db = new UCGrabEntities();
 
-            // Fetch user by userId
             var user = _db.User_Accounts
-                         .Where(u => u.id == userId)
-                         .FirstOrDefault();  // Use FirstOrDefault for single item
+                          .Where(u => u.id == userId)
+                          .FirstOrDefault();
 
             if (user == null)
             {
-                return HttpNotFound();  // Better to use HttpNotFound for a 404 response
+                return HttpNotFound();
             }
 
-            // Passing the user object to the view
-            return View(user);
+            var businessPermit = _db.File_Documents
+                                    .Where(fd => fd.user_id == userId)
+                                    .Select(fd => fd.file_document)
+                                    .FirstOrDefault();
+
+            var userViewModel = new UserDetailsViewModel
+            {
+                UserId = user.id,
+                Username = user.username,
+                Email = user.email,
+                Status = user.status == 1 ? "Active" : "Inactive",
+                Role = user.User_Role?.rolename,
+                BusinessPermitPath = businessPermit
+            };
+
+            return View(userViewModel);
+        }
+
+        [HttpPost]
+        public ActionResult AcceptUser(int userId)
+        {
+            var _db = new UCGrabEntities();
+
+            var user = _db.User_Accounts.FirstOrDefault(u => u.id == userId);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            user.status = (int)Status.Active;
+
+            _db.SaveChanges();
+
+            string verificationCode = user.verify_code;
+
+            string emailBody = $"Your verification code is: {verificationCode}";
+            string errorMessage = "";
+
+            var mailManager = new MailManager();
+            bool emailSent = mailManager.SendEmail(user.email, "Verification Code", emailBody, ref errorMessage);
+
+            if (!emailSent)
+            {
+                ModelState.AddModelError(string.Empty, $"Failed to send email: {errorMessage}");
+                return RedirectToAction("UserAccounts", "Admin");
+            }
+
+            return RedirectToAction("UserAccounts", "Admin");
+        }
+        public string ConvertPdfToImage(string pdfPath)
+        {
+            string imagePath = Path.ChangeExtension(pdfPath, ".png");
+            using (var images = new MagickImageCollection(pdfPath))
+            {
+                // Convert the first page to PNG
+                var image = images[0];
+                image.Write(imagePath);
+            }
+            return imagePath;
         }
     }
 }

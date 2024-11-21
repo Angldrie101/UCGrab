@@ -40,24 +40,30 @@
             <div class="col-lg-12 mb-5">
                 <div class="bg-light p-30 tab-content">
                     <div id="toConfirm" class="tab-pane fade show active">
-                        @RenderOrders(Model.Where(o => o.Status == "Pending"), "Confirm Order", true)
+                        @RenderOrders(Model.Where(o => o.Status == "Pending")
+                    .OrderByDescending(o => o.OrderDate), "Confirm Order", true)
                     </div>
 
                     <div id="toDeliver" class="tab-pane fade">
-                        @RenderOrders(Model.Where(o => o.Status == "Confirmed"), "Ready for Delivery")
+                        @RenderOrders(Model.Where(o => o.Status == "Confirmed")
+                    .OrderByDescending(o => o.OrderDate), "Ready for Delivery")
                     </div>
 
                     <div id="toReceive" class="tab-pane fade">
-                        @RenderOrders(Model.Where(o => o.Status == "ReadyToDeliver"), "To Receive")
+                        @RenderOrders(Model.Where(o => o.Status == "ReadyToDeliver")
+                    .OrderByDescending(o => o.OrderDate), "To Receive")
                     </div>
 
                     <div id="received" class="tab-pane fade">
-                        @RenderOrders(Model.Where(o => o.Status == "Delivered"), "Order Completed")
+                        @RenderOrders(Model.Where(o => o.Status == "Delivered")
+                    .OrderByDescending(o => o.OrderDate), "Order Completed")
                     </div>
 
                     <div id="cancelled" class="tab-pane fade">
-                        @RenderOrders(Model.Where(o => o.Status == "Cancelled"), "Order Cancelled")
+                        @RenderOrders(Model.Where(o => o.Status == "Cancelled")
+                    .OrderByDescending(o => o.OrderDate), "Order Cancelled")
                     </div>
+
                 </div>
             </div>
         </div>
