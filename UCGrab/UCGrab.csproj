@@ -185,6 +185,7 @@
     <Content Include="Assets\Shop\img\foods&amp;bev.jpg" />
     <Content Include="Assets\Shop\img\foodsdrinks.jpg" />
     <Content Include="Assets\Shop\img\hmtm.jpg" />
+    <Content Include="Assets\Shop\img\Image_not_available.png" />
     <Content Include="Assets\Shop\img\lmcares.jpg" />
     <Content Include="Assets\Shop\img\lmfocus.jpg" />
     <Content Include="Assets\Shop\img\lmscholar.jpg" />
@@ -197,6 +198,16 @@
     <Content Include="Assets\Shop\img\offer-1.jpg" />
     <Content Include="Assets\Shop\img\offer-2.jpg" />
     <Content Include="Assets\Shop\img\payments.png" />
+    <Content Include="Database\UCGrab.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>UCGrab.edmx</DependentUpon>
+      <LastGenOutput>UCGrab.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Database\UCGrab.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>UCGrab.edmx</DependentUpon>
+      <LastGenOutput>UCGrab.cs</LastGenOutput>
+    </Content>
     <Content Include="UploadedFiles\profile.jpg" />
     <Content Include="Assets\Shop\img\psits.jpg" />
     <Content Include="Assets\Shop\img\seniorHS.jpg" />
@@ -222,20 +233,12 @@
     <Content Include="Assets\Shop\lib\owlcarousel\owl.carousel.min.js" />
     <Content Include="Assets\Shop\mail\contact.js" />
     <Content Include="Assets\Shop\mail\jqBootstrapValidation.min.js" />
-    <Content Include="Database\UCGrab.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>UCGrab.edmx</DependentUpon>
-      <LastGenOutput>UCGrab.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="Database\UCGrab.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>UCGrab.edmx</DependentUpon>
-      <LastGenOutput>UCGrab.cs</LastGenOutput>
-    </Content>
     <Content Include="Global.asax" />
     <Content Include="scripts\ai.0.22.9-build00167.js" />
     <Content Include="scripts\ai.0.22.9-build00167.min.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -272,19 +275,10 @@
     <Compile Include="Database\Product.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>
-    <Compile Include="Database\sp_helpdiagramdefinition_Result.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Database\sp_helpdiagrams_Result.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
-    </Compile>
     <Compile Include="Database\Stock.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\Store.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Database\sysdiagrams.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\UCGrab.Context.cs">
@@ -343,13 +337,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Home\Login.cshtml" />
-    <EntityDeploy Include="Database\UCGrab.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>UCGrab.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <Content Include="Database\UCGrab.edmx.diagram">
-      <DependentUpon>UCGrab.edmx</DependentUpon>
-    </Content>
     <Content Include="Views\Shared\AdminPageLayout.cshtml" />
     <Content Include="Views\Shared\ShopPageLayout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
@@ -579,6 +566,14 @@
     <Content Include="Views\Delivery\ToDeliver.cshtml" />
     <Content Include="Views\Home\ChangePass.cshtml" />
     <Content Include="Views\Admin\ViewUser.cshtml" />
+    <EntityDeploy Include="Database\UCGrab.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>UCGrab.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Database\UCGrab.edmx.diagram">
+      <DependentUpon>UCGrab.edmx</DependentUpon>
+    </Content>
+    <None Include="Properties\PublishProfiles\UCGrab.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -6,101 +6,189 @@
 }
 
 <style>
-    .editprofile {
-        background-color: #fff;
-        padding: 5px;
-        border: 1px solid #ffd800;
-        font-weight: 100;
-    }
-
-    .edit-store-button {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-    }
-
-    .store-details {
+    body {
+        margin: 0;
+        color: #2e323c;
+        background: #f5f6fa;
         position: relative;
-        padding-top: 50px; /* To accommodate the button */
+        height: 100%;
+    }
+
+    .account-settings .user-profile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0 0 1rem 0;
+        padding-bottom: 1rem;
+        text-align: center;
+    }
+
+        .account-settings .user-profile .user-avatar {
+            margin: 0 0 1rem 0;
+        }
+
+            .account-settings .user-profile .user-avatar img {
+                width: 150px;
+                height: 150px;
+                border-radius: 100px;
+            }
+
+        .account-settings .user-profile h5.user-name {
+            margin: 0 0 0.5rem 0;
+        }
+
+        .account-settings .user-profile h6.user-email {
+            margin: 0;
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #9fa8b9;
+        }
+
+    .form-control {
+        border: 1px solid #cfd1d8;
+        border-radius: 2px;
+        font-size: .825rem;
+        background: #ffffff;
+        color: #2e323c;
+    }
+
+    .container {
+        max-width: 100%; /* Allow the container to span the full width */
+        padding: 0 50px; /* Reduce padding to minimize space */
+    }
+
+    .row.gutters {
+        margin-left: 0; /* Remove margin from the sides */
+        margin-right: 0;
+    }
+
+        .row.gutters > [class*="col-"] {
+            padding-left: 10px; /* Add a bit of spacing between columns */
+            padding-right: 10px;
+        }
+
+    .card {
+        width: 100%; /* Ensure cards span the full width of their container */
     }
 </style>
 
-<!-- Store Information Start -->
-<div class="container-fluid">
-    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
-        <span class="bg-secondary pr-3">Store Information</span>
-    </h2>
-    <div class="row px-xl-5">
-        <!-- Store Details Start -->
-        <div class="col-lg-12 mb-5 d-flex">
-            @if (!String.IsNullOrEmpty(TempData["Message"] as String))
-            {
-                <div class="alert alert-success" role="alert">@TempData["Message"]</div>
-            }
-            <div class="bg-primary p-4" style="border-radius: 2px; text-align: center; width: 300px;">
-                <h4 style="color: white;">Store Logo</h4>
-                @{
-                    string profileImage = string.IsNullOrEmpty(Model.Image_Store.FirstOrDefault()?.image_file) ? Url.Content("~/UploadedFiles/profile.jpg") : Url.Content("~/UploadedFiles/" + Model.Image_Store.FirstOrDefault()?.image_file);
-                }
-                <img src="@profileImage" alt="Avatar" class="img-fluid" style="border-radius: 5px; margin-bottom: 15px; width:290px" />
-                <form id="profilePictureForm" enctype="multipart/form-data"></form>
-            </div>
-            <div class="store-details bg-light p-4 mb-4 shadow-sm rounded" style="flex: 2;">
-                <h5 class="card-title"><i class="fas fa-store mr-2"></i>Store Details</h5>
-                <div class="mb-3">
-                    <label for="storeName" class="form-label">Store Name</label>
-                    <h4 id="storeName" class="font-weight-normal">
-                        @(string.IsNullOrEmpty(Model.store_name) ? "" : Model.store_name)
-                    </h4>
-                </div>
-                <div class="mb-3">
-                    <label for="storeAddress" class="form-label">Store Address</label>
-                    <h4 id="storeAddress" class="font-weight-normal">
-                        @(string.IsNullOrEmpty(Model.store_address) ? "" : Model.store_address)
-                    </h4>
-                </div>
-                <div class="mb-3">
-                    <label for="storeEmail" class="form-label">Email</label>
-                    <h4 id="storeEmail" class="font-weight-normal">
-                        @(string.IsNullOrEmpty(Model.email) ? "" : Model.email)
-                    </h4>
-                </div>
-                <div class="mb-3">
-                    <label for="storePhone" class="form-label">Phone</label>
-                    <h4 id="storePhone" class="font-weight-normal">
-                        @(string.IsNullOrEmpty(Model.phone) ? "" : Model.phone)
-                    </h4>
-                </div>
-                <div class="mb-3">
-                    <label for="storehours" class="form-label">Operating Hours</label>
-                    <h4 id="storehours" class="font-weight-normal">
-                        @(string.IsNullOrEmpty(Model.operating_hours) ? "" : Model.operating_hours)
-                    </h4>
-                </div>
-                <div class="mb-3">
-                    <label for="storeDescription" class="form-label">Description</label>
-                    <h4 id="storeDescription" class="font-weight-normal">
-                        @(string.IsNullOrEmpty(Model.store_description) ? "" : Model.store_description)
-                    </h4>
-                </div>
-                <div class="edit-store-button">
-                    <a class="btn btn-primary py-2 px-4" href="~/Shop/ChangeLogo">Edit Store</a>
-                </div>
+<h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
+    <span class="bg-secondary px-3 py-2 rounded">Store Information</span>
+</h2>
 
+@if (!String.IsNullOrEmpty(TempData["Message"] as String))
+            {
+    <div class="alert alert-success" role="alert">@TempData["Message"]</div>
+}
+    <div class="container">
+        <div class="row gutters">
+            <!-- Left Panel -->
+            <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="account-settings">
+                            <div class="user-profile">
+                                <div class="user-avatar">
+                                    @{
+                                        string profileImage = string.IsNullOrEmpty(Model.Image_Store.FirstOrDefault()?.image_file) ? Url.Content("~/UploadedFiles/") : Url.Content("~/UploadedFiles/" + Model.Image_Store.FirstOrDefault()?.image_file);
+                                    }
+                                    <img src="@profileImage" alt="Store Avatar" id="currentStoreImage">
+                                    <form id="profilePictureForm" enctype="multipart/form-data"></form>
+                                </div>
+                                <h5 class="user-name">@Model.store_name</h5>
+                                <h6 class="user-email">@Model.email</h6>
+                            </div>
+                            <div class="about">
+                                <h5>About Store</h5>
+                                <p>@Model.store_description</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="row gutters">
+                            <div class="col-xl-12">
+                                <h6 class="mb-2 text-primary">Store Details</h6>
+                            </div>
+
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="address"> <strong>Store Address</strong></label> <br />
+                                    <label>@Model.store_address</label>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="phone"><strong>Phone Number</strong></label>
+                                    <br />
+                                    <label>@Model.phone</label>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="operatingh"><strong>Operating Hours</strong></label>
+                                    <br />
+                                    <label>@Model.operating_hours</label>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="operatingh"><strong>Email</strong></label>
+                                    <br />
+                                    <label>@Model.email</label>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+
+                        <div class="row gutters">
+                            <div class="col-xl-12">
+                                <h6 class="mt-3 mb-2 text-primary">G-Cash Information</h6>
+                            </div>
+
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="number"><strong>G-Cash Number</strong></label>
+                                    <br />
+                                    <label>@Model.gnumber</label>
+
+                                </div>
+                            </div>
+
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="imageUpload"><strong>G-Cash QR Code</strong></label> <br />
+                                    @{
+                                        string qrcode = string.IsNullOrEmpty(Model.Image_Store.FirstOrDefault()?.qr_file) ? Url.Content("~/UploadedFiles/") : Url.Content("~/UploadedFiles/" + Model.Image_Store.FirstOrDefault()?.qr_file);
+                                    }
+                                    <img src="@qrcode" alt="QR code" id="QRForm">
+                                    <form id="QRForm" enctype="multipart/form-data"></form>
+                                </div>
+                            </div>
+                        <div class="row gutters">
+                            <div class="col-xl-12">
+                                <div class="text-right">
+                                    <a href="/Shop/ChangeLogo" class="btn btn-primary">Edit Store</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- Store Information End -->
-<!-- JavaScript Libraries -->
+
+
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-<script src="/Assets/Shop/lib/easing/easing.min.js"></script>
-<script src="/Assets/Shop/lib/owlcarousel/owl.carousel.min.js"></script>
-
-<!-- Contact Javascript File -->
-<script src="/Assets/Shop/mail/jqBootstrapValidation.min.js"></script>
-<script src="/Assets/Shop/mail/contact.js"></script>
-
-<!-- Template Javascript -->
-<script src="/Assets/Shop/js/main.js"></script>

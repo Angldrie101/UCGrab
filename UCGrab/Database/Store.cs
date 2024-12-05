@@ -28,6 +28,7 @@ namespace UCGrab.Database
         public string store_address { get; set; }
         public string phone { get; set; }
         public string email { get; set; }
+        public string gnumber { get; set; }
         public string operating_hours { get; set; }
         public Nullable<int> status { get; set; }
     

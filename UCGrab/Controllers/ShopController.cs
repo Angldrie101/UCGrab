@@ -280,7 +280,7 @@ namespace UCGrab.Controllers
         }
 
         [HttpPost]
-        public ActionResult ChangeLogo(Store store, HttpPostedFileBase profilePicture)
+        public ActionResult ChangeLogo(Store store, HttpPostedFileBase profilePicture, HttpPostedFileBase qr)
         {
             IsUserLoggedSession();
 
@@ -322,6 +322,44 @@ namespace UCGrab.Controllers
                         {
                             image_file = profileFileName,
                             store_id = store.id
+                        };
+
+                        if (_imageManager.CreateImgStore(img, ref ErrorMessage) == ErrorCode.Error)
+                        {
+                            ModelState.AddModelError(String.Empty, ErrorMessage);
+                            return View(store);
+                        }
+                    }
+                }
+                if (qr != null && qr.ContentLength > 0)
+                {
+                    var uploadsFolderPath = Server.MapPath("~/UploadedFiles/");
+                    if (!Directory.Exists(uploadsFolderPath))
+                        Directory.CreateDirectory(uploadsFolderPath);
+
+                    var qrfileName = Path.GetFileName(qr.FileName);
+                    var qrSavePath = Path.Combine(uploadsFolderPath, qrfileName);
+                    qr.SaveAs(qrSavePath);
+
+
+                    System.Diagnostics.Debug.WriteLine("Profile picture saved at: " + qrSavePath);
+
+                    var existingImage = _imageManager.ListImgAttachByImageStoreId(store.id).FirstOrDefault();
+                    if (existingImage != null)
+                    {
+                        existingImage.qr_file = qrfileName;
+                        if (_imageManager.UpdateImgStore(existingImage, ref ErrorMessage) == ErrorCode.Error)
+                        {
+                            ModelState.AddModelError(String.Empty, ErrorMessage);
+                            return View(store);
+                        }
+                    }
+                    else
+                    {
+                        Image_Store img = new Image_Store
+                        {
+                            store_id = store.id,
+                            qr_file = qrfileName
                         };
 
                         if (_imageManager.CreateImgStore(img, ref ErrorMessage) == ErrorCode.Error)

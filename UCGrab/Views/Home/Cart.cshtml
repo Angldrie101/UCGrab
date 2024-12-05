@@ -1,4 +1,4 @@
-﻿@model IEnumerable<UCGrab.Database.Order>
+﻿@model IEnumerable<IGrouping<string, UCGrab.Database.Order>>
 @{
     ViewBag.Title = "Cart";
     Layout = "~/Views/Shared/UserLayout.cshtml";
@@ -80,15 +80,12 @@
 <!-- Cart Start -->
 @if (Model.Any())
 {
-    foreach (var order in Model)
+    foreach (var storeGroup in Model)
     {
-        double storeTotal = 0;
-        using (Html.BeginForm())
-        {
         <div class="container-fluid mb-5">
             <div class="row px-xl-5">
                 <div class="col-lg-8 table-responsive mb-5">
-                    <h4>Store Name: @order.Store.store_name</h4>
+                    <h4>@storeGroup.Key</h4>
                     <table class="table table-light table-borderless table-hover text-center mb-0">
                         <thead class="thead-dark">
                             <tr>
@@ -100,48 +97,50 @@
                             </tr>
                         </thead>
                         <tbody class="align-middle">
-                            @foreach (var orDetail in order.Order_Detail)
+                            @foreach (var order in storeGroup)
                             {
-                                double total = Convert.ToDouble(orDetail.quatity) * Convert.ToDouble(orDetail.price);
-                                storeTotal += total;
-                                <tr>
-                                    <td class="align-middle">
-                                        <div class="d-flex align-items-center">
-                                            <img src="~/UploadedFiles/@(orDetail.Product.Image_Product.FirstOrDefault()?.image_file ?? "default_image.jpg")" alt="@orDetail.Product.product_name" class="product-img">
-                                            @orDetail.Product.product_name
-                                        </div>
-                                    </td>
-                                    <td class="align-middle">Php @orDetail.price</td>
-                                    <td class="align-middle">
-                                        <input type="hidden" name="orderDtId" value="@orDetail.id" />
-                                        <div class="input-group quantity mx-auto" style="width: 100px;">
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-sm btn-primary btn-minus" type="submit" name="action" value="&minus;">
-                                                    <i class="fa fa-minus"></i>
-                                                </button>
+                                foreach (var orDetail in order.Order_Detail)
+                                {
+                                    double total = Convert.ToDouble(orDetail.quatity) * Convert.ToDouble(orDetail.price);
+                                    <tr>
+                                        <td class="align-middle">
+                                            <div class="d-flex align-items-center">
+                                                <img src="~/UploadedFiles/@(orDetail.Product.Image_Product.FirstOrDefault()?.image_file ?? "default_image.jpg")" alt="@orDetail.Product.product_name" class="product-img">
+                                                @orDetail.Product.product_name
                                             </div>
-                                            <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center" name="qty" value="@orDetail.quatity">
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-sm btn-primary btn-plus" type="submit" name="action" value="&plus;">
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
+                                        </td>
+                                        <td class="align-middle">Php @orDetail.price</td>
+                                        <td class="align-middle">
+                                            <input type="hidden" name="orderDtId" value="@orDetail.id" />
+                                            <div class="input-group quantity mx-auto" style="width: 100px;">
+                                                <div class="input-group-btn">
+                                                    <button class="btn btn-sm btn-primary btn-minus" type="submit" name="action" value="&minus;">
+                                                        <i class="fa fa-minus"></i>
+                                                    </button>
+                                                </div>
+                                                <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center" name="qty" value="@orDetail.quatity">
+                                                <div class="input-group-btn">
+                                                    <button class="btn btn-sm btn-primary btn-plus" type="submit" name="action" value="&plus;">
+                                                        <i class="fa fa-plus"></i>
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td class="align-middle">Php @total.ToString("N2")</td>
-                                    <td class="align-middle">
-                                        <button class="btn btn-sm btn-danger" type="submit" name="action" value="X">
-                                            <i class="fa fa-times"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td class="align-middle">Php @total.ToString("N2")</td>
+                                        <td class="align-middle">
+                                            <button class="btn btn-sm btn-danger" type="submit" name="action" value="X">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
                             }
                         </tbody>
                     </table>
                 </div>
                 <div class="col-lg-4">
                     <div class="cart-summary">
-                        <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Cart Summary for @order.Store.store_name</span></h5>
+                        <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Cart Summary for @storeGroup.Key</span></h5>
                         <form class="mb-30" action="">
                             <div class="input-group">
                                 <input type="text" class="form-control border-0 p-4" placeholder="Coupon Code">
@@ -151,16 +150,11 @@
                             </div>
                         </form>
                         <br />
-                        <br />
                         <div class="border-bottom pb-2">
                             <div class="d-flex justify-content-between mb-3">
                                 <h6>Subtotal</h6>
-                                <h6>Php @storeTotal.ToString("N2")</h6>
+                                <h6>Php @storeGroup.Sum(order => order.Order_Detail.Sum(od => od.quatity * od.price))</h6>
                             </div>
-                            @*<div class="d-flex justify-content-between mb-3">
-                                <h6>Discounts</h6>
-                                <h6>-Php 10.00</h6>
-                            </div>*@
                             <div class="d-flex justify-content-between mb-3">
                                 <h6>Voucher</h6>
                                 <h6>-Php 10.00</h6>
@@ -169,7 +163,7 @@
                         <div class="pt-2">
                             <div class="d-flex justify-content-between mt-2">
                                 <h5>Total</h5>
-                                <h5><strong>Php @((storeTotal - 10).ToString("N2"))</strong></h5>
+                                <h5><strong>Php @((storeGroup.Sum(order => order.Order_Detail.Sum(od => od.quatity * od.price)) - 10))</strong></h5>
                             </div>
                             <a href="/Home/CheckOut" class="btn btn-block btn-primary font-weight-bold my-3 py-3">Checkout</a>
                         </div>
@@ -177,17 +171,15 @@
                 </div>
             </div>
         </div>
-                }
-            }
-        }
-        else
-        {
-            <div class="container-fluid">
-                <div class="row px-xl-5">
-                    <div class="col-lg-12">
-                        <h3 class="text-center">Your cart is empty.</h3>
-                    </div>
-                </div>
+    }
+}
+else
+{
+    <div class="container-fluid">
+        <div class="row px-xl-5">
+            <div class="col-lg-12">
+                <h3 class="text-center">Your cart is empty.</h3>
             </div>
-        }
-<!-- Cart End -->
+        </div>
+    </div>
+}

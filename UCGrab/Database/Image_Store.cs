@@ -17,6 +17,7 @@ namespace UCGrab.Database
         public int id { get; set; }
         public Nullable<int> store_id { get; set; }
         public string image_file { get; set; }
+        public string qr_file { get; set; }
     
         public virtual Store Store { get; set; }
     }

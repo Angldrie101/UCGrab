@@ -5,91 +5,211 @@
     Layout = "~/Views/Shared/ShopPageLayout.cshtml";
 }
 
+<style>
+    body {
+        margin: 0;
+        color: #2e323c;
+        background: #f5f6fa;
+        position: relative;
+        height: 100%;
+    }
+
+    .account-settings .user-profile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0 0 1rem 0;
+        padding-bottom: 1rem;
+        text-align: center;
+    }
+
+    .account-settings .user-profile .user-avatar {
+        margin: 0 0 1rem 0;
+    }
+
+    .account-settings .user-profile .user-avatar img {
+        width: 150px;
+        height:150px;
+        border-radius: 100px;
+    }
+
+    .account-settings .user-profile h5.user-name {
+        margin: 0 0 0.5rem 0;
+    }
+
+    .account-settings .user-profile h6.user-email {
+        margin: 0;
+        font-size: 0.8rem;
+        font-weight: 400;
+        color: #9fa8b9;
+    }
+
+    .form-control {
+        border: 1px solid #cfd1d8;
+        border-radius: 2px;
+        font-size: .825rem;
+        background: #ffffff;
+        color: #2e323c;
+    }
+        .container {
+        max-width: 100%; /* Allow the container to span the full width */
+        padding: 0 50px; /* Reduce padding to minimize space */
+    }
+
+    .row.gutters {
+        margin-left: 0; /* Remove margin from the sides */
+        margin-right: 0;
+    }
+
+    .row.gutters > [class*="col-"] {
+        padding-left: 10px; /* Add a bit of spacing between columns */
+        padding-right: 10px;
+    }
+
+    .card {
+        width: 100%; /* Ensure cards span the full width of their container */
+    }
+</style>
+
+<h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
+    <span class="bg-secondary px-3 py-2 rounded">Store Information</span>
+</h2>
+
 @using (Html.BeginForm("ChangeLogo", "Shop", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
-    
-<div class="container-fluid">
-    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
-        <span class="bg-secondary pr-3">Store Information</span>
-    </h2>
-    <div class="row px-xl-5">
-        <div class="col-lg-12 mb-5 d-flex">
-            @if (!String.IsNullOrEmpty(TempData["Message"] as String))
-            {
-                <div class="alert alert-success" role="alert">@TempData["Message"]</div>
-            }
-            @Html.HiddenFor(model => model.id)
-            @Html.HiddenFor(model => model.user_id)
-            @Html.HiddenFor(model => model.store_id)
-            @Html.HiddenFor(model => model.status)
-            <div class="bg-primary p-4" style="border-radius: 2px; text-align: center; width: 300px;">
-                <div class="bg-primary p-4" style="border-radius: 5px; text-align: center;">
-                    <h4 style="color: white;">Store Logo</h4>
-                    <img src="~/Assets/Shop/img/profile.jpg" alt="Avatar" class="img-fluid" style="border-radius: 5px; margin-bottom: 15px" id="currentStoreImage" />
-                    <div class="form-group">
-                        <input type="file" accept="image/*" class="form-control" id="profilePicture" name="profilePicture" style="display: none;" onchange="previewImage(event);" />
-                        <button class="btn btn-warning py-2 px-4" type="button" onclick="document.getElementById('profilePicture').click();">Upload New Photo</button>
+
+
+    <div class="container">
+        <div class="row gutters">
+            <!-- Left Panel -->
+            <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+                @if (!String.IsNullOrEmpty(TempData["Message"] as String))
+                {
+                    <div class="alert alert-success" role="alert">@TempData["Message"]</div>
+                }
+                @Html.HiddenFor(model => model.id)
+                @Html.HiddenFor(model => model.user_id)
+                @Html.HiddenFor(model => model.store_id)
+                @Html.HiddenFor(model => model.status)
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="account-settings">
+                            <div class="about">
+                                <h5>Store Logo</h5>
+                                <input type="file" class="form-control" id="profilePicture" name="profilePicture" accept="image/*" placeholder="Choose Image">
+                            </div>
+                            <br />
+                            <div class="about">
+                                <h5>About Store</h5>
+                                @Html.EditorFor(model => model.store_description, new { htmlAttributes = new { @class = "form-control", placeholder = @Model.store_description, required = "required",
+                               data_validation_required_message = "Please enter store description"} })
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="store-details bg-light p-4 mb-4 shadow-sm rounded" style="flex: 2;">
-                <h5 class="card-title"><i class="fas fa-store mr-2"></i>Store Details</h5>
-                <div class="mb-3">
-                    <label for="storeName" class="form-label">Store Name</label>
-                    @Html.TextBoxFor(model => model.store_name, new { @class = "form-control", placeholder = "Store name", required = "required", data_validation_required_message = "Please enter store name" })
-                </div>
-                <div class="mb-3">
-                    <label for="storeAddress" class="form-label">Store Address</label>
-                    @Html.TextBoxFor(model => model.store_address, new { @class = "form-control", placeholder = "Store Address", required = "required", data_validation_required_message = "Please enter store address"})
-                </div>
-                <div class="mb-3">
-                    <label for="storeEmail" class="form-label">Email</label>
-                    @Html.TextBoxFor(model => model.email, new { @class = "form-control", placeholder = "Email", required = "required", data_validation_required_message = "Please enter store email" })
-                </div>
-                <div class="mb-3">
-                    <label for="storePhone" class="form-label">Phone</label>
-                    @Html.TextBoxFor(model => model.phone, new { @class = "form-control", placeholder = "Phone", required = "required", data_validation_required_message = "Please enter store phone"})
-                </div>
-                <div class="mb-3">
-                    <label for="storePhone" class="form-label">Operating Hours</label>
-                    @Html.TextAreaFor(model => model.operating_hours, new { @class = "form-control", placeholder = "Operating Hours", required = "required", data_validation_required_message = "Please enter store operation" })
-                </div>
-                <div class="mb-3">
-                    <label for="storePhone" class="form-label">Description</label>
-                    @Html.TextAreaFor(model => model.store_description, new { @class = "form-control", placeholder = "Description", required = "required", data_validation_required_message = "Please enter store description" })
-                </div>
-                    @Html.TextBoxFor(model => model.status, new { @class = "form-control", @Value = 1, style = "visibility:hidden;" })
-                <div>
-                    <button class="btn btn-primary py-2 px-4" type="submit" id="saveProfileButton">Save Changes</button>
+
+            <!-- Right Panel -->
+            <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="row gutters">
+                            <div class="col-xl-12">
+                                <h6 class="mb-2 text-primary">Store Details</h6>
+                            </div>
+
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="storeName">Store Name</label>
+                                    @Html.EditorFor(model => model.store_name, new { htmlAttributes = new { @class = "form-control", placeholder = @Model.store_name, required = "required", data_validation_required_message = "Please enter store name" } })
+                                </div>
+                            </div>
+
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="storeAddress">Store Address</label>
+                                    @Html.EditorFor(model => model.store_address, new { htmlAttributes = new { @class = "form-control", placeholder = @Model.store_address, required = "required", data_validation_required_message = "Please enter store address" } })
+                                </div>
+                            </div>
+
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="email">Store Email</label>
+                                    @Html.EditorFor(model => model.email, new { htmlAttributes = new { @class = "form-control", placeholder = @Model.email, required = "required", data_validation_required_message = "Please enter email" } })
+                                </div>
+                            </div>
+
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="storePhone">Phone Number</label>
+                                    @Html.EditorFor(model => model.phone, new { htmlAttributes = new { @class = "form-control", placeholder = @Model.phone, required = "required", data_validation_required_message = "Please enter store phone" } })
+                                </div>
+                            </div>
+
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="operatingHours">Store Operating Hours</label>
+                                    <div class="d-flex">
+                                        <div class="me-2">
+                                            <label for="fromTime" class="form-label">From:</label>
+                                            <input type="time" class="form-control" id="fromTime" required>
+                                        </div>
+                                        <div>
+                                            <label for="toTime" class="form-label">To:</label>
+                                            <input type="time" class="form-control" id="toTime" required>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="operatingHours" name="operating_hours">
+                                    <small class="form-text text-muted">Please specify the store's operating hours.</small>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12" hidden>
+                                <div class="form-group">
+                                    <label for="status">Status</label>
+                                    <input type="text" class="form-control" name="status" value= "1">
+                                </div>
+                            </div>
+
+                            
+                        </div>
+
+                        <div class="row gutters">
+                            <div class="col-xl-12">
+                                <h6 class="mt-3 mb-2 text-primary">Address</h6>
+                            </div>
+
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="Street"><strong>Gcash Number</strong></label>
+                                    @Html.EditorFor(model => model.gnumber, new { htmlAttributes = new { @class = "form-control", placeholder = @Model.gnumber, required = "required" } })
+                                </div>
+                            </div>
+
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="imageUpload"><strong>GCash QR Code</strong></label>
+                                    <input type="file" class="form-control" id="qr" name="qr" accept="image/*" placeholder="Choose Image">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row gutters">
+                            <div class="col-xl-12">
+                                <div class="text-right">
+                                    <a href="/Shop/MyStore" class="btn btn-secondary">Cancel</a>
+                                    <button type="submit" class="btn btn-primary">Update</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 }
+
+
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-<script src="/Assets/Shop/lib/easing/easing.min.js"></script>
-<script src="/Assets/Shop/lib/owlcarousel/owl.carousel.min.js"></script>
-
-<script src="/Assets/Shop/mail/jqBootstrapValidation.min.js"></script>
-<script src="/Assets/Shop/mail/contact.js"></script>
-
-<script src="/Assets/Shop/js/main.js"></script>
-
-<script>
-    function previewImage(event) {
-        var file = event.target.files[0];
-        var reader = new FileReader();
-
-        reader.onload = function(e) {
-            var currentProfileImage = document.getElementById('currentStoreImage');
-            currentProfileImage.src = e.target.result;
-        }
-
-        if (file) {
-            reader.readAsDataURL(file);
-        }
-    }
-</script>

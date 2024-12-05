@@ -683,7 +683,11 @@ namespace UCGrab.Controllers
         [AllowAnonymous]
         public ActionResult Cart()
         {
-            return View(_orderManager.GetOrderByUserId(UserId));
+            var orders = _orderManager.GetOrderByUserId(UserId);
+            var groupedOrders = orders
+                .GroupBy(order => order.Store.store_name)
+                .ToList();
+            return View(groupedOrders);
         }
         [HttpPost]
         [AllowAnonymous]
