@@ -641,13 +641,38 @@ namespace UCGrab.Controllers
 
             try
             {
-                if (_orderManager.AddCart(UserId, prodId, qty, ref ErrorMessage) == ErrorCode.Error)
+                // Retrieve the active order (or cart) for the current user
+                var currentOrder = _orderManager.GetOpenOrderByUserId(UserId);
+                if (currentOrder == null)
                 {
-                    throw new Exception(ErrorMessage);
+                    throw new Exception("No active order found for the user.");
+                }
+
+                // Check if the product already exists in the Order_Detail table for the current order
+                var existingOrderDetail = _orderManager.GetOrderDetailByOrderIdAndProductId(currentOrder.order_id, prodId);
+
+                if (existingOrderDetail != null)
+                {
+                    // Increment the quantity if the item exists
+                    existingOrderDetail.quatity += qty;
+                    _orderManager.UpdateCart(existingOrderDetail.id, existingOrderDetail, ref ErrorMessage);
+                }
+                else
+                {
+                    // Add a new item if it doesn't exist
+                    var newOrderDetail = new Order_Detail
+                    {
+                        order_id = currentOrder.order_id,
+                        product_id = prodId,
+                        quatity = qty,
+                        price = _orderManager.GetProductPrice(prodId) // Fetch product price dynamically
+                    };
+
+                    _orderManager.AddOrderDetail(newOrderDetail, ref ErrorMessage);
                 }
 
                 res.code = (int)ErrorCode.Success;
-                res.message = "Item Added!";
+                res.message = "Item successfully added to the cart!";
             }
             catch (Exception ex)
             {
@@ -665,6 +690,7 @@ namespace UCGrab.Controllers
 
             return Json(res, JsonRequestBehavior.AllowGet);
         }
+    
         private void LogError(Exception ex)
         {
             string logFilePath = Server.MapPath("~/Logs/errorlog.txt");
@@ -795,15 +821,8 @@ namespace UCGrab.Controllers
             }
         }
 
-
         [AllowAnonymous]
         public ActionResult Contact()
-        {
-            return View();
-        }
-
-        [AllowAnonymous]
-        public ActionResult Ewallet()
         {
             return View();
         }

@@ -574,6 +574,7 @@
       <DependentUpon>UCGrab.edmx</DependentUpon>
     </Content>
     <None Include="Properties\PublishProfiles\UCGrab.pubxml" />
+    <Content Include="Views\Home\QRCode.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

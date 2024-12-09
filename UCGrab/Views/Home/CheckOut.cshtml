@@ -132,10 +132,28 @@
                     </h5>
                     <div class="bg-light p-30">
                         <div class="row">
-                            <div class="col-md-6 form-group">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="payment1" name="PaymentMethod" value="0">
-                                    <label class="custom-control-label" for="payment1">G-Cash</label>
+                            <div id="gcashModal" class="modal" tabindex="-1" role="dialog">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">G-Cash Payment</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Scan the QR code below and upload the payment proof:</p>
+                                            <img src="/path-to-your-qrcode-image.jpg" alt="G-Cash QR Code" style="width: 100%; max-width: 300px;">
+                                            <div class="form-group mt-3">
+                                                <label for="gcashReceipt">Upload Receipt</label>
+                                                <input type="file" id="gcashReceipt" name="gcashReceipt" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-primary" onclick="submitGcashOrder()">Submit</button>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6 form-group" id="cod-option">

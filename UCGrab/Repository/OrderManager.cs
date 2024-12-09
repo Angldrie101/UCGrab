@@ -266,6 +266,52 @@ namespace UCGrab.Repository
             }
         }
 
+        public Order GetOpenOrderByUserId(string userId)
+        {
+            return _db.Order.FirstOrDefault(o => o.user_id == userId && o.order_status == (int)OrderStatus.Open);
+        }
+
+        public Order_Detail GetOrderDetailByOrderIdAndProductId(int orderId, int productId)
+        {
+            return _db.Order_Detail.FirstOrDefault(od => od.order_id == orderId && od.product_id == productId);
+        }
+
+        public void UpdateCart(int orderDetailId, Order_Detail updatedOrderDetail, ref string errorMessage)
+        {
+            try
+            {
+                var orderDetail = _db.Order_Detail.Find(orderDetailId);
+                if (orderDetail != null)
+                {
+                    orderDetail.quatity = updatedOrderDetail.quatity;
+                    _db.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = ex.Message;
+            }
+        }
+
+        public void AddOrderDetail(Order_Detail newOrderDetail, ref string errorMessage)
+        {
+            try
+            {
+                _db.Order_Detail.Add(newOrderDetail);
+                _db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                errorMessage = ex.Message;
+            }
+        }
+
+        public decimal GetProductPrice(int productId)
+        {
+            return _db.Product.Where(p => p.id == productId).Select(p => p.price).FirstOrDefault();
+        }
+
+
         public ErrorCode ToDeliverOrder(int orderId)
         {
             try

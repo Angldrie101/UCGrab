@@ -1,0 +1,20 @@
+﻿
+@{
+    ViewBag.Title = "QRCode";
+    Layout = "~/Views/Shared/UserLayout.cshtml";
+}
+
+<div style="display: flex; justify-content: space-between; align-items: center; height: 100vh; padding: 20px;">
+    <!-- QR Code Section -->
+    <div style="flex: 1; text-align: center;">
+        <h3>Scan the QR Code</h3>
+        <img src="path-to-qr-code.png" alt="QR Code" style="max-width: 100%; height: auto;">
+    </div>
+
+    <!-- Image Upload Section -->
+    <div style="flex: 1; text-align: center;">
+        <h3>Upload an Image</h3>
+        <input type="file" accept="image/*" style="margin-top: 10px;">
+    </div>
+</div>
+
