@@ -77,6 +77,7 @@
           <Property Name="phone" Type="varchar" MaxLength="255" />
           <Property Name="email" Type="varchar" MaxLength="255" />
           <Property Name="delivery_id" Type="varchar(max)" />
+          <Property Name="gcash_receipt" Type="varchar(max)" />
         </EntityType>
         <EntityType Name="Order_Detail">
           <Key>
@@ -102,6 +103,7 @@
           <Property Name="date_created" Type="date" />
           <Property Name="status" Type="int" Nullable="false" />
           <Property Name="user_id" Type="varchar" MaxLength="255" />
+          <Property Name="store_id" Type="int" />
         </EntityType>
         <EntityType Name="Stock">
           <Key>
@@ -276,6 +278,18 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Product_Store">
+          <End Role="Store" Type="Self.Store" Multiplicity="0..1" />
+          <End Role="Product" Type="Self.Product" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Store">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Product">
+              <PropertyRef Name="store_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Stock_Product">
           <End Role="Product" Type="Self.Product" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -395,6 +409,10 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <End Role="Product" EntitySet="Product" />
             <End Role="Image_Product" EntitySet="Image_Product" />
           </AssociationSet>
+          <AssociationSet Name="FK_Product_Store" Association="Self.FK_Product_Store">
+            <End Role="Store" EntitySet="Store" />
+            <End Role="Product" EntitySet="Product" />
+          </AssociationSet>
           <AssociationSet Name="FK_Stock_Product" Association="Self.FK_Stock_Product">
             <End Role="Product" EntitySet="Product" />
             <End Role="Stock" EntitySet="Stock" />
@@ -471,6 +489,10 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <End Role="Product" EntitySet="Product" />
             <End Role="Order_Detail" EntitySet="Order_Detail" />
           </AssociationSet>
+          <AssociationSet Name="FK_Product_Store" Association="UCGrabModel.FK_Product_Store">
+            <End Role="Store" EntitySet="Store" />
+            <End Role="Product" EntitySet="Product" />
+          </AssociationSet>
           <AssociationSet Name="FK_Stock_Product" Association="UCGrabModel.FK_Stock_Product">
             <End Role="Product" EntitySet="Product" />
             <End Role="Stock" EntitySet="Stock" />
@@ -491,7 +513,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <End Role="User_Role" EntitySet="User_Role" />
             <End Role="User_Role1" EntitySet="User_Role" />
           </AssociationSet>
-        </EntityContainer>
+          </EntityContainer>
         <EntityType Name="Category">
           <Key>
             <PropertyRef Name="category_id" />
@@ -569,6 +591,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="phone" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="delivery_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="gcash_receipt" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Order_Detail" Relationship="UCGrabModel.FK_Order_Detail_Order" FromRole="Order" ToRole="Order_Detail" />
           <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Order_Store" FromRole="Order" ToRole="Store" />
         </EntityType>
@@ -598,9 +621,11 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="date_created" Type="DateTime" Precision="0" />
           <Property Name="status" Type="Int32" Nullable="false" />
           <Property Name="user_id" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="store_id" Type="Int32" />
           <NavigationProperty Name="Category" Relationship="UCGrabModel.FK_Product_Category" FromRole="Product" ToRole="Category" />
           <NavigationProperty Name="Image_Product" Relationship="UCGrabModel.FK_Product_Image_Product" FromRole="Product" ToRole="Image_Product" />
           <NavigationProperty Name="Order_Detail" Relationship="UCGrabModel.FK_Order_Detail_Product" FromRole="Product" ToRole="Order_Detail" />
+          <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Product_Store" FromRole="Product" ToRole="Store" />
           <NavigationProperty Name="Stock" Relationship="UCGrabModel.FK_Stock_Product" FromRole="Product" ToRole="Stock" />
         </EntityType>
         <EntityType Name="Stock">
@@ -629,6 +654,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="status" Type="Int32" />
           <NavigationProperty Name="Image_Store" Relationship="UCGrabModel.FK_Image_Store_Image_Store" FromRole="Store" ToRole="Image_Store" />
           <NavigationProperty Name="Order" Relationship="UCGrabModel.FK_Order_Store" FromRole="Store" ToRole="Order" />
+          <NavigationProperty Name="Product" Relationship="UCGrabModel.FK_Product_Store" FromRole="Store" ToRole="Product" />
         </EntityType>
         <EntityType Name="User_Accounts">
           <Key>
@@ -787,6 +813,18 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Product_Store">
+          <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Product" Role="Product" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Store">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Product">
+              <PropertyRef Name="store_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Stock_Product">
           <End Type="UCGrabModel.Product" Role="Product" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -849,7 +887,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             </Dependent>
           </ReferentialConstraint>
         </Association>
-      </Schema>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -917,6 +955,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <EntitySetMapping Name="Order">
             <EntityTypeMapping TypeName="UCGrabModel.Order">
               <MappingFragment StoreEntitySet="Order">
+                <ScalarProperty Name="gcash_receipt" ColumnName="gcash_receipt" />
                 <ScalarProperty Name="delivery_id" ColumnName="delivery_id" />
                 <ScalarProperty Name="email" ColumnName="email" />
                 <ScalarProperty Name="phone" ColumnName="phone" />
@@ -950,6 +989,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <EntitySetMapping Name="Product">
             <EntityTypeMapping TypeName="UCGrabModel.Product">
               <MappingFragment StoreEntitySet="Product">
+                <ScalarProperty Name="store_id" ColumnName="store_id" />
                 <ScalarProperty Name="user_id" ColumnName="user_id" />
                 <ScalarProperty Name="status" ColumnName="status" />
                 <ScalarProperty Name="date_created" ColumnName="date_created" />
@@ -1036,7 +1076,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-        </EntityContainerMapping>
+          </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
   </edmx:Runtime>

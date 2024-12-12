@@ -31,10 +31,12 @@ namespace UCGrab.Database
         public Nullable<System.DateTime> date_created { get; set; }
         public int status { get; set; }
         public string user_id { get; set; }
+        public Nullable<int> store_id { get; set; }
     
         public virtual Category Category { get; set; }
         public virtual ICollection<Image_Product> Image_Product { get; set; }
         public virtual ICollection<Order_Detail> Order_Detail { get; set; }
+        public virtual Store Store { get; set; }
         public virtual ICollection<Stock> Stock { get; set; }
     }
 }

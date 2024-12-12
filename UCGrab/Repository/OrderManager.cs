@@ -59,7 +59,7 @@ namespace UCGrab.Repository
                 return ErrorCode.Error;
             }
 
-            var order = GetOrCreateOrderByUserId(userId, product, ref error);
+            var order = GetOrCreateOrderByUserId(userId, product,ref error);
             var orDetail = new Order_Detail();
             orDetail.order_id = order.order_id;
             orDetail.product_id = productId;
@@ -143,7 +143,7 @@ namespace UCGrab.Repository
             return _orderDetail.Delete(id, out err);
         }
 
-        public ErrorCode PlaceOrder(string userId, OrderViewModel model, ref string error)
+        public ErrorCode PlaceOrder(string userId, OrderViewModel model, string gcashReceiptFileName, ref string error)
         {
             try
             {
@@ -163,7 +163,11 @@ namespace UCGrab.Repository
                     order.phone = model.Phone;
                     order.email = model.Email;
                     order.additional_info = model.AdditionalInfo;
-                    
+                    if (!string.IsNullOrEmpty(gcashReceiptFileName))
+                    {
+                        order.gcash_receipt = gcashReceiptFileName;
+                    }
+
                     _order.Update(order.order_id, order, out error);
 
                     return ErrorCode.Success;
@@ -180,6 +184,39 @@ namespace UCGrab.Repository
                 return ErrorCode.Error;
             }
         }
+
+        public Order GetOrCreateOpenOrderForCart(string userId, ref string err)
+        {
+            // Get user info based on userId
+            var user = _userMgr.GetUserInfoByUserId(userId);
+
+            // Retrieve existing open order or create a new one
+            var order = _order._table.Where(m => m.user_id == userId && m.store_id == user.store_id && m.order_status == (int)OrderStatus.Open).FirstOrDefault();
+
+            if (order == null)
+            {
+                // If no open order exists, create a new one
+                order = new Order
+                {
+                    user_id = userId,
+                    order_status = (int)OrderStatus.Open,
+                    store_id = user.store_id,
+                    order_date = DateTime.Now
+                };
+
+                // Create the new order in the database
+                _order.Create(order, out err);
+
+                // Handle error if any
+                if (!string.IsNullOrEmpty(err))
+                {
+                    throw new Exception("Error creating order: " + err);
+                }
+            }
+
+            return order;
+        }
+
 
         public List<Order_Detail> GetOrderDetailsByOrderId(int orderId)
         {
@@ -241,7 +278,7 @@ namespace UCGrab.Repository
 
             return orders;
         }
-
+        
         public ErrorCode ConfirmOrder(int orderId)
         {
             try

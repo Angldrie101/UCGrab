@@ -32,6 +32,7 @@ namespace UCGrab.Repository
             return _store.GetAll().Where(m => m.store_id == id).FirstOrDefault();
         }
 
+      
         public Store GetStoreByUserId(string userId)
         {
 

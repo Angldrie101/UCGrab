@@ -641,38 +641,13 @@ namespace UCGrab.Controllers
 
             try
             {
-                // Retrieve the active order (or cart) for the current user
-                var currentOrder = _orderManager.GetOpenOrderByUserId(UserId);
-                if (currentOrder == null)
+                if (_orderManager.AddCart(UserId, prodId, qty, ref ErrorMessage) == ErrorCode.Error)
                 {
-                    throw new Exception("No active order found for the user.");
-                }
-
-                // Check if the product already exists in the Order_Detail table for the current order
-                var existingOrderDetail = _orderManager.GetOrderDetailByOrderIdAndProductId(currentOrder.order_id, prodId);
-
-                if (existingOrderDetail != null)
-                {
-                    // Increment the quantity if the item exists
-                    existingOrderDetail.quatity += qty;
-                    _orderManager.UpdateCart(existingOrderDetail.id, existingOrderDetail, ref ErrorMessage);
-                }
-                else
-                {
-                    // Add a new item if it doesn't exist
-                    var newOrderDetail = new Order_Detail
-                    {
-                        order_id = currentOrder.order_id,
-                        product_id = prodId,
-                        quatity = qty,
-                        price = _orderManager.GetProductPrice(prodId) // Fetch product price dynamically
-                    };
-
-                    _orderManager.AddOrderDetail(newOrderDetail, ref ErrorMessage);
+                    throw new Exception(ErrorMessage);
                 }
 
                 res.code = (int)ErrorCode.Success;
-                res.message = "Item successfully added to the cart!";
+                res.message = "Item Added!";
             }
             catch (Exception ex)
             {
@@ -689,29 +664,33 @@ namespace UCGrab.Controllers
             }
 
             return Json(res, JsonRequestBehavior.AllowGet);
+
         }
-    
+
         private void LogError(Exception ex)
         {
-            string logFilePath = Server.MapPath("~/Logs/errorlog.txt");
-            string errorMessage = DateTime.Now.ToString() + " - " + ex.ToString();
+            string logDirectory = @"C:\Logs";  // Use a local directory
 
-            if (!System.IO.File.Exists(logFilePath))
+            if (!Directory.Exists(logDirectory))
             {
-                System.IO.File.Create(logFilePath).Dispose();
+                Directory.CreateDirectory(logDirectory);
             }
+
+            string logFilePath = Path.Combine(logDirectory, "errorlog.txt");
+            string errorMessage = DateTime.Now.ToString() + " - " + ex.ToString();
 
             using (StreamWriter writer = new StreamWriter(logFilePath, true))
             {
                 writer.WriteLine(errorMessage);
             }
+
         }
         [AllowAnonymous]
         public ActionResult Cart()
         {
             var orders = _orderManager.GetOrderByUserId(UserId);
             var groupedOrders = orders
-                .GroupBy(order => order.Store.store_name)
+                .GroupBy(order => order.Store?.store_name)
                 .ToList();
             return View(groupedOrders);
         }
@@ -782,25 +761,24 @@ namespace UCGrab.Controllers
                     Quantity = (Int32)od.quatity,
                     Price = (Int32)od.price
                 }).ToList(),
-                Total = (Int32)orderDetails.Sum(od => od.price * od.quatity),
+                Total = orderDetails.Sum(od => (od.price ?? 0) * (od.quatity ?? 0)), // Handling nulls
                 CheckOutOption = (Int32)CheckoutOption.PickUp,
                 PaymentMethod = (Int32)PayMethod.GCash
             };
 
             return View(model);
-
         }
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult CheckOut(OrderViewModel model)
+        public ActionResult CheckOut(OrderViewModel model, string gcashReceipt)
         {
             IsUserLoggedSession();
 
             try
             {
                 string errorMessage = string.Empty;
-                var result = _orderManager.PlaceOrder(UserId, model, ref errorMessage);
+                var result = _orderManager.PlaceOrder(UserId, model, gcashReceipt, ref errorMessage);
 
                 if (result == ErrorCode.Success)
                 {

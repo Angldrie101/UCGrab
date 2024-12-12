@@ -92,6 +92,19 @@ namespace UCGrab.Repository
             return _product._table.Count(p => p.user_id == userId && p.status == (int)ProductStatus.HasStock);
         }
 
+        public List<Product> GetProductsByStoreId(int storeId)
+        {
+            try
+            {
+                // Retrieve all products associated with the given store_id
+                return _product._table.Where(p => p.store_id == storeId).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving products for the store.", ex);
+            }
+        }
+
         public List<ProductViewModel> GetTopSellingProducts(string userId)
         {
             var _db = new UCGrabEntities();

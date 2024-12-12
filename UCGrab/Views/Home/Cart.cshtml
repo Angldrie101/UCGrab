@@ -157,13 +157,13 @@
                             </div>
                             <div class="d-flex justify-content-between mb-3">
                                 <h6>Voucher</h6>
-                                <h6>-Php 10.00</h6>
+                                <h6>--</h6>
                             </div>
                         </div>
                         <div class="pt-2">
                             <div class="d-flex justify-content-between mt-2">
                                 <h5>Total</h5>
-                                <h5><strong>Php @((storeGroup.Sum(order => order.Order_Detail.Sum(od => od.quatity * od.price)) - 10))</strong></h5>
+                                <h5><strong>Php @(storeGroup.Sum(order => order.Order_Detail.Sum(od => od.quatity * od.price)))</strong></h5>
                             </div>
                             <a href="/Home/CheckOut" class="btn btn-block btn-primary font-weight-bold my-3 py-3">Checkout</a>
                         </div>

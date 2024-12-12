@@ -179,11 +179,13 @@
     <Content Include="Assets\Shop\img\comstudies.png" />
     <Content Include="Assets\Shop\img\crim.jpg" />
     <Content Include="Assets\Shop\img\customs.jpg" />
+    <Content Include="Assets\Shop\img\def.jpg" />
     <Content Include="Assets\Shop\img\DepartmentalShirts.jpg" />
     <Content Include="Assets\Shop\img\Drinks.jpg" />
     <Content Include="Assets\Shop\img\dunkin.png" />
     <Content Include="Assets\Shop\img\foods&amp;bev.jpg" />
     <Content Include="Assets\Shop\img\foodsdrinks.jpg" />
+    <Content Include="Assets\Shop\img\GCASHQR.jpg" />
     <Content Include="Assets\Shop\img\hmtm.jpg" />
     <Content Include="Assets\Shop\img\Image_not_available.png" />
     <Content Include="Assets\Shop\img\lmcares.jpg" />
@@ -575,6 +577,7 @@
     </Content>
     <None Include="Properties\PublishProfiles\UCGrab.pubxml" />
     <Content Include="Views\Home\QRCode.cshtml" />
+    <Content Include="Views\Admin\Inquires.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

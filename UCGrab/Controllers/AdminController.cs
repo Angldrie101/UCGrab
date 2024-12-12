@@ -160,5 +160,11 @@ namespace UCGrab.Controllers
             }
             return imagePath;
         }
+
+        [AllowAnonymous]
+        public ActionResult Inquires()
+        {
+            return View();
+        }
     }
 }

@@ -441,12 +441,15 @@ namespace UCGrab.Controllers
             ViewBag.Category = Utilities.SelectListItemCategoryByUser(Username);
             ViewBag.Categories = _categoryManager.ListCategory(Username) ?? new List<Category>();
             ViewBag.Products = _productManager.ListProduct(Username) ?? new List<Product>();
+            var user = _userManager.GetUserInfoByUsername(Username);
+            var storeId = _storeManager.GetStoreByUserId(user.user_id);
 
             var prodgUid = $"Item-{Utilities.gUid}";
             product.product_id = prodgUid;
             product.user_id = UserId;
             product.date_created = DateTime.Now;
             product.status = (Int32)ProductStatus.NoStock;
+            product.store_id = storeId.id;
 
             if (_productManager.CreateProduct(product, ref ErrorMessage) == ErrorCode.Error)
             {
