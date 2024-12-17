@@ -1,4 +1,5 @@
-﻿@{
+﻿@model UCGrab.Models.ProviderDashboardViewModel
+@{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/ShopPageLayout.cshtml";
 }
@@ -12,7 +13,7 @@
                 <h5 class="card-title text-dark">
                     <i class="mr-2">₱</i>Total Sales
                 </h5>
-                <p class="display-4 text-dark">₱<span id="total-sales">00000</span></p>
+                <p class="display-4 text-dark">₱<span id="total-sales">@Model.TotalSales</span></p>
             </div>
         </div>
         <div class="col-lg-3 mb-5">
@@ -20,7 +21,7 @@
                 <h5 class="card-title text-dark">
                     <i class="fas fa-boxes mr-2"></i>Total Products
                 </h5>
-                <p class="display-4 text-dark"><span id="total-products">0000</span></p>
+                <p class="display-4 text-dark"><span id="total-products">@Model.TotalProducts</span></p>
             </div>
         </div>
         <div class="col-lg-3 mb-5">
@@ -28,7 +29,7 @@
                 <h5 class="card-title text-dark">
                     <i class="fas fa-shopping-cart mr-2"></i>Orders
                 </h5>
-                <p class="display-4 text-dark"><span id="total-orders">0000</span></p>
+                <p class="display-4 text-dark"><span id="total-orders">@Model.TotalOrders</span></p>
             </div>
         </div>
         <div class="col-lg-3 mb-5">
@@ -36,7 +37,7 @@
                 <h5 class="card-title text-dark">
                     <i class="fas fa-users mr-2"></i>New Customers
                 </h5>
-                <p class="display-4 text-dark"><span id="new-customers">00000</span></p>
+                <p class="display-4 text-dark"><span id="new-customers">0</span></p>
             </div>
         </div>
     </div>

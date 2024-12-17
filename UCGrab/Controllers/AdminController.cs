@@ -20,7 +20,22 @@ namespace UCGrab.Controllers
         [AllowAnonymous]
         public ActionResult Index()
         {
-            return View();
+            var _db = new UCGrabEntities();
+            
+            var totalRevenue = _db.Order.Sum(o => o.order_id);
+            var totalStores = _db.Store.Count();
+            var totalUsers = _db.User_Accounts.Count();
+            //var customerInquiries = _db.Inquiries.Count();
+
+            var dashboardData = new AdminDashBoardViewModel
+            {
+                TotalRevenue = totalRevenue,
+                NumberStores = totalStores,
+                NumberAccounts = totalUsers,
+                //NewCustomerInquiries = customerInquiries
+            };
+
+            return View(dashboardData);
         }
 
         [AllowAnonymous]

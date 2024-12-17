@@ -1,5 +1,6 @@
-﻿
+﻿@model UCGrab.Models.AdminDashBoardViewModel
 @{
+    ViewBag.Title = "Index";
     Layout = "~/Views/Shared/AdminPageLayout.cshtml";
 
 }
@@ -14,7 +15,7 @@
                 <h5 class="card-title text-dark">
                     <i class="fas fa-dollar-sign mr-2"></i>Total Revenue
                 </h5>
-                <p class="display-4 text-dark">₱<span id="total-sales">2,000</span></p>
+                <p class="display-4 text-dark">₱<span id="total-sales">@Model.TotalRevenue</span></p>
             </div>
         </div>
         <div class="col-lg-3 mb-5">
@@ -22,7 +23,7 @@
                 <h5 class="card-title text-dark">
                     <i class="fas fa-boxes mr-2"></i>Number of Stores
                 </h5>
-                <p class="display-4 text-dark">₱<span id="total-products">5</span></p>
+                <p class="display-4 text-dark"><span id="total-products">@Model.NumberStores</span></p>
             </div>
         </div>
         <div class="col-lg-3 mb-5">
@@ -30,7 +31,7 @@
                 <h5 class="card-title text-dark">
                     <i class="fas fa-shopping-cart mr-2"></i>Number of Users
                 </h5>
-                <p class="display-4 text-dark"><span id="total-orders">50</span></p>
+                <p class="display-4 text-dark"><span id="total-orders">@Model.NumberAccounts</span></p>
             </div>
         </div>
         <div class="col-lg-3 mb-5">
@@ -38,7 +39,7 @@
                 <h5 class="card-title text-dark">
                     <i class="fas fa-users mr-2"></i>Customer Inquiries
                 </h5>
-                <p class="display-4 text-dark"><span id="new-customers">9</span></p>
+                <p class="display-4 text-dark"><span id="new-customers">0</span></p>
             </div>
         </div>
     </div>

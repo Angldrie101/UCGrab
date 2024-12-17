@@ -22,7 +22,22 @@ namespace UCGrab.Controllers
         {
             IsUserLoggedSession();
 
-            return View();
+            var _db = new UCGrabEntities();
+
+            var totalales = _db.Order.Sum(o => o.order_id);
+            var totalOrders = _db.Order.Count();
+            var totalProduct = _db.Product.Count();
+            //var newCustoemrs = _db.Inquiries.Count();
+
+            var dashboardData = new ProviderDashboardViewModel
+            {
+                TotalSales = totalales,
+                TotalProducts = totalOrders,
+                TotalOrders = totalProduct,
+                //NewCustomers = customerInquiries
+            };
+
+            return View(dashboardData);
         }
 
         [Authorize]
