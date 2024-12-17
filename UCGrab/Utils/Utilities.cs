@@ -130,21 +130,23 @@ namespace UCGrab.Utils
             }
         }
 
-        public static List<SelectListItem> SelectListItemCategoryByUser(String username)
+        public static List<SelectListItem> GetAllCategory
         {
-            CategoryManager _categoryMgr = new CategoryManager();
-            var list = new List<SelectListItem>();
-            foreach (var item in _categoryMgr.ListCategory(username))
+            get
             {
-                var r = new SelectListItem
+                BaseRepository<Category> category = new BaseRepository<Category>();
+                var list = new List<SelectListItem>();
+                foreach (var item in category.GetAll())
                 {
-                    Text = item.category_name,
-                    Value = item.category_id.ToString()
-                };
-                list.Add(r);
+                    var c = new SelectListItem
+                    {
+                        Text = item.category_name,
+                        Value = item.category_id.ToString()
+                    };
+                    list.Add(c);
+                }
+                return list;
             }
-
-            return list;
         }
     }
 }

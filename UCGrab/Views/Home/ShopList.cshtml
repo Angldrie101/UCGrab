@@ -5,40 +5,32 @@
     Layout = "~/Views/Shared/UserLayout.cshtml";
 }
 
-<!-- Shops Start -->
 <div class="container-fluid">
-    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Shops Selling {Specify Category}</span></h2>
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
+        <span class="bg-secondary pr-3">Shops Selling @ViewBag.CategoryName</span>
+    </h2>
     <div class="row px-xl-5">
         @if (!Model.Any())
         {
-            <!-- No Shops Message Start -->
             <div class="col-12">
                 <div class="alert alert-info" role="alert">
-                    There are no shops available.
+                    No shops available for this category.
                 </div>
             </div>
-            <!-- No Shops Message End -->
         }
         else
         {
             foreach (var store in Model)
             {
                 <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-                    <a href="/Home/Shop?storeId=@store.user_id" class="text-decoration-none">
+                    <a href="/Home/Shop?storeId=@store.user_id&categoryId=@ViewBag.SelectedCategory" class="text-decoration-none">
                         <div class="shop-item bg-light mb-4">
                             <div class="shop-img position-relative overflow-hidden" style="height: 250px;">
-                                <img class="img-fluid w-100 h-100" src="~/UploadedFiles/@store.Image_Store.FirstOrDefault().image_file" alt="@store.store_name" style="object-fit: cover;">
+                                <img class="img-fluid w-100 h-100" src="~/UploadedFiles/@(store.Image_Store.FirstOrDefault()?.image_file ?? "placeholder.jpg")"
+                                     alt="Image of @store.store_name in the category @ViewBag.CategoryName" style="object-fit: cover;">
                             </div>
                             <div class="text-center py-4">
-                                <a class="h6 text-decoration-none text-truncate" href="/Home/Shop?storeId=@store.user_id">@store.store_name</a>
-                                <div class="d-flex align-items-center justify-content-center mb-1">
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star-half-alt text-primary mr-1"></small>
-                                    <small>(99)</small>
-                                </div>
+                                <h6 class="text-decoration-none text-truncate">@store.store_name</h6>
                             </div>
                         </div>
                     </a>
@@ -47,4 +39,4 @@
         }
     </div>
 </div>
-<!-- Shops End -->
+

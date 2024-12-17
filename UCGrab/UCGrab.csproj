@@ -576,8 +576,9 @@
       <DependentUpon>UCGrab.edmx</DependentUpon>
     </Content>
     <None Include="Properties\PublishProfiles\UCGrab.pubxml" />
-    <Content Include="Views\Home\QRCode.cshtml" />
     <Content Include="Views\Admin\Inquires.cshtml" />
+    <Content Include="Views\Delivery\MyProfile.cshtml" />
+    <Content Include="Views\Delivery\EditProfile.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

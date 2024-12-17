@@ -15,6 +15,8 @@ namespace UCGrab.Models
 
         public Store Store { get; set; }
 
+        public Category Category { get; set; }
+
         public int TotalStock { get; set; }
 
         public string ProductName { get; set; }

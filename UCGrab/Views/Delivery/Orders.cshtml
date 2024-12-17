@@ -7,32 +7,64 @@
 }
 
 <style>
-    .carousel-item {
-        text-align: center;
+    .orders-container {
+        display: flex;
+        flex-direction: row;
+        margin-left:30px;
+        gap: 1rem;
     }
 
-    .card {
-        margin: 0 auto;
-        max-width: 800px;
-        width: 100%;
+    .order-list {
+        width: 32%;
+        max-height: 600px;
+        overflow-y: auto;
     }
 
-        .card img {
-            width: 100%;
-            height: 400px;
+    .order-item {
+        padding: 20px;
+        margin: 15px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #f9f9f9;
+        transition: background-color 0.2s ease-in-out;
+        position: relative; 
+
+    }
+    .order-item .btn-primary {
+    position: absolute;  /* Positioning the button */
+    bottom: 10px;  /* Adjust the distance from the bottom */
+    right: 10px;  /* Adjust the distance from the right */
+    padding: 5px 10px;
+}
+        .order-item:hover {
+            background-color: #e6f7ff;
         }
 
-    .card-header {
-        font-size: 1.5rem;
+        .order-item.active {
+            background-color: #cceeff;
+        }
+
+    .order-details {
+        width: 65%;
+        padding: 10px;
     }
 
-    .card-body {
-        font-size: 1.25rem;
-    }
+        .order-details img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
 
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
-        background-color: dodgerblue;
+        .order-details h4 {
+            margin-top: 20px;
+            font-size: 1.5rem;
+        }
+
+    .btn-actions {
+        margin-top: 10px;
     }
 </style>
 
@@ -42,39 +74,28 @@
 
 @if (orders != null && orders.Any())
 {
-    <div id="orderCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
-        <div class="carousel-inner">
-            @for (var i = 0; i < orders.Count; i++)
+    <div class="orders-container">
+        <!-- Order List -->
+        <div class="order-list" id="orderList">
+            @foreach (var order in orders)
             {
-                var order = orders[i];
-                <div id="order_@(order.OrderId)" class="carousel-item @(i == 0 ? "active" : "")">
-                    <div class="card">
-                        <img src="~/UploadedFiles/@(order.Products.FirstOrDefault()?.ImageFilePath ?? "default-image.jpg")" alt="Order image" class="card-img-top">
-                        <div class="card-header">
-                            Order Number: @order.OrderId
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title">Customer: @order.Firstname @order.Lastname</h5>
-                            <p class="card-text">
-                                Delivery Address: @order.Building at room @order.Room<br />
-                                Items: @order.Products.Count piece<br />
-                                Total Amount: Php @order.Total<br />
-                            </p>
-                            <a href="javascript:void(0);" class="btn btn-primary" onclick="changeOrderStatus(@order.OrderId)">Accept</a>
-                            <a href="@Url.Action("OrderDetails", "Delivery", new { id = order.OrderId })" class="btn btn-primary">View Details</a>
-                        </div>
+                <div class="order-item" data-order-id="@order.OrderId" onclick="showOrderDetails(@order.OrderId)">
+                    <strong>Order #@order.OrderId</strong><br />
+                    <span>Customer: @order.Firstname @order.Lastname</span><br />
+                    <span>Total Amount: Php @order.Total.ToString("N2")</span>
+                    <div>
+                        <a href="javascript:void(0);" class="btn btn-primary" onclick="changeOrderStatus(@order.OrderId)">Accept</a>
                     </div>
                 </div>
             }
         </div>
-        <a class="carousel-control-prev" href="#orderCarousel" role="button" data-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="sr-only">Previous</span>
-        </a>
-        <a class="carousel-control-next" href="#orderCarousel" role="button" data-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="sr-only">Next</span>
-        </a>
+
+        <!-- Order Details -->
+        <div class="order-details" id="orderDetails">
+            <div class="text-center">
+                <p>Select an order to view details.</p>
+            </div>
+        </div>
     </div>
 }
 else
@@ -83,12 +104,56 @@ else
         <h3>No orders to deliver.</h3>
     </div>
 }
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    var orders = @Html.Raw(Json.Encode(orders));
+
+    function showOrderDetails(orderId) {
+        var order = orders.find(o => o.OrderId === orderId);
+        if (!order) return;
+
+        // Highlight selected order
+        $('.order-item').removeClass('active');
+        $('[data-order-id="' + orderId + '"]').addClass('active');
+
+        // Product List
+        var productListHtml = '<ul>';
+        if (order.Products && order.Products.length > 0) {
+            order.Products.forEach(function(product) {
+                productListHtml += `
+                <li>
+                    ${product.ProductName} - ${product.Quantity} x Php ${product.Price.toFixed(2)}
+                </li>`;
+            });
+        } else {
+            productListHtml += '<li>No products available</li>';
+        }
+        productListHtml += '</ul>';
+
+        // Product Image
+        var productImage = order.Products.length > 0
+            ? '/UploadedFiles/' + order.Products[0].ImageFilePath
+            : '/UploadedFiles/default-image.jpg';
+
+        // Update Order Details Section
+        var orderDetailsHtml = `
+        <img src="${productImage}" alt="Product Image">
+        <h4>Order Number: ${order.OrderId}</h4>
+        <p><strong>Customer:</strong> ${order.Firstname} ${order.Lastname}</p>
+        <p><strong>Store:</strong> ${order.Stores}</p>
+        <p><strong>Store Address:</strong> ${order.StoreAddress}</p>
+        <p><strong>Delivery Address:</strong> ${order.Building} at Room ${order.Room}</p>
+        <p><strong>Items (${order.Products.length}):</strong> Php ${order.Total.toFixed(2)}</p>
+        ${productListHtml}`;
+
+        $('#orderDetails').html(orderDetailsHtml);
+    
+    }
+
+
     function changeOrderStatus(orderId) {
         Swal.fire({
             title: 'Are you sure?',
@@ -107,11 +172,8 @@ else
                     success: function(response) {
                         if (response.success) {
                             Swal.fire('Accepted!', 'The order has been accepted', 'success');
-                            $('#order_' + orderId).remove();
-                            if ($('#orderCarousel .carousel-item').length === 0) {
-                                $('#orderCarousel').hide();
-                                $('.text-center').show();
-                            }
+                            $('[data-order-id="' + orderId + '"]').remove();
+                            $('#orderDetails').html('<div class="text-center"><p>Select an order to view details.</p></div>');
                         } else {
                             Swal.fire('Failed!', 'There was an issue accepting the order', 'error');
                         }
@@ -123,4 +185,12 @@ else
             }
         });
     }
+    $(document).ready(function() {
+        if (orders.length > 0) {
+            // Simulate click event on the first order item
+            var firstOrderId = orders[0].OrderId;
+            showOrderDetails(firstOrderId); // Show details for the first order
+            $('[data-order-id="' + firstOrderId + '"]').addClass('active'); // Mark it as active
+        }
+    });
 </script>

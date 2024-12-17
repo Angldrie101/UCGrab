@@ -11,8 +11,6 @@
           </Key>
           <Property Name="category_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="category_name" Type="varchar" MaxLength="255" Nullable="false" />
-          <Property Name="date_created" Type="datetime" />
-          <Property Name="user_id" Type="varchar(max)" Nullable="false" />
         </EntityType>
         <EntityType Name="ContactUs">
           <Key>
@@ -174,6 +172,18 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
           <Property Name="username" Type="nvarchar" MaxLength="50" />
           <Property Name="rolename" Type="nvarchar" MaxLength="50" />
         </EntityType>
+        <Association Name="FK_Category_Category">
+          <End Role="Category" Type="Self.Category" Multiplicity="1" />
+          <End Role="Category1" Type="Self.Category" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="category_id" />
+            </Principal>
+            <Dependent Role="Category1">
+              <PropertyRef Name="category_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_File_Documents_File_Documents">
           <End Role="User_Accounts" Type="Self.User_Accounts" Multiplicity="0..1" />
           <End Role="File_Documents" Type="Self.File_Documents" Multiplicity="*" />
@@ -377,6 +387,10 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
 [vw_Role].[rolename] AS [rolename]
 FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </EntitySet>
+          <AssociationSet Name="FK_Category_Category" Association="Self.FK_Category_Category">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="Category1" EntitySet="Category" />
+          </AssociationSet>
           <AssociationSet Name="FK_File_Documents_File_Documents" Association="Self.FK_File_Documents_File_Documents">
             <End Role="User_Accounts" EntitySet="User_Accounts" />
             <End Role="File_Documents" EntitySet="File_Documents" />
@@ -457,6 +471,10 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <EntitySet Name="User_Information" EntityType="UCGrabModel.User_Information" />
           <EntitySet Name="User_Role" EntityType="UCGrabModel.User_Role" />
           <EntitySet Name="vw_Role" EntityType="UCGrabModel.vw_Role" />
+          <AssociationSet Name="FK_Category_Category" Association="UCGrabModel.FK_Category_Category">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="Category1" EntitySet="Category" />
+          </AssociationSet>
           <AssociationSet Name="FK_Product_Category" Association="UCGrabModel.FK_Product_Category">
             <End Role="Category" EntitySet="Category" />
             <End Role="Product" EntitySet="Product" />
@@ -520,8 +538,8 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </Key>
           <Property Name="category_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="category_name" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
-          <Property Name="date_created" Type="DateTime" Precision="3" />
-          <Property Name="user_id" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Category1" Relationship="UCGrabModel.FK_Category_Category" FromRole="Category" ToRole="Category1" />
+          <NavigationProperty Name="Category2" Relationship="UCGrabModel.FK_Category_Category" FromRole="Category1" ToRole="Category" />
           <NavigationProperty Name="Product" Relationship="UCGrabModel.FK_Product_Category" FromRole="Category" ToRole="Product" />
         </EntityType>
         <EntityType Name="ContactUs">
@@ -709,6 +727,18 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="username" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="rolename" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
+        <Association Name="FK_Category_Category">
+          <End Type="UCGrabModel.Category" Role="Category" Multiplicity="1" />
+          <End Type="UCGrabModel.Category" Role="Category1" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="category_id" />
+            </Principal>
+            <Dependent Role="Category1">
+              <PropertyRef Name="category_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Product_Category">
           <End Type="UCGrabModel.Category" Role="Category" Multiplicity="1" />
           <End Type="UCGrabModel.Product" Role="Product" Multiplicity="*" />
@@ -897,8 +927,6 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <EntitySetMapping Name="Category">
             <EntityTypeMapping TypeName="UCGrabModel.Category">
               <MappingFragment StoreEntitySet="Category">
-                <ScalarProperty Name="user_id" ColumnName="user_id" />
-                <ScalarProperty Name="date_created" ColumnName="date_created" />
                 <ScalarProperty Name="category_name" ColumnName="category_name" />
                 <ScalarProperty Name="category_id" ColumnName="category_id" />
               </MappingFragment>

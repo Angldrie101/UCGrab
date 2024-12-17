@@ -16,69 +16,14 @@
 </style>
 
 <div class="container-fluid">
-    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Product Management</span></h2>
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
+        <span class="bg-secondary pr-3">Product Management</span>
+    </h2>
     <div class="row px-xl-5">
+        <!-- Left Column: Form -->
         <div class="col-lg-6 mb-5">
             <div class="bg-light p-30 mb-30">
-                <h5 class="card-title"><i class="fas fa-tags mr-2"></i>Product Categories</h5>
-                @using (Html.BeginForm("AddCategory", "Shop", FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-                    <div class="form-group">
-                        <label for="categoryName" class="form-label">Category Name</label>
-                        <select name="category_name" class="form-control" id="categoryName" required>
-                            <option value="" disabled selected>Select a category to add to your store</option>
-                            <option value="Snack">Snack</option>
-                            <option value="Beverage">Beverage</option>
-                            <option value="Breakfast">Breakfast</option>
-                            <option value="Lunch">Lunch</option>
-                            <option value="Uniform">Uniform</option>
-                            <option value="Departmental Shirts">Departmental Shirts</option>
-                            <option value="Books">Books</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Add Category</button>
-                }
-                <hr>
-                <h5 class="card-title">Existing Categories</h5>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (ViewBag.Categories != null && ViewBag.Categories.Count > 0)
-                        {
-                            foreach (var category in ViewBag.Categories)
-                            {
-                                <tr>
-                                    <td>@category.category_id</td>
-                                    <td>@category.category_name</td>
-                                    <td>@category.date_created.ToString("yyyy-MM-dd")</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-danger" onclick="catDelete('@category.category_id')">Delete</button>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="3">No categories available.</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="col-lg-6 mb-5">
-            <div class="bg-light p-30 mb-30">
-                <h5 class="card-title"><i class="fas fa-box mr-2"></i>Products</h5>
+                <h5 class="card-title"><i class="fas fa-box mr-2"></i>Add Product</h5>
                 @using (Html.BeginForm("ProductInfo", "Shop", FormMethod.Post, new { enctype = "multipart/form-data" }))
                 {
                     @Html.AntiForgeryToken()
@@ -88,7 +33,7 @@
                     }
                     <div class="form-group">
                         <label class="form-label">Product Image</label>
-                        <div alt="Product Picture" class="img-fluid" id="preview"></div>
+                        <div id="preview" class="img-fluid"></div>
                         <div class="form-group">
                             <input id="files" name="files" type="file" accept="image/*">
                         </div>
@@ -99,7 +44,7 @@
                     </div>
                     <div class="form-group">
                         <label for="productCategory" class="form-label">Category</label>
-                        @Html.DropDownList("category_id", (IEnumerable<SelectListItem>)ViewBag.Category, new { @class = "form-control" })
+                        @Html.DropDownList("Category", (IEnumerable<SelectListItem>)ViewBag.Categories, new { @class = "form-control" })
                     </div>
                     <div class="form-group">
                         <label for="productPrice" class="form-label">Price</label>
@@ -117,10 +62,14 @@
                         <label for="productStock" class="form-label">Initial Stock Quantity</label>
                         <input type="number" class="form-control" id="productStock" name="stock_quantity" placeholder="Enter initial stock quantity" required>
                     </div>
-                    
                     <button type="submit" class="btn btn-primary">Add Product</button>
                 }
-                <hr>
+            </div>
+        </div>
+
+        <!-- Right Column: Product List -->
+        <div class="col-lg-6 mb-5">
+            <div class="bg-light p-30">
                 <h5 class="card-title">Existing Products</h5>
                 <table class="table table-striped">
                     <thead>
@@ -154,7 +103,7 @@
                         else
                         {
                             <tr>
-                                <td colspan="5">No products available.</td>
+                                <td colspan="6">No products available.</td>
                             </tr>
                         }
                     </tbody>
@@ -163,6 +112,7 @@
         </div>
     </div>
 </div>
+
 
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>

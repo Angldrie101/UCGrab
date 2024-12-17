@@ -591,24 +591,35 @@ namespace UCGrab.Controllers
         }
 
         [AllowAnonymous]
-        public ActionResult Shop(String storeId)
+        public ActionResult Shop(String storeId, int? categoryId)
         {
             var store = _storeManager.GetStoreByUserId(storeId);
 
             if (store != null)
             {
-                var products = _productManager.ListActiveProduct(store.user_id) ?? new List<Product>();
+                var products = categoryId.HasValue
+                    ? _productManager.ListActiveProductByCategory(store.user_id, categoryId.Value)
+                    : _productManager.ListActiveProduct(store.user_id);
+
+                ViewBag.SelectedCategory = categoryId; // Pass the category ID for display
+                ViewBag.StoreName = store.store_name;
                 return View(products);
             }
 
-            // Optionally, handle the case where the store is not found
             return HttpNotFound("Store not found");
         }
 
         [AllowAnonymous]
-        public ActionResult ShopList()
+        public ActionResult ShopList(int? categoryId)
         {
-            var stores = _storeManager.ListStore();
+            var stores = categoryId.HasValue
+                ? _storeManager.ListStoresByCategory(categoryId.Value)
+                : _storeManager.ListStore();
+
+            ViewBag.SelectedCategory = categoryId; // Pass the category ID for display
+            ViewBag.CategoryName = categoryId.HasValue
+                ? ((Categories)categoryId.Value).ToString()
+                : "All Categories";
 
             return View(stores);
         }
@@ -755,13 +766,13 @@ namespace UCGrab.Controllers
                 Lastname = userInfo.last_name,
                 Phone = userInfo.phone,
                 Email = userInfo.email,
+                Total = (Int32)orderDetails.Sum(od => od.price * od.quatity),
                 Products = orderDetails.Select(od => new ProductViewModel
                 {
                     ProductName = od.Product.product_name,
                     Quantity = (Int32)od.quatity,
                     Price = (Int32)od.price
                 }).ToList(),
-                Total = orderDetails.Sum(od => (od.price ?? 0) * (od.quatity ?? 0)), // Handling nulls
                 CheckOutOption = (Int32)CheckoutOption.PickUp,
                 PaymentMethod = (Int32)PayMethod.GCash
             };

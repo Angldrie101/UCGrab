@@ -115,12 +115,12 @@ namespace UCGrab.Repository
         {
             return _order._table.Where(m => m.user_id == userId && m.order_status == (Int32)OrderStatus.ReadyToDeliver).ToList();
         }
-        
+
         public Order GetOrderbyId(int id)
         {
             return _db.Order
-              .Include(o => o.Products)
-              .FirstOrDefault(o => o.order_id == id);
+                .Include(o => o.Order_Detail.Select(od => od.Product)) // Correct navigation
+                .FirstOrDefault(o => o.order_id == id);
         }
 
         public int GetCartCountByUserId(String userId)

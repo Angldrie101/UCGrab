@@ -8,6 +8,7 @@ namespace UCGrab.Models
 {
     public class OrderViewModel
     {
+        public List<Store> Store { get; set; }
         public int OrderId { get; set; }
         public string OrderNumber { get; set; }
         public DateTime OrderDate { get; set; }
@@ -28,5 +29,6 @@ namespace UCGrab.Models
         public string Stores { get; set; }
         public string StoreQrCode { get; set; }
         public string Receipt { get; set; }
+        public string StoreAddress { get; set; }
     }
 }

@@ -104,6 +104,12 @@ namespace UCGrab.Repository
                 throw new Exception("An error occurred while retrieving products for the store.", ex);
             }
         }
+        public IEnumerable<Product> ListActiveProductByCategory(string userId, int categoryId)
+        {
+            var _db = new UCGrabEntities();
+            return _db.Product.Where(product => product.user_id == userId && product.category_id == categoryId && product.status==(int)Status.Active).ToList();
+        }
+
 
         public List<ProductViewModel> GetTopSellingProducts(string userId)
         {

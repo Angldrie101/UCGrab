@@ -11,21 +11,21 @@ namespace UCGrab.Repository
     {
         private BaseRepository<Category> _category;
         private UserManager _userMgr;
+        private ProductManager _product;
         public CategoryManager()
         {
             _category = new BaseRepository<Category>();
             _userMgr = new UserManager();
+            _product = new ProductManager ();
         }
 
         public Category GetCategoryById(int? id)
         {
             return _category.Get(id);
         }
-
-        public List<Category> ListCategory(String username)
+        public List<Category> GetAllCategory(int id)
         {
-            var user = _userMgr.GetUserByUsername(username);
-            return _category._table.Where(m => m.user_id == user.user_id).ToList();
+            return _category._table.Where(m => m.category_id == id).ToList();
         }
 
         public ErrorCode CreateCategory(Category category, ref String err)

@@ -112,7 +112,7 @@
                     <div class="border-bottom pt-3 pb-2">
                         <div class="d-flex justify-content-between mb-3">
                             <h6>Subtotal</h6>
-                            <h6 id="subtotal">₱@Model.Total</h6>  <!-- Added id for subtotal -->
+                            <h6 id="total-amount">₱@Model.Total.ToString("N2")</h6>
                         </div>
 
                         <div class="d-flex justify-content-between">
@@ -124,7 +124,7 @@
                     <div class="pt-2">
                         <div class="d-flex justify-content-between mt-2">
                             <h5>Total</h5>
-                            <h5 id="total-amount">₱@Model.Total</h5>  
+                            <h5 id="total-amount">₱@Model.Total.ToString("N2")</h5>
                         </div>
                     </div>
 
@@ -180,6 +180,7 @@
 
                 <!-- Place Order Button -->
                 <button type="button" class="btn btn-block btn-primary font-weight-bold py-3" onclick="confirmOrder()">Place Order</button>
+            </div>
         </div>
     </div>
 </form>
@@ -198,7 +199,6 @@
         var subtotalText = document.getElementById("subtotal").innerText.replace('₱', '');
         var subtotal = parseFloat(subtotalText);
 
-        // Check if subtotal is a valid number
         if (isNaN(subtotal)) {
             console.error('Subtotal is not a valid number:', subtotalText);
             return;
@@ -207,17 +207,17 @@
         if (pickUp.checked) {
             shippingAddress.style.display = "none";
             pickUpInfo.style.display = "block";
-            codOption.style.display = "none"; // Hide COD when Pick-Up is selected
+            codOption.style.display = "none";
             shippingFeeText.style.display = "none";
             shippingFee.style.display = "none";
-            totalAmountElement.innerText = '₱' + subtotal.toFixed(2); // No shipping fee added for Pick-Up
+            totalAmountElement.innerText = '₱' + subtotal.toFixed(2);
         } else {
             shippingAddress.style.display = "block";
             pickUpInfo.style.display = "none";
-            codOption.style.display = "block"; // Show COD for Deliver option
+            codOption.style.display = "block";
             shippingFeeText.style.display = "block";
             shippingFee.style.display = "block";
-            totalAmountElement.innerText = '₱' + (subtotal + 10).toFixed(2); // Add shipping fee for Deliver
+            totalAmountElement.innerText = '₱' + (subtotal + 10).toFixed(2); // Example shipping fee
         }
     }
 

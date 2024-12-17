@@ -21,9 +21,9 @@ namespace UCGrab.Database
     
         public int category_id { get; set; }
         public string category_name { get; set; }
-        public Nullable<System.DateTime> date_created { get; set; }
-        public string user_id { get; set; }
     
+        public virtual Category Category1 { get; set; }
+        public virtual Category Category2 { get; set; }
         public virtual ICollection<Product> Product { get; set; }
     }
 }

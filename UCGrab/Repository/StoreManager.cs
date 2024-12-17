@@ -38,6 +38,12 @@ namespace UCGrab.Repository
 
             return _store._table.FirstOrDefault(m => m.user_id == userId);
         }
+        public IEnumerable<Store> ListStoresByCategory(int categoryId)
+        {
+            var _db = new UCGrabEntities();
+            return _db.Store.Where(store => store.Product.Any(product => product.category_id == categoryId)).ToList();
+        }
+
 
         public ErrorCode AddStoreForUser(Store store, string user_id, ref String err)
         {
