@@ -827,8 +827,10 @@ namespace UCGrab.Controllers
             var userInfo = _userManager.GetUserInfoByUserId(userId);
             var order = _orderManager.GetOrderByUserId(userId).FirstOrDefault();
             var orderDetails = _orderManager.GetOrderDetailsByOrderId(order.order_id);
+            var totalOrder = _orderManager.GetTotalByOrderId(order.order_id);
+            var image = _imageManager.GetStoreQrCodeByStoreId(order.store_id);
 
-            var model = new OrderViewModel
+            var model = new CheckOutViewModel
             {
                 OrderId = order.order_id,
                 Firstname = userInfo.first_name,
@@ -843,8 +845,9 @@ namespace UCGrab.Controllers
                 }).ToList(),
                 CheckOutOption = (Int32)CheckoutOption.PickUp,
                 PaymentMethod = (Int32)PayMethod.GCash,
-                Total = (decimal)order.Order_Detail?.Sum(od => od.price * od.quatity)
-        };
+                Total = order.Order_Detail != null ? order.Order_Detail.Sum(od => od.price * od.quatity) : 0,
+                StoreQrCode = image
+            };
 
             return View(model);
         }
@@ -857,6 +860,7 @@ namespace UCGrab.Controllers
 
             try
             {
+                
                 string errorMessage = string.Empty;
                 var result = _orderManager.PlaceOrder(UserId, model, gcashReceipt, ref errorMessage);
 

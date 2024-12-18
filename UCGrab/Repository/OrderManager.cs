@@ -233,7 +233,7 @@ namespace UCGrab.Repository
         {
             return _orderDetail.Delete(id, out err);
         }
-
+        
         public ErrorCode PlaceOrder(string userId, OrderViewModel model, string gcashReceiptFileName, ref string error)
         {
             try
@@ -307,6 +307,17 @@ namespace UCGrab.Repository
 
             return order;
         }
+        public decimal GetTotalByOrderId(int orderId)
+        {
+            // Fetch all order details for the given orderId
+            var orderdetails = _orderDetail._table.Where(o => o.order_id == orderId);
+
+            // Multiply price and quantity for each order detail and sum them up
+            var totalOrder = orderdetails.Sum(o => o.price * o.quatity) ?? 0m; // Use 0m if the result is null
+
+            return totalOrder;
+        }
+
 
 
         public List<Order_Detail> GetOrderDetailsByOrderId(int orderId)

@@ -100,7 +100,7 @@ namespace UCGrab.Repository
             return ErrorCode.Success;
         }
 
-        public string GetStoreQrCodeByStoreId(int storeId)
+        public string GetStoreQrCodeByStoreId(int? storeId)
         {
             var storeImage = _imgstore._table.FirstOrDefault(img => img.store_id == storeId);
             return storeImage != null ? storeImage.qr_file : "~/Assets/Shop/img/def.jpg"; // Default QR if none exists

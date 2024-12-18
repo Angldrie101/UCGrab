@@ -167,7 +167,6 @@
                                     @{ 
                                         var tot = storeGroup.Sum(order => order.Order_Detail.Sum(od => od.quatity * od.price));
                                     }
-                                    <input type="text" name="tot" value="@tot" />
                                     <h5><strong>Php @tot</strong></h5>
                                 </div>
                                 <a href="/Home/Checkout" class="btn btn-block btn-primary font-weight-bold my-3 py-3">Checkout</a>

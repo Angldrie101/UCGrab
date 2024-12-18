@@ -612,6 +612,7 @@
     <Content Include="Views\Admin\Inquires.cshtml" />
     <Content Include="Views\Delivery\MyProfile.cshtml" />
     <Content Include="Views\Delivery\EditProfile.cshtml" />
+    <Content Include="Views\Home\CheckOut.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
