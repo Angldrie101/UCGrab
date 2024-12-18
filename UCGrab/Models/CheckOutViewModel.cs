@@ -6,7 +6,7 @@ using UCGrab.Database;
 
 namespace UCGrab.Models
 {
-    public class OrderViewModel
+    public class CheckOutViewModel
     {
         public List<Store> Store { get; set; }
         public int OrderId { get; set; }
@@ -19,7 +19,7 @@ namespace UCGrab.Models
         public string Email { get; set; }
         public List<ProductViewModel> Products { get; set; }
         public decimal? Total { get; set; }
-        public int PaymentMethod { get; set; } 
+        public int PaymentMethod { get; set; }
         public string Building { get; set; }
         public string Room { get; set; }
         public string AdditionalInfo { get; set; }

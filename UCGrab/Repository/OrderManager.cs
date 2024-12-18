@@ -19,6 +19,7 @@ namespace UCGrab.Repository
         UserManager _userMgr;
         ProductManager _productMgr;
         BaseRepository<Favorites> _fav;
+        StoreManager _storeMgr;
         public OrderManager()
         {
             _db = new UCGrabEntities();
@@ -27,6 +28,7 @@ namespace UCGrab.Repository
             _productMgr = new ProductManager();
             _orderDetail = new BaseRepository<Order_Detail>();
             _fav = new BaseRepository<Favorites>();
+            _storeMgr = new StoreManager();
         }
 
         public Order GetOrCreateOrderByUserId(String userId, Product prod, ref String err)
@@ -34,9 +36,17 @@ namespace UCGrab.Repository
             String orderNo = String.Empty;
 
             var user = _userMgr.GetUserInfoByUserId(prod.user_id);
+            var store = _storeMgr.GetStoreByUserId(prod.user_id);
 
-            var order = _order._table.Where(m => m.user_id == userId && m.store_id == user.store_id).FirstOrDefault();
-            if (order == null || order.order_status != (Int32)OrderStatus.Open)
+
+            var order = _order._table.Where(m => m.user_id == userId && m.store_id == store.id && m.order_status == (Int32)OrderStatus.Open).FirstOrDefault();
+
+
+            if (order != null)
+            {
+                return order;
+            }
+            else if (order == null || order.order_status != (Int32)OrderStatus.Open)
             {
                 order = new Order();
                 order.user_id = userId;
@@ -45,8 +55,7 @@ namespace UCGrab.Repository
                 order.order_date = DateTime.Now;
 
                 _order.Create(order, out err);
-
-                return order;
+                
             }
 
             return order;
@@ -57,23 +66,32 @@ namespace UCGrab.Repository
             var product = _productMgr.GetProductById(productId);
             if (product == null)
             {
-                error = "Not Found";
+                error = "Product not found";
                 return ErrorCode.Error;
             }
+            var order = GetOrCreateOrderByUserId(userId, product, ref error);
+            
+            var orderdet = GetOrderDetailByOrderId(order.order_id);
 
-            var order = GetOrCreateOrderByUserId(userId, product,ref error);
-            var orDetail = new Order_Detail();
-            orDetail.order_id = order.order_id;
-            orDetail.product_id = productId;
-            orDetail.quatity = qty;
-            orDetail.price = product.price;
+            
+                var result = AddUpdateCartQty(new Order_Detail
+                {
+                    order_id = order.order_id,
+                    product_id = productId,
+                    quatity = qty,
+                    price = product.price
+                }, order);
 
-            if (AddUpdateCartQty(orDetail, order) == ErrorCode.Error)
-            {
-                error = Message; 
-                return ErrorCode.Error;
-            }
+                return result;
 
+            
+
+
+            //if (result == ErrorCode.Error)
+            //{
+            //    error = Message;
+            //    return ErrorCode.Error;
+            //}
 
             return ErrorCode.Success;
         }
@@ -82,25 +100,25 @@ namespace UCGrab.Repository
         {
             try
             {
-                String err = String.Empty;
-                var lproduct = _productMgr.GetProductById(orderItem.product_id);
-                var lOrderItem = _order.Get(order.order_id).Order_Detail.Where(m => m.product_id == orderItem.product_id).FirstOrDefault();
-                if (lOrderItem == null)
+                var existingOrderDetail = _order
+                    .Get(order.order_id)?
+                    .Order_Detail
+                    .FirstOrDefault(m => m.product_id == orderItem.product_id);
+
+                if (existingOrderDetail != null)
                 {
+                    existingOrderDetail.quatity += orderItem.quatity;
 
-                    return _orderDetail.Create(orderItem, out Message);
+                    return _orderDetail.Update(existingOrderDetail.id, existingOrderDetail, out Message);
                 }
-                var orDt = _orderDetail.Get(lOrderItem.id);
-                orDt.quatity += orderItem.quatity;
-
-                return _orderDetail.Update(orDt.id, orDt, out Message);
+                
+                return _orderDetail.Create(orderItem, out Message);
             }
             catch (Exception ex)
             {
-                Message = ex.Message;
+                Message = $"Failed to update cart quantity: {ex.Message}";
                 return ErrorCode.Error;
             }
-
         }
 
         public ErrorCode AddToFavorites(String userId, int productId, int qty, ref String error)
@@ -202,7 +220,10 @@ namespace UCGrab.Repository
         {
             return _orderDetail.Get(id);
         }
-      
+        public Order_Detail GetOrderDetailByOrderId (int orderId)
+        {
+            return _orderDetail.GetAll().Where(o => o.order_id == orderId).FirstOrDefault();
+        }
         public ErrorCode UpdateOrderDetail(int id, Order_Detail orderDt, ref String err)
         {
             return _orderDetail.Update(id, orderDt, out err);
@@ -293,6 +314,7 @@ namespace UCGrab.Repository
             return _orderDetail._table.Where(od => od.order_id == orderId).ToList();
         }
 
+        
         public List<Order> GetUserOrderByUserId(String userId)
         {
             return _order._table.Where(m => m.user_id == userId).ToList();

@@ -82,6 +82,7 @@
 {
     foreach (var storeGroup in Model)
     {
+
         <div class="container-fluid mb-5">
             <div class="row px-xl-5">
                 <div class="col-lg-8 table-responsive mb-5">
@@ -161,11 +162,16 @@
                             </div>
                         </div>
                         <div class="pt-2">
-                            <div class="d-flex justify-content-between mt-2">
-                                <h5>Total</h5>
-                                <h5><strong>Php @(storeGroup.Sum(order => order.Order_Detail.Sum(od => od.quatity * od.price)))</strong></h5>
-                            </div>
-                            <a href="/Home/CheckOut" class="btn btn-block btn-primary font-weight-bold my-3 py-3">Checkout</a>
+                                <div class="d-flex justify-content-between mt-2">
+                                    <h5>Total</h5>
+                                    @{ 
+                                        var tot = storeGroup.Sum(order => order.Order_Detail.Sum(od => od.quatity * od.price));
+                                    }
+                                    <input type="text" name="tot" value="@tot" />
+                                    <h5><strong>Php @tot</strong></h5>
+                                </div>
+                                <a href="/Home/Checkout" class="btn btn-block btn-primary font-weight-bold my-3 py-3">Checkout</a>
+                                
                         </div>
                     </div>
                 </div>

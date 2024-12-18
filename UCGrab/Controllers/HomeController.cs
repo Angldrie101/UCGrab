@@ -648,33 +648,38 @@ namespace UCGrab.Controllers
         [HttpPost]
         public JsonResult AddCart(int prodId, int qty)
         {
-            var res = new Response();
+            var response = new Response();
 
             try
             {
-                if (_orderManager.AddCart(UserId, prodId, qty, ref ErrorMessage) == ErrorCode.Error)
+                // Call the _orderManager to handle adding/updating the cart
+                var result = _orderManager.AddCart(UserId, prodId, qty, ref ErrorMessage);
+
+                if (result == ErrorCode.Error)
                 {
                     throw new Exception(ErrorMessage);
                 }
 
-                res.code = (int)ErrorCode.Success;
-                res.message = "Item Added!";
+                // Success response
+                response.code = (int)ErrorCode.Success;
+                response.message = "Item added to the cart!";
             }
             catch (Exception ex)
             {
-                res.code = (int)ErrorCode.Error;
-                res.message = "An error occurred while adding the item to the cart: " + ex.Message;
+                // Error handling and logging
+                response.code = (int)ErrorCode.Error;
+                response.message = $"An error occurred while adding the item to the cart: {ex.Message}";
 
-                // Log the inner exception if it exists
                 if (ex.InnerException != null)
                 {
-                    res.message += " Inner exception: " + ex.InnerException.Message;
+                    response.message += $" Inner exception: {ex.InnerException.Message}";
                 }
 
                 LogError(ex);
             }
 
-            return Json(res, JsonRequestBehavior.AllowGet);
+            // Return JSON response
+            return Json(response, JsonRequestBehavior.AllowGet);
 
         }
 
@@ -707,7 +712,7 @@ namespace UCGrab.Controllers
         }
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult Cart(int qty, int orderDtId, String action)
+        public ActionResult Cart(int qty, int orderDtId, string action)
         {
             switch (action)
             {
@@ -733,7 +738,8 @@ namespace UCGrab.Controllers
 
             _orderManager.UpdateOrderDetail(orderDt.id, orderDt, ref ErrorMessage);
 
-            return View(_orderManager.GetOrderByUserId(UserId));
+            var updatedOrders = _orderManager.GetOrderByUserId(UserId);
+            return View(updatedOrders);
         }
 
         public JsonResult GetCartCount()
@@ -774,7 +780,7 @@ namespace UCGrab.Controllers
             catch (Exception ex)
             {
                 res.code = (int)ErrorCode.Error;
-                res.message = "An error occurred while adding the item to the favorite: " + ex.Message;
+                res.message = "" + ex.Message;
 
                 // Log the inner exception if it exists
                 if (ex.InnerException != null)
@@ -787,7 +793,31 @@ namespace UCGrab.Controllers
 
             return Json(res, JsonRequestBehavior.AllowGet);
         }
+        [HttpPost]
+        [AllowAnonymous]
+        public JsonResult RemoveFromFavorites(int prodId)
+        {
+            var res = new Response();
 
+            try
+            {
+                if (_favManager.RemoveFromFavorites(UserId, prodId, ref ErrorMessage) == ErrorCode.Error)
+                {
+                    res.code = (int)ErrorCode.Success;
+                    res.message = "Item removed from favorites!";
+                }
+
+                throw new Exception(ErrorMessage);
+            }
+            catch (Exception ex)
+            {
+                res.code = (int)ErrorCode.Error;
+                res.message = "" + ex.Message;
+                LogError(ex);
+            }
+
+            return Json(res, JsonRequestBehavior.AllowGet);
+        }
         [AllowAnonymous]
         public ActionResult CheckOut()
         {
@@ -805,7 +835,6 @@ namespace UCGrab.Controllers
                 Lastname = userInfo.last_name,
                 Phone = userInfo.phone,
                 Email = userInfo.email,
-                Total = (Int32)orderDetails.Sum(od => od.price * od.quatity),
                 Products = orderDetails.Select(od => new ProductViewModel
                 {
                     ProductName = od.Product.product_name,
@@ -813,15 +842,16 @@ namespace UCGrab.Controllers
                     Price = (Int32)od.price
                 }).ToList(),
                 CheckOutOption = (Int32)CheckoutOption.PickUp,
-                PaymentMethod = (Int32)PayMethod.GCash
-            };
+                PaymentMethod = (Int32)PayMethod.GCash,
+                Total = (decimal)order.Order_Detail?.Sum(od => od.price * od.quatity)
+        };
 
             return View(model);
         }
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult CheckOut(OrderViewModel model, string gcashReceipt)
+        public ActionResult Checkout(OrderViewModel model, string gcashReceipt)
         {
             IsUserLoggedSession();
 

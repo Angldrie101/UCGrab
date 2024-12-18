@@ -195,7 +195,7 @@ namespace UCGrab.Controllers
                         Price = (Int32)od.price,
                         ImageFilePath = od.Product.Image_Product.FirstOrDefault()?.image_file
                     }).ToList(),
-                    Total = (decimal)order.Order_Detail.Sum(od => od.price * od.quatity),
+                    Total = (int)order.Order_Detail.Sum(od => od.price * od.quatity),
                     PaymentMethod = (Int32)order.payment_method,
                     Stores = store.store_name
                 };

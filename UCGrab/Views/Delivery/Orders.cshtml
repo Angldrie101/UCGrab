@@ -82,7 +82,7 @@
                 <div class="order-item" data-order-id="@order.OrderId" onclick="showOrderDetails(@order.OrderId)">
                     <strong>Order #@order.OrderId</strong><br />
                     <span>Customer: @order.Firstname @order.Lastname</span><br />
-                    <span>Total Amount: Php @order.Total.ToString("N2")</span>
+                    <span>Total Amount: Php @(order.Total?.ToString("N2") ?? "0.00")</span>
                     <div>
                         <a href="javascript:void(0);" class="btn btn-primary" onclick="changeOrderStatus(@order.OrderId)">Accept</a>
                     </div>

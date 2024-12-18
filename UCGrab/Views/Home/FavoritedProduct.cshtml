@@ -19,7 +19,7 @@
                             <img class="img-fluid w-100 h-100" src="~/UploadedFiles/@(product.Product.Image_Product.FirstOrDefault()?.image_file ?? "default_image.jpg")" alt="@product.Product.product_name" style="object-fit: cover;">
                             <div class="product-action">
                                 <a class="btn btn-outline-dark btn-square" onclick="onAddCart(@product.id)"><i class="fa fa-shopping-cart"></i></a>
-                                <a class="btn btn-outline-dark btn-square" onclick="onRemoveFav(@product.id)">
+                                <a class="btn btn-outline-dark btn-square" onclick="onRemoveFav(@product.product_id)">
                                     <i class="fa fa-times"></i>
                                 </a>
                             </div>
@@ -93,11 +93,11 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.post("/Home/RemoveFromFavorites", { prodId: prodId }, function (data, status) {
-                    if (data.code === 0) {
-                        Swal.fire(data.message, "", "success");
+                    if (data.code == 1) {
+                        Swal.fire(data.message, "Deleted!", "success");
                         location.reload();
                     } else {
-                        Swal.fire(data.message, "", "error");
+                        Swal.fire(data.message, "Unable to Delete", "error");
                     }
                 }).fail(function (xhr, status, error) {
                     Swal.fire("Error removing favorite!", error, "error");
