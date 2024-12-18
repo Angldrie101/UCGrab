@@ -742,11 +742,50 @@ namespace UCGrab.Controllers
 
             return Json(res, JsonRequestBehavior.AllowGet);
         }
-
+        
         [AllowAnonymous]
         public ActionResult FavoritedProduct()
         {
-            return View();
+            var fav = _favManager.GetAllProduct(UserId);
+            return View(fav);
+        }
+        //public JsonResult GetFavoriteCount()
+        //{
+        //    var res = new { count = _orderManager.GetCartCountByUserId(UserId) };
+
+        //    return Json(res, JsonRequestBehavior.AllowGet);
+        //}
+        [HttpPost]
+        [AllowAnonymous]
+        public JsonResult AddToFavorites(int prodId, int qty)
+        {
+            var res = new Response();
+
+            try
+            {
+                if (_orderManager.AddToFavorites(UserId, prodId, qty, ref ErrorMessage) == ErrorCode.Error)
+                {
+                    throw new Exception(ErrorMessage);
+                }
+
+                res.code = (int)ErrorCode.Success;
+                res.message = "Item Added!";
+            }
+            catch (Exception ex)
+            {
+                res.code = (int)ErrorCode.Error;
+                res.message = "An error occurred while adding the item to the favorite: " + ex.Message;
+
+                // Log the inner exception if it exists
+                if (ex.InnerException != null)
+                {
+                    res.message += " Inner exception: " + ex.InnerException.Message;
+                }
+
+                LogError(ex);
+            }
+
+            return Json(res, JsonRequestBehavior.AllowGet);
         }
 
         [AllowAnonymous]

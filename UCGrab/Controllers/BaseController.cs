@@ -19,6 +19,7 @@ namespace UCGrab.Controllers
         public ProductManager _productManager;
         public CategoryManager _categoryManager;
         public OrderManager _orderManager;
+        public FavoritesManager _favManager;
 
         public String Username { get { return User.Identity.Name; } }
         public String UserId { get { return _userManager.GetUserByUsername(Username).user_id; } }
@@ -32,6 +33,7 @@ namespace UCGrab.Controllers
             _productManager = new ProductManager();
             _categoryManager = new CategoryManager();
             _orderManager = new OrderManager();
+            _favManager = new FavoritesManager();
 
         }
         public void IsUserLoggedSession()

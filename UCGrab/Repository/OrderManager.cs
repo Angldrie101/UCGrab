@@ -18,6 +18,7 @@ namespace UCGrab.Repository
         BaseRepository<Order_Detail> _orderDetail;
         UserManager _userMgr;
         ProductManager _productMgr;
+        BaseRepository<Favorites> _fav;
         public OrderManager()
         {
             _db = new UCGrabEntities();
@@ -25,6 +26,7 @@ namespace UCGrab.Repository
             _userMgr = new UserManager();
             _productMgr = new ProductManager();
             _orderDetail = new BaseRepository<Order_Detail>();
+            _fav = new BaseRepository<Favorites>();
         }
 
         public Order GetOrCreateOrderByUserId(String userId, Product prod, ref String err)
@@ -100,6 +102,74 @@ namespace UCGrab.Repository
             }
 
         }
+
+        public ErrorCode AddToFavorites(String userId, int productId, int qty, ref String error)
+        {
+            var product = _productMgr.GetProductById(productId);
+            if (product == null)
+            {
+                error = "Product not found.";
+                return ErrorCode.Error;
+            }
+            
+            var existingFavorite = _db.Favorites
+                .FirstOrDefault(f => f.user_id == userId && f.product_id == productId);
+
+            if (existingFavorite != null)
+            {
+                error = "Product is already in favorites.";
+                return ErrorCode.Error;
+            }
+
+            // Add to favorites
+            var favorite = new Favorites
+            {
+                user_id = userId,
+                product_id = productId,
+                quantity = qty
+            };
+
+            _db.Favorites.Add(favorite);
+            _db.SaveChanges();
+
+            return ErrorCode.Success;
+        }
+        public ErrorCode AddUpdateFavoritesQty(Favorites favItem, Product product)
+        {
+            try
+            {
+                string err = string.Empty;
+
+                // Ensure that the product exists in the database
+                var lProduct = _productMgr.GetProductById(favItem.product_id);
+                if (lProduct == null)
+                {
+                    err = "Product not found.";
+                    return ErrorCode.Error;
+                }
+                
+                var existingFavorite = _fav._table.Where(m => m.user_id == m.user_id && m.product_id == product.id).FirstOrDefault();
+
+                if (existingFavorite == null)
+                {
+                    // If not, create a new favorite item
+                    return _fav.Create(favItem, out err);
+                }
+                else
+                {
+                    // If it exists, update the favorite item (e.g., increase quantity)
+                    existingFavorite.quantity += favItem.quantity;  // Update quantity or other fields as necessary
+
+                    return _fav.Update(existingFavorite.id, existingFavorite, out err);
+                }
+            }
+            catch (Exception ex)
+            {
+                Message = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
+
 
         public List<Order> GetOrderByUserId(String userId)
         {

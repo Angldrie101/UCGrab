@@ -101,9 +101,9 @@
                             </div>
                         </div>
                         <div class="navbar-nav ml-auto py-0 d-none d-lg-block">
-                            <a href="~/Home/FavoritedProduct" class="btn px-0">
+                            <a href="/Home/FavoritedProduct" class="btn px-0">
                                 <i class="fas fa-heart text-primary"></i>
-                                <span class="badge text-secondary border border-secondary rounded-circle">3</span>
+                                <span class="badge text-secondary border border-secondary rounded-circle"></span>
                             </a>
                             <a href="~/Home/Cart" class="btn px-0 ml-3">
                                 <i class="fas fa-shopping-cart text-primary"></i>
@@ -178,6 +178,18 @@
                       }
                   });
         }
+        //$(document).ready(function () {
+        //    loadFavoriteCount();
+        //});
+        //function loadFavoriteCount() {
+        //    $.get("/Home/GetFavoriteCount",
+        //          function (data) {
+        //              console.log(data.count);
+        //              if (data.count != 0) {
+        //                  document.getElementById("lblCountCart").innerHTML = data.count;
+        //              }
+        //          });
+        //}
     </script>
 </body>
 </html>

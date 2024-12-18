@@ -22,6 +22,15 @@
           <Property Name="subject" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="description" Type="varchar(max)" Nullable="false" />
         </EntityType>
+        <EntityType Name="Favorites">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="product_id" Type="int" />
+          <Property Name="user_id" Type="nvarchar(max)" />
+          <Property Name="quantity" Type="int" />
+        </EntityType>
         <EntityType Name="File_Documents">
           <Key>
             <PropertyRef Name="id" />
@@ -181,6 +190,30 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
             </Principal>
             <Dependent Role="Category1">
               <PropertyRef Name="category_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Favorites_Favorites">
+          <End Role="Favorites" Type="Self.Favorites" Multiplicity="1" />
+          <End Role="Favorites1" Type="Self.Favorites" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Favorites">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Favorites1">
+              <PropertyRef Name="id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Favorites_Product">
+          <End Role="Product" Type="Self.Product" Multiplicity="0..1" />
+          <End Role="Favorites" Type="Self.Favorites" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Favorites">
+              <PropertyRef Name="product_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -368,6 +401,7 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
         <EntityContainer Name="UCGrabModelStoreContainer">
           <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ContactUs" EntityType="Self.ContactUs" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Favorites" EntityType="Self.Favorites" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="File_Documents" EntityType="Self.File_Documents" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Image" EntityType="Self.Image" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Image_Product" EntityType="Self.Image_Product" Schema="dbo" store:Type="Tables" />
@@ -390,6 +424,14 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <AssociationSet Name="FK_Category_Category" Association="Self.FK_Category_Category">
             <End Role="Category" EntitySet="Category" />
             <End Role="Category1" EntitySet="Category" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Favorites_Favorites" Association="Self.FK_Favorites_Favorites">
+            <End Role="Favorites" EntitySet="Favorites" />
+            <End Role="Favorites1" EntitySet="Favorites" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Favorites_Product" Association="Self.FK_Favorites_Product">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="Favorites" EntitySet="Favorites" />
           </AssociationSet>
           <AssociationSet Name="FK_File_Documents_File_Documents" Association="Self.FK_File_Documents_File_Documents">
             <End Role="User_Accounts" EntitySet="User_Accounts" />
@@ -531,6 +573,15 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <End Role="User_Role" EntitySet="User_Role" />
             <End Role="User_Role1" EntitySet="User_Role" />
           </AssociationSet>
+          <EntitySet Name="Favorites" EntityType="UCGrabModel.Favorites" />
+          <AssociationSet Name="FK_Favorites_Favorites" Association="UCGrabModel.FK_Favorites_Favorites">
+            <End Role="Favorites" EntitySet="Favorites" />
+            <End Role="Favorites1" EntitySet="Favorites" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Favorites_Product" Association="UCGrabModel.FK_Favorites_Product">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="Favorites" EntitySet="Favorites" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="Category">
           <Key>
@@ -645,6 +696,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <NavigationProperty Name="Order_Detail" Relationship="UCGrabModel.FK_Order_Detail_Product" FromRole="Product" ToRole="Order_Detail" />
           <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Product_Store" FromRole="Product" ToRole="Store" />
           <NavigationProperty Name="Stock" Relationship="UCGrabModel.FK_Stock_Product" FromRole="Product" ToRole="Stock" />
+          <NavigationProperty Name="Favorites" Relationship="UCGrabModel.FK_Favorites_Product" FromRole="Product" ToRole="Favorites" />
         </EntityType>
         <EntityType Name="Stock">
           <Key>
@@ -917,6 +969,42 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Favorites">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="product_id" Type="Int32" />
+          <Property Name="user_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Favorites1" Relationship="UCGrabModel.FK_Favorites_Favorites" FromRole="Favorites" ToRole="Favorites1" />
+          <NavigationProperty Name="Favorites2" Relationship="UCGrabModel.FK_Favorites_Favorites" FromRole="Favorites1" ToRole="Favorites" />
+          <NavigationProperty Name="Product" Relationship="UCGrabModel.FK_Favorites_Product" FromRole="Favorites" ToRole="Product" />
+          <Property Name="quantity" Type="Int32" />
+        </EntityType>
+        <Association Name="FK_Favorites_Favorites">
+          <End Type="UCGrabModel.Favorites" Role="Favorites" Multiplicity="1" />
+          <End Type="UCGrabModel.Favorites" Role="Favorites1" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Favorites">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Favorites1">
+              <PropertyRef Name="id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Favorites_Product">
+          <End Type="UCGrabModel.Product" Role="Product" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Favorites" Role="Favorites" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Favorites">
+              <PropertyRef Name="product_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1100,6 +1188,16 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
               <MappingFragment StoreEntitySet="vw_Role">
                 <ScalarProperty Name="rolename" ColumnName="rolename" />
                 <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Favorites">
+            <EntityTypeMapping TypeName="UCGrabModel.Favorites">
+              <MappingFragment StoreEntitySet="Favorites">
+                <ScalarProperty Name="quantity" ColumnName="quantity" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="product_id" ColumnName="product_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

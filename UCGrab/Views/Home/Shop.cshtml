@@ -132,7 +132,7 @@
                                         <img class="img-fluid w-100" src="~/UploadedFiles/@imageUrl" alt="@item.product_name">
                                         <div class="product-action">
                                             <a class="btn btn-outline-dark btn-square" onclick="onAddCart(@item.id)"><i class="fa fa-shopping-cart"></i></a>
-                                            <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
+                                            <a class="btn btn-outline-dark btn-square" onclick="onAddFav(@item.id)"><i class="far fa-heart"></i></a>
                                             <a class="btn btn-outline-dark btn-square" href="/Home/Detail/@item.id"><i class="fa fa-info-circle"></i></a>
                                         </div>
                                     </div>
@@ -149,38 +149,76 @@
         </div>
      </div>
  </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
  <script>
-    function onAddCart(prodId) {
-        // Using Javascript
-        var qty = document.getElementById("txtQty").value;
+     function onAddCart(prodId) {
+         var qty = 1; // Default quantity
 
-        Swal.fire({
-            title: "Are you sure?",
-            icon: "question",
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            showCancelButton: true,
-            confirmButtonText: "OK",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // save here
-                $.post("/Home/AddCart",
-                    {
-                        prodId: prodId,
-                        qty: qty
-                    },
-                    function (data, status) {
-                        if (data.code == 0) {
-                            Swal.fire(data.message, "", "success");
-                            loadCartCount();
-                        } else {
-                            Swal.fire(data.message, "", "error");
-                        }
-                    });
-            }
-        });
-    }
+         Swal.fire({
+             title: "Are you sure?",
+             icon: "question",
+             confirmButtonColor: "#3085d6",
+             cancelButtonColor: "#d33",
+             showCancelButton: true,
+             confirmButtonText: "OK",
+         }).then((result) => {
+             if (result.isConfirmed) {
+                 $.post("/Home/AddCart",
+                     {
+                         prodId: prodId,
+                         qty: qty
+                     },
+                     function (data, status) {
+                         if (data.code == 0) {
+                             Swal.fire(data.message, "", "success");
+                             if (typeof loadCartCount === "function") {
+                                 loadCartCount();
+                             }
+                         } else {
+                             Swal.fire(data.message, "", "error");
+                         }
+                     }).fail(function (xhr, status, error) {
+                         Swal.fire("Error adding to cart!", error, "error");
+                     });
+             }
+         });
+     }
 
+     function onAddFav(prodId) {
+         var qty = 1; // Default quantity
+
+         Swal.fire({
+             title: "Are you sure?",
+             icon: "question",
+             confirmButtonColor: "#3085d6",
+             cancelButtonColor: "#d33",
+             showCancelButton: true,
+             confirmButtonText: "OK",
+         }).then((result) => {
+             if (result.isConfirmed) {
+                 $.post("/Home/AddToFavorites",
+                     {
+                         prodId: prodId,
+                         qty: qty
+                     },
+                     function (data, status) {
+                         if (data.code == 0) {
+                             Swal.fire(data.message, "", "success");
+                             if (typeof loadCartCount === "function") {
+                                 loadCartCount();
+                             }
+                         } else {
+                             Swal.fire(data.message, "", "error");
+                         }
+                     }).fail(function (xhr, status, error) {
+                         Swal.fire("Error adding to favorites!", error, "error");
+                     });
+             }
+         });
+     }
 </script>
 
 

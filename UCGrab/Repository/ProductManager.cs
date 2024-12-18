@@ -15,6 +15,7 @@ namespace UCGrab.Repository
         UserManager _userMgr;
         BaseRepository<Product> _product;
         BaseRepository<Stock> _stock;
+
         public ProductManager()
         {
             _userMgr = new UserManager();

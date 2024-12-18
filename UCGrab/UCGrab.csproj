@@ -256,6 +256,9 @@
     <Compile Include="Database\ContactUs.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>
+    <Compile Include="Database\Favorites.cs">
+      <DependentUpon>UCGrab.tt</DependentUpon>
+    </Compile>
     <Compile Include="Database\File_Documents.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>
@@ -324,6 +327,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\BaseRepository.cs" />
     <Compile Include="Repository\CategoryManager.cs" />
+    <Compile Include="Repository\FavoritesManager.cs" />
     <Compile Include="Repository\ImageManager.cs" />
     <Compile Include="Repository\MailManager.cs" />
     <Compile Include="Repository\OrderManager.cs" />
