@@ -144,7 +144,7 @@ namespace UCGrab.Controllers
                 return HttpNotFound();
             }
 
-            user.status = (int)Status.Active;
+            user.status = (int)Status.Accepted;
 
             _db.SaveChanges();
 

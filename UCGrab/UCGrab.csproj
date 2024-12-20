@@ -228,15 +228,15 @@
     <Content Include="Assets\Shop\img\offer-1.jpg" />
     <Content Include="Assets\Shop\img\offer-2.jpg" />
     <Content Include="Assets\Shop\img\payments.png" />
-    <Content Include="Database\UCGrab.Context.tt">
+    <Content Include="Database\Model1.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>UCGrab.edmx</DependentUpon>
-      <LastGenOutput>UCGrab.Context.cs</LastGenOutput>
+      <DependentUpon>Model1.edmx</DependentUpon>
+      <LastGenOutput>Model1.Context.cs</LastGenOutput>
     </Content>
-    <Content Include="Database\UCGrab.tt">
+    <Content Include="Database\Model1.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>UCGrab.edmx</DependentUpon>
-      <LastGenOutput>UCGrab.cs</LastGenOutput>
+      <DependentUpon>Model1.edmx</DependentUpon>
+      <LastGenOutput>Model1.cs</LastGenOutput>
     </Content>
     <Content Include="UploadedFiles\profile.jpg" />
     <Content Include="Assets\Shop\img\psits.jpg" />
@@ -279,67 +279,67 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ShopController.cs" />
     <Compile Include="Database\Category.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\ContactUs.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\Favorites.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\File_Documents.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\Image.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\Image_Product.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\Image_Store.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Model1.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Model1.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Model1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Model1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Model1.edmx</DependentUpon>
     </Compile>
     <Compile Include="Database\Order.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\Order_Detail.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\Product.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\Stock.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\Store.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Database\UCGrab.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>UCGrab.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Database\UCGrab.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>UCGrab.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Database\UCGrab.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>UCGrab.edmx</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\User_Accounts.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\User_Information.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\User_Role.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\vw_Role.cs">
-      <DependentUpon>UCGrab.tt</DependentUpon>
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -601,12 +601,12 @@
     <Content Include="Views\Delivery\ToDeliver.cshtml" />
     <Content Include="Views\Home\ChangePass.cshtml" />
     <Content Include="Views\Admin\ViewUser.cshtml" />
-    <EntityDeploy Include="Database\UCGrab.edmx">
+    <EntityDeploy Include="Database\Model1.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>UCGrab.Designer.cs</LastGenOutput>
+      <LastGenOutput>Model1.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <Content Include="Database\UCGrab.edmx.diagram">
-      <DependentUpon>UCGrab.edmx</DependentUpon>
+    <Content Include="Database\Model1.edmx.diagram">
+      <DependentUpon>Model1.edmx</DependentUpon>
     </Content>
     <None Include="Properties\PublishProfiles\UCGrab.pubxml" />
     <Content Include="Views\Admin\Inquires.cshtml" />

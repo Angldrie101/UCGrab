@@ -16,7 +16,9 @@ namespace UCGrab.Utils
     public enum Status
     {
         InActive,
-        Active
+        Active,
+        Accepted,
+        Rejected
     }
 
     public enum RoleType

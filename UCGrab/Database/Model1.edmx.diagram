@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="1443c6a3886d48deb4f512869afdcc73" Name="Diagram1">
+        <EntityTypeShape EntityType="UCGrabModel.Category" Width="1.5" PointX="3.75" PointY="2.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="UCGrabModel.ContactUs" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="UCGrabModel.Favorites" Width="1.5" PointX="8.25" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="UCGrabModel.File_Documents" Width="1.5" PointX="15.25" PointY="2" IsExpanded="true" />
+        <EntityTypeShape EntityType="UCGrabModel.Image" Width="1.5" PointX="13" PointY="6.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="UCGrabModel.Image_Product" Width="1.5" PointX="8.25" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="UCGrabModel.Image_Store" Width="1.5" PointX="3" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="UCGrabModel.Order" Width="1.5" PointX="3" PointY="8.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="UCGrabModel.Order_Detail" Width="1.5" PointX="5.25" PointY="9.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="UCGrabModel.Product" Width="1.5" PointX="6" PointY="4.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="UCGrabModel.Stock" Width="1.5" PointX="8.25" PointY="8.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="UCGrabModel.Store" Width="1.5" PointX="0.75" PointY="7.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="UCGrabModel.User_Accounts" Width="1.5" PointX="13" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="UCGrabModel.User_Information" Width="1.5" PointX="10.75" PointY="6" IsExpanded="true" />
+        <EntityTypeShape EntityType="UCGrabModel.User_Role" Width="1.5" PointX="10.75" PointY="1.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="UCGrabModel.vw_Role" Width="1.5" PointX="10.75" PointY="9.75" IsExpanded="true" />
+        <AssociationConnector Association="UCGrabModel.FK_Category_Category" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_Product_Category" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_Favorites_Favorites" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_Favorites_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_File_Documents_File_Documents" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_Image_User_Accounts" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_Product_Image_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_Image_Store_Image_Store" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_Order_Detail_Order" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_Order_Store" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_Order_Detail_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_Product_Store" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_Stock_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_User_Accounts_User_Accounts1" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_User_Accounts_User_Role" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_User_Role_User_Role" ManuallyRouted="false" />
+        <AssociationConnector Association="UCGrabModel.FK_User_Role_User_Role1" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

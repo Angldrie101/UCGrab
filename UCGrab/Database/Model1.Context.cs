@@ -30,6 +30,7 @@ namespace UCGrab.Database
     
         public DbSet<Category> Category { get; set; }
         public DbSet<ContactUs> ContactUs { get; set; }
+        public DbSet<Favorites> Favorites { get; set; }
         public DbSet<File_Documents> File_Documents { get; set; }
         public DbSet<Image> Image { get; set; }
         public DbSet<Image_Product> Image_Product { get; set; }
@@ -43,7 +44,6 @@ namespace UCGrab.Database
         public DbSet<User_Information> User_Information { get; set; }
         public DbSet<User_Role> User_Role { get; set; }
         public DbSet<vw_Role> vw_Role { get; set; }
-        public DbSet<Favorites> Favorites { get; set; }
     
         public virtual ObjectResult<Nullable<int>> sp_getCartCountByUserId(string user_id)
         {
