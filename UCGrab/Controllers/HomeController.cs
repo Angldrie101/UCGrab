@@ -823,12 +823,12 @@ namespace UCGrab.Controllers
             var fav = _favManager.GetAllProduct(UserId);
             return View(fav);
         }
-        //public JsonResult GetFavoriteCount()
-        //{
-        //    var res = new { count = _orderManager.GetCartCountByUserId(UserId) };
+        public JsonResult GetFavoriteCount()
+        {
+            var res = new { count = _orderManager.GetFavoriteCountByUserId(UserId) };
 
-        //    return Json(res, JsonRequestBehavior.AllowGet);
-        //}
+            return Json(res, JsonRequestBehavior.AllowGet);
+        }
         [HttpPost]
         [AllowAnonymous]
         public JsonResult AddToFavorites(int prodId, int qty)

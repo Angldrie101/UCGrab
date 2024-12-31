@@ -26,11 +26,11 @@
             <div class="d-inline-flex align-items-center d-block d-lg-none">
                 <a href="/Home/FavoritedProduct" class="btn px-0 ml-2">
                     <i class="fas fa-heart text-dark"></i>
-                    <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
+                    <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;" id="lblCountFavorite">0</span>
                 </a>
                 <a href="/Home/Cart" class="btn px-0 ml-2">
                     <i class="fas fa-shopping-cart text-dark"></i>
-                    <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;" id="cart-count">0</span>
+                    <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;" id="lblCountCart">0</span>
                 </a>
             </div>
         </div>
@@ -103,11 +103,11 @@
                         <div class="navbar-nav ml-auto py-0 d-none d-lg-block">
                             <a href="/Home/FavoritedProduct" class="btn px-0">
                                 <i class="fas fa-heart text-primary"></i>
-                                <span class="badge text-secondary border border-secondary rounded-circle"></span>
+                                <span class="badge text-secondary border border-secondary rounded-circle" id="lblCountFavorite">0</span>
                             </a>
                             <a href="~/Home/Cart" class="btn px-0 ml-3">
                                 <i class="fas fa-shopping-cart text-primary"></i>
-                                <span class="badge text-secondary border border-secondary rounded-circle" id="lblCountCart"></span>
+                                <span class="badge text-secondary border border-secondary rounded-circle" id="lblCountCart">0</span>
                             </a>
                         </div>
                     </div>
@@ -167,29 +167,29 @@
     <script type="text/javascript">
         $(document).ready(function () {
             loadCartCount();
+            loadFavoriteCount();
         });
-        function loadCartCount()
-        {
-            $.get("/Home/GetCartCount",
-                  function (data) {
-                      console.log(data.count);
-                      if (data.count != 0) {
-                          document.getElementById("lblCountCart").innerHTML = data.count;
-                      }
-                  });
+        function loadCartCount() {
+            $.get("/Home/GetCartCount")
+                .done(function (data) {
+                    document.getElementById("lblCountCart").innerHTML = data.count || 0;
+                })
+                .fail(function () {
+                    console.error("Failed to load cart count.");
+                    document.getElementById("lblCountCart").innerHTML = 0;
+                });
         }
-        //$(document).ready(function () {
-        //    loadFavoriteCount();
-        //});
-        //function loadFavoriteCount() {
-        //    $.get("/Home/GetFavoriteCount",
-        //          function (data) {
-        //              console.log(data.count);
-        //              if (data.count != 0) {
-        //                  document.getElementById("lblCountCart").innerHTML = data.count;
-        //              }
-        //          });
-        //}
+
+        function loadFavoriteCount() {
+            $.get("/Home/GetFavoriteCount")
+                .done(function (data) {
+                    document.getElementById("lblCountFavorite").innerHTML = data.count || 0;
+                })
+                .fail(function () {
+                    console.error("Failed to load favorite count.");
+                    document.getElementById("lblCountFavorite").innerHTML = 0;
+                });
+        }
     </script>
 </body>
 </html>

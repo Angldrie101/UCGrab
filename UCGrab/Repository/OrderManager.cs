@@ -220,6 +220,14 @@ namespace UCGrab.Repository
 
             return count;
         }
+        public int GetFavoriteCountByUserId(String userId)
+        {
+            var count = (from f in _db.Favorites
+                         where f.user_id == userId
+                         select f).Count();
+
+            return count;
+        }
         public Order_Detail GetOrderDetailById(int id)
         {
             return _orderDetail.Get(id);
