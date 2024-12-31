@@ -213,8 +213,12 @@ namespace UCGrab.Repository
 
         public int GetCartCountByUserId(String userId)
         {
-            var count = _db.sp_getCartCountByUserId(userId).FirstOrDefault();
-            return (Int32)count;
+            var count = (from o in _db.Order
+                         join od in _db.Order_Detail on o.order_id equals od.order_id
+                         where o.order_status == 0 && o.user_id == userId
+                         select od).Count();
+
+            return count;
         }
         public Order_Detail GetOrderDetailById(int id)
         {

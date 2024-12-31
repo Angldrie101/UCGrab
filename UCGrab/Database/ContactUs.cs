@@ -15,11 +15,11 @@ namespace UCGrab.Database
     public partial class ContactUs
     {
         public int contact_id { get; set; }
+        public string user_id { get; set; }
         public string name { get; set; }
         public string email { get; set; }
         public string subject { get; set; }
         public string description { get; set; }
-        public string user_id { get; set; }
     
         public virtual ContactUs ContactUs1 { get; set; }
         public virtual ContactUs ContactUs2 { get; set; }
