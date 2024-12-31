@@ -26,6 +26,9 @@
                             <div class="form-group"></div>
                             <form class="login-form">
                                 @TempData["error"]
+                                <div class="form-group">
+                                    Please wait for admin approval of your account. A verification code will be sent to the provided Gmail address once approved.
+                                </div><br />
                                 <input type="hidden" name="username" value="@TempData["username"]" />
                                 <div class="form-group d-flex">
                                     <input type="text" name="verify_code" class="form-control rounded-left" placeholder="Verification Code" maxlength="6" pattern="\d{6}" title="Please enter a 6-digit code" required>

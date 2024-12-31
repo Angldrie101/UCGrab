@@ -25,7 +25,7 @@ namespace UCGrab.Repository
         {
             return _db.Set<T>().Find(id);
         }
-
+       
         public ErrorCode Create(T t, out string errorMsg)
         {
             try

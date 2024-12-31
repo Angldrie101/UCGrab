@@ -192,7 +192,7 @@ namespace UCGrab.Controllers
 
             SendActivationNotificationEmail(user.email);
             
-            return RedirectToAction("Login");
+            return RedirectToAction("Index");
         }
 
         private void SendActivationNotificationEmail(string userEmail)
@@ -299,9 +299,24 @@ namespace UCGrab.Controllers
                 ModelState.AddModelError(string.Empty, "Student ID is required.");
                 return View(ua);
             }
-            
+            var users = _userManager.GetUserByEmail(ua.email);
+            string verificationCode = ua.verify_code;
+
+            string emailBody = $"Your verification code is: {verificationCode}";
+            string errorMessages = "";
+
+            var mailManager = new MailManager();
+            bool emailSent = mailManager.SendEmail(ua.email, "Verification Code", emailBody, ref errorMessages);
+
+            if (!emailSent)
+            {
+                ModelState.AddModelError(String.Empty, errorMessages);
+                ViewBag.Role = Utilities.ListRole;
+                return View(ua);
+            }
+
             TempData["SuccessMessage"] = "Registration successful. Admin will validate your registration.";
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Verify", "Home");
         }
 
         [AllowAnonymous]
@@ -315,48 +330,45 @@ namespace UCGrab.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public ActionResult SignUpForProvider(User_Accounts ua, HttpPostedFileBase businessPermit, string ConfirmPass)
+        public ActionResult SignUpForProvider(User_Accounts ua, Store store, HttpPostedFileBase businessPermit, string ConfirmPass)
         {
             if (!ua.password.Equals(ConfirmPass))
             {
                 ModelState.AddModelError(string.Empty, "Password does not match");
                 return View(ua);
             }
-            
-            if (_userManager.SignUp(ua, ref ErrorMessage) != ErrorCode.Success)
+
+            string errorMessage = string.Empty;
+
+            // Create account and store
+            if (_storeManager.CreateAccountAndStore(ua, store, ref errorMessage) != ErrorCode.Success)
             {
-                ModelState.AddModelError(string.Empty, ErrorMessage);
+                ModelState.AddModelError(string.Empty, errorMessage);
                 return View(ua);
             }
-            
-            var user = _userManager.GetUserByEmail(ua.email);
-            if (user == null)
-            {
-                ModelState.AddModelError(string.Empty, "User account creation failed.");
-                return View(ua);
-            }
-            
+
+            // Process business permit
             if (businessPermit != null && businessPermit.ContentLength > 0)
             {
                 try
                 {
                     string fileName = Path.GetFileName(businessPermit.FileName);
                     string filePath = Path.Combine(Server.MapPath("~/Uploads/BusinessPermits/"), fileName);
-                    
+
                     if (!Directory.Exists(Server.MapPath("~/Uploads/BusinessPermits/")))
                     {
                         Directory.CreateDirectory(Server.MapPath("~/Uploads/BusinessPermits/"));
                     }
-                    
+
                     businessPermit.SaveAs(filePath);
-                    
+
                     var fileDocument = new File_Documents
                     {
-                        user_id = user.id, 
-                        file_document = "/Uploads/BusinessPermits/" + fileName 
+                        user_id = ua.id,
+                        file_document = "/Uploads/BusinessPermits/" + fileName
                     };
-                    
-                    _imageManager.CreateFileDocument(fileDocument, ref ErrorMessage);
+
+                    _imageManager.CreateFileDocument(fileDocument, ref errorMessage);
                 }
                 catch (Exception ex)
                 {
@@ -369,9 +381,24 @@ namespace UCGrab.Controllers
                 ModelState.AddModelError(string.Empty, "Business permit is required.");
                 return View(ua);
             }
-            
+            var user = _userManager.GetUserByEmail(ua.email);
+            string verificationCode = ua.verify_code;
+
+            string emailBody = $"Your verification code is: {verificationCode}";
+            string errorMessages = "";
+
+            var mailManager = new MailManager();
+            bool emailSent = mailManager.SendEmail(ua.email, "Verification Code", emailBody, ref errorMessages);
+
+            if (!emailSent)
+            {
+                ModelState.AddModelError(String.Empty, errorMessage);
+                ViewBag.Role = Utilities.ListRole;
+                return View(ua);
+            }
+
             TempData["SuccessMessage"] = "Registration successful. Admin will validate your registration.";
-            return RedirectToAction("Login", "Home");
+            return RedirectToAction("Verify");
         }
 
         public bool CreateFileDocument(File_Documents fileDocument, ref string errorMessage)
@@ -457,9 +484,24 @@ namespace UCGrab.Controllers
                 ModelState.AddModelError(string.Empty, "Business permit is required.");
                 return View(ua);
             }
+            var users = _userManager.GetUserByEmail(ua.email);
+            string verificationCode = ua.verify_code;
+
+            string emailBody = $"Your verification code is: {verificationCode}";
+            string errorMessages = "";
+
+            var mailManager = new MailManager();
+            bool emailSent = mailManager.SendEmail(ua.email, "Verification Code", emailBody, ref errorMessages);
+
+            if (!emailSent)
+            {
+                ModelState.AddModelError(String.Empty, errorMessages);
+                ViewBag.Role = Utilities.ListRole;
+                return View(ua);
+            }
 
             TempData["SuccessMessage"] = "Registration successful. Admin will validate your registration.";
-            return RedirectToAction("Login", "Home");
+            return RedirectToAction("Driver", "Home");
 
         }
         
@@ -844,6 +886,56 @@ namespace UCGrab.Controllers
 
             return Json(res, JsonRequestBehavior.AllowGet);
         }
+        //public ActionResult Filter(decimal? minPrice, decimal? maxPrice)
+        //{
+        //    try
+        //    {
+        //        var db = new UCGrabEntities();
+        //        var filteredProducts = db.Product.AsQueryable();
+
+        //        // Apply price filtering if the min and max prices are provided
+        //        if (minPrice.HasValue && maxPrice.HasValue)
+        //        {
+        //            filteredProducts = filteredProducts.Where(p => p.price >= minPrice.Value && p.price <= maxPrice.Value);
+        //        }
+        //        else if (minPrice.HasValue) // If only minPrice is specified
+        //        {
+        //            filteredProducts = filteredProducts.Where(p => p.price >= minPrice.Value);
+        //        }
+        //        else if (maxPrice.HasValue) // If only maxPrice is specified
+        //        {
+        //            filteredProducts = filteredProducts.Where(p => p.price <= maxPrice.Value);
+        //        }
+
+        //        var productList = filteredProducts.Select(p => new
+        //        {
+        //            p.id,
+        //            p.product_name,
+        //            p.price,
+        //            Image_Product = p.Image_Product.Select(i => new { i.image_file }).ToList()
+        //        }).ToList();
+
+        //        return Json(productList, JsonRequestBehavior.AllowGet);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new HttpStatusCodeResult(500, "Internal Server Error: " + ex.Message);
+        //    }
+        //}
+        //public ActionResult productSort()
+        //{
+
+        //    var ps = new UCGrabEntities();
+
+        //    // Assuming you have a method to fetch products from the database
+        //    var products = ps.Product.ToList();  // Retrieve all products from the database
+
+        //    // Sort the products by price in ascending order
+        //    var sortedProducts = products.OrderBy(p => p.price).ToList();
+
+        //    // Pass the sorted list to the view
+        //    return View(sortedProducts);
+        //}
         [AllowAnonymous]
         public ActionResult CheckOut()
         {
@@ -908,13 +1000,33 @@ namespace UCGrab.Controllers
                 return View(model);
             }
         }
-
+        
         [AllowAnonymous]
         public ActionResult Contact()
         {
             return View();
         }
+        [HttpPost]
+        public ActionResult Contact(ContactUs inquiry)
+        {
+            if (ModelState.IsValid)
+            {
+                using (var db = new UCGrabEntities())
+                {
+                    // Optional: Retrieve logged-in user ID
+                    var userId = UserId;
+                    inquiry.user_id = userId;
 
+                    db.ContactUs.Add(inquiry);
+                    db.SaveChanges();
+                }
+
+                TempData["Message"] = "Your inquiry has been submitted successfully!";
+                return RedirectToAction("Contact");
+            }
+
+            return View(inquiry);
+        }
         [AllowAnonymous]
         public ActionResult MyOrders()
         {

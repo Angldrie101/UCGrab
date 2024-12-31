@@ -89,7 +89,7 @@ namespace UCGrab.Controllers
         [Authorize]
         public ActionResult ManageStore()
         {
-            var stores = _storeManager.ListStore();
+            var stores = _storeManager.ManageStore();
             return View(stores);
         }
 
@@ -164,12 +164,29 @@ namespace UCGrab.Controllers
 
             return RedirectToAction("UserAccounts", "Admin");
         }
+        [HttpPost]
+        public ActionResult RejectUser(int userId)
+        {
+            var _db = new UCGrabEntities();
+
+            var user = _db.User_Accounts.FirstOrDefault(u => u.id == userId);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            user.status = (int)Status.Rejected;
+
+            _db.SaveChanges();
+            
+
+            return RedirectToAction("UserAccounts", "Admin");
+        }
         public string ConvertPdfToImage(string pdfPath)
         {
             string imagePath = Path.ChangeExtension(pdfPath, ".png");
             using (var images = new MagickImageCollection(pdfPath))
             {
-                // Convert the first page to PNG
                 var image = images[0];
                 image.Write(imagePath);
             }

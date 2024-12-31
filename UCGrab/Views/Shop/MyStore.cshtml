@@ -91,7 +91,7 @@
                             <div class="user-profile">
                                 <div class="user-avatar">
                                     @{
-                                        string profileImage = string.IsNullOrEmpty(Model.Image_Store.FirstOrDefault()?.image_file) ? Url.Content("~/UploadedFiles/") : Url.Content("~/UploadedFiles/" + Model.Image_Store.FirstOrDefault()?.image_file);
+                                        string profileImage = string.IsNullOrEmpty(Model.Image_Store.FirstOrDefault()?.image_file) ? Url.Content("~/UploadedFiles/profile.jpg") : Url.Content("~/UploadedFiles/" + Model.Image_Store.FirstOrDefault()?.image_file);
                                     }
                                     <img src="@profileImage" alt="Store Avatar" id="currentStoreImage">
                                     <form id="profilePictureForm" enctype="multipart/form-data"></form>

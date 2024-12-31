@@ -17,10 +17,11 @@
             <PropertyRef Name="contact_id" />
           </Key>
           <Property Name="contact_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="name" Type="nvarchar" MaxLength="255" Nullable="false" />
-          <Property Name="email" Type="varchar" MaxLength="255" Nullable="false" />
-          <Property Name="subject" Type="varchar" MaxLength="255" Nullable="false" />
-          <Property Name="description" Type="varchar(max)" Nullable="false" />
+          <Property Name="user_id" Type="varchar(max)" />
+          <Property Name="name" Type="nvarchar" MaxLength="255" />
+          <Property Name="email" Type="varchar" MaxLength="255" />
+          <Property Name="subject" Type="varchar" MaxLength="255" />
+          <Property Name="description" Type="varchar(max)" />
         </EntityType>
         <EntityType Name="Favorites">
           <Key>
@@ -190,6 +191,18 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
             </Principal>
             <Dependent Role="Category1">
               <PropertyRef Name="category_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ContactUs_ContactUs">
+          <End Role="ContactUs" Type="Self.ContactUs" Multiplicity="1" />
+          <End Role="ContactUs1" Type="Self.ContactUs" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="ContactUs">
+              <PropertyRef Name="contact_id" />
+            </Principal>
+            <Dependent Role="ContactUs1">
+              <PropertyRef Name="contact_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -425,6 +438,10 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <End Role="Category" EntitySet="Category" />
             <End Role="Category1" EntitySet="Category" />
           </AssociationSet>
+          <AssociationSet Name="FK_ContactUs_ContactUs" Association="Self.FK_ContactUs_ContactUs">
+            <End Role="ContactUs" EntitySet="ContactUs" />
+            <End Role="ContactUs1" EntitySet="ContactUs" />
+          </AssociationSet>
           <AssociationSet Name="FK_Favorites_Favorites" Association="Self.FK_Favorites_Favorites">
             <End Role="Favorites" EntitySet="Favorites" />
             <End Role="Favorites1" EntitySet="Favorites" />
@@ -509,10 +526,13 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <PropertyRef Name="contact_id" />
           </Key>
           <Property Name="contact_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="name" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="subject" Type="String" MaxLength="255" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="name" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="subject" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="user_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ContactUs1" Relationship="UCGrabModel.FK_ContactUs_ContactUs" FromRole="ContactUs" ToRole="ContactUs1" />
+          <NavigationProperty Name="ContactUs2" Relationship="UCGrabModel.FK_ContactUs_ContactUs" FromRole="ContactUs1" ToRole="ContactUs" />
         </EntityType>
         <EntityType Name="Favorites">
           <Key>
@@ -1002,9 +1022,25 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <End Role="User_Role1" EntitySet="User_Role" />
           </AssociationSet>
           <FunctionImport Name="sp_getCartCountByUserId" ReturnType="Collection(Int32)">
-            <Parameter Name="user_id" Mode="In" Type="String" />
+          <Parameter Name="user_id" Mode="In" Type="String" />
           </FunctionImport>
+          <AssociationSet Name="FK_ContactUs_ContactUs" Association="UCGrabModel.FK_ContactUs_ContactUs">
+            <End Role="ContactUs" EntitySet="ContactUs" />
+            <End Role="ContactUs1" EntitySet="ContactUs" />
+          </AssociationSet>
         </EntityContainer>
+        <Association Name="FK_ContactUs_ContactUs">
+          <End Type="UCGrabModel.ContactUs" Role="ContactUs" Multiplicity="1" />
+          <End Type="UCGrabModel.ContactUs" Role="ContactUs1" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="ContactUs">
+              <PropertyRef Name="contact_id" />
+            </Principal>
+            <Dependent Role="ContactUs1">
+              <PropertyRef Name="contact_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1022,6 +1058,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <EntitySetMapping Name="ContactUs">
             <EntityTypeMapping TypeName="UCGrabModel.ContactUs">
               <MappingFragment StoreEntitySet="ContactUs">
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
                 <ScalarProperty Name="contact_id" ColumnName="contact_id" />
                 <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="email" ColumnName="email" />

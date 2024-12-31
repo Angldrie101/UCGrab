@@ -23,6 +23,10 @@ namespace UCGrab.Repository
         {
             return _store._table.Where(m => m.status == (Int32)StoreStatus.Active).ToList();
         }
+        public List<Store> ManageStore()
+        {
+            return _store._table.Where(m => m.status == (int)StoreStatus.Active || m.status == (int)StoreStatus.Inactive).ToList();
+        }
         public Store GetStoreById(int? id)
         {
             return _store.Get(id);
@@ -73,31 +77,76 @@ namespace UCGrab.Repository
         {
             return _store.Update(id, store, out err);
         }
+        public Store GetByUserId(string userId)
+        {
+            var _db = new UCGrabEntities();
+            return _db.Store.FirstOrDefault(store => store.user_id == userId);
+        }
         public Store CreateOrRetrieve(String username, ref String err)
         {
             var user = _userMgr.GetUserByUsername(username);
-            var userInf = _userMgr.GetUserInfoByUserId(user.user_id);
-
-            if (userInf.store_id != null)
-                return _store.Get(userInf.store_id);
-
-            var store = new Store();
-
-            if (AddStoreForUser(store, user.user_id, ref err) != ErrorCode.Success)
-            
-            if (_store.Create(store, out err) != ErrorCode.Success)
+            if (user == null)
             {
-                // Return Error
+                err = "User not found.";
                 return null;
             }
-            store = GetStoreByGuId(store.store_id);
-            // Update user information assign store id
-            userInf.store_id = store.id;
-            //
-            _userInfo.Update(userInf.id, userInf, out err);
 
-            return store;
+            // Retrieve the store using the GetByUserId method from StoreManager
+            var store = GetByUserId(user.user_id);
+
+            if (store != null)
+            {
+                return store;
+            }
+
+            err = "No store found for the user.";
+            return null;
         }
+
+        public ErrorCode CreateAccountAndStore(User_Accounts ua, Store store, ref string errorMessage)
+        {
+            using (var _db = new UCGrabEntities())
+            {
+                try
+                {
+                    ua.user_id = Utilities.gUid;
+                    ua.verify_code = Utilities.code.ToString();
+                    ua.date_created = DateTime.Now;
+                    ua.status = (Int32)Status.InActive;
+                    
+                    if (_db.User_Accounts.Any(u => u.username == ua.username || u.email == ua.email))
+                    {
+                        errorMessage = "Username or email already exists.";
+                        return ErrorCode.Error;
+                    }
+                    
+                    if (_db.Store.Any(s => s.store_name == store.store_name))
+                    {
+                        errorMessage = "Store name already exists.";
+                        return ErrorCode.Error;
+                    }
+                    
+                    _db.User_Accounts.Add(ua);
+                    _db.SaveChanges();
+                    
+                    store.user_id = ua.user_id;
+                    store.store_id = Utilities.gUid;
+                    store.status = (int)StoreStatus.Inactive;
+
+                    _db.Store.Add(store);
+                    _db.SaveChanges();
+                    
+                    return ErrorCode.Success;
+                }
+                catch (Exception ex)
+                {
+                    errorMessage = "An error occurred: " + ex.Message;
+                    return ErrorCode.Error;
+                }
+            }
+        }
+
+
 
     }
 }

@@ -18,34 +18,40 @@
             <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Filter by price</span></h5>
             <div class="bg-light p-4 mb-30">
                 <form>
-                    <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                        <input type="checkbox" class="custom-control-input" checked id="price-all">
+                    <!-- All Price Filter -->
+                    <div class="custom-control custom-radio d-flex align-items-center justify-content-between mb-3">
+                        <input type="radio" class="custom-control-input" checked id="price-all" name="priceFilter">
                         <label class="custom-control-label" for="price-all">All Price</label>
                         <span class="badge border font-weight-normal">1000</span>
                     </div>
-                    <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                        <input type="checkbox" class="custom-control-input" id="price-1">
-                        <label class="custom-control-label" for="price-1">₱0 - $100</label>
+                    <!-- Price Range 0-100 -->
+                    <div class="custom-control custom-radio d-flex align-items-center justify-content-between mb-3">
+                        <input type="radio" class="custom-control-input" id="price-1" name="priceFilter">
+                        <label class="custom-control-label" for="price-1">₱0 - ₱100</label>
                         <span class="badge border font-weight-normal">150</span>
                     </div>
-                    <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                        <input type="checkbox" class="custom-control-input" id="price-2">
-                        <label class="custom-control-label" for="price-2">₱100 - $200</label>
+                    <!-- Price Range 100-200 -->
+                    <div class="custom-control custom-radio d-flex align-items-center justify-content-between mb-3">
+                        <input type="radio" class="custom-control-input" id="price-2" name="priceFilter">
+                        <label class="custom-control-label" for="price-2">₱100 - ₱200</label>
                         <span class="badge border font-weight-normal">295</span>
                     </div>
-                    <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                        <input type="checkbox" class="custom-control-input" id="price-3">
-                        <label class="custom-control-label" for="price-3">₱200 - $300</label>
+                    <!-- Price Range 200-300 -->
+                    <div class="custom-control custom-radio d-flex align-items-center justify-content-between mb-3">
+                        <input type="radio" class="custom-control-input" id="price-3" name="priceFilter">
+                        <label class="custom-control-label" for="price-3">₱200 - ₱300</label>
                         <span class="badge border font-weight-normal">246</span>
                     </div>
-                    <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                        <input type="checkbox" class="custom-control-input" id="price-4">
-                        <label class="custom-control-label" for="price-4">₱300 - $400</label>
+                    <!-- Price Range 300-400 -->
+                    <div class="custom-control custom-radio d-flex align-items-center justify-content-between mb-3">
+                        <input type="radio" class="custom-control-input" id="price-4" name="priceFilter">
+                        <label class="custom-control-label" for="price-4">₱300 - ₱400</label>
                         <span class="badge border font-weight-normal">145</span>
                     </div>
-                    <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between">
-                        <input type="checkbox" class="custom-control-input" id="price-5">
-                        <label class="custom-control-label" for="price-5">₱400 - $500</label>
+                    <!-- Price Range 400-500 -->
+                    <div class="custom-control custom-radio d-flex align-items-center justify-content-between">
+                        <input type="radio" class="custom-control-input" id="price-5" name="priceFilter">
+                        <label class="custom-control-label" for="price-5">₱1000 - ₱1500</label>
                         <span class="badge border font-weight-normal">168</span>
                     </div>
                 </form>
@@ -91,69 +97,70 @@
         <!-- Shop Sidebar End -->
         <!-- Shop Product Start -->
         <div class="col-lg-9 col-md-8">
-            <div class="row pb-3">
+            <div class="col-12">
+                <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4" id="store-title">
+                    <span class="bg-secondary pr-3">@ViewBag.StoreName</span>
+                </h2>
+            </div>
+            <div id="product-list" class="row pb-3">
                 <div class="col-12 pb-1">
                     <div class="d-flex align-items-center justify-content-between mb-4">
-                        <div>
-                            <button class="btn btn-sm btn-light"><i class="fa fa-th-large"></i></button>
-                            <button class="btn btn-sm btn-light ml-2"><i class="fa fa-bars"></i></button>
-                        </div>
-                        <div class="ml-2">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">Sorting</button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#">Latest</a>
-                                    <a class="dropdown-item" href="#">Popularity</a>
-                                    <a class="dropdown-item" href="#">Best Rating</a>
-                                </div>
-                            </div>
-                            <div class="btn-group ml-2">
-                                <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">Showing</button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#">10</a>
-                                    <a class="dropdown-item" href="#">20</a>
-                                    <a class="dropdown-item" href="#">30</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="container-fluid">
-                    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
-                        <span class="bg-secondary pr-3">@ViewBag.StoreName</span>
-                    </h2>
-                    <div class="row pb-3">
-                        @foreach (var item in Model)
-                        {
-                            var imageUrl = item.Image_Product.FirstOrDefault()?.image_file ?? "default_image.jpg";
-                            <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
-                                <div class="product-item bg-light mb-4">
-                                    <div class="product-img position-relative overflow-hidden">
-                                        <img class="img-fluid w-100" src="~/UploadedFiles/@imageUrl" alt="@item.product_name">
-                                        <div class="product-action">
-                                            <a class="btn btn-outline-dark btn-square" onclick="onAddCart(@item.id)"><i class="fa fa-shopping-cart"></i></a>
-                                            <a class="btn btn-outline-dark btn-square" onclick="onAddFav(@item.id)"><i class="far fa-heart"></i></a>
-                                            <a class="btn btn-outline-dark btn-square" href="/Home/Detail/@item.id"><i class="fa fa-info-circle"></i></a>
-                                        </div>
-                                    </div>
-                                    <div class="text-center py-4">
-                                        <h6>@item.product_name</h6>
-                                        <h5>Php @item.price.ToString("N2")</h5>
-                                    </div>
-                                </div>
-                            </div>
-                        }
+
                     </div>
                 </div>
             </div>
+            <div class="container-fluid">
+            </div>
+            <div class="row pb-3" id="product-list">
+                @foreach (var item in Model)
+                {
+                    var imageUrl = item.Image_Product.FirstOrDefault()?.image_file ?? "default_image.jpg";
+                    <div class="col-lg-4 col-md-6 col-sm-6 pb-1" data-price="@item.price">
+                        <div class="product-item bg-light mb-4">
+                            <div class="product-img position-relative overflow-hidden">
+                                <img class="img-fluid w-100" src="~/UploadedFiles/@imageUrl" alt="@item.product_name">
+                                <div class="product-action">
+                                    <a class="btn btn-outline-dark btn-square" onclick="onAddCart(@item.id)"><i class="fa fa-shopping-cart"></i></a>
+                                    <a class="btn btn-outline-dark btn-square" onclick="onAddFav(@item.id)"><i class="far fa-heart"></i></a>
+                                    <a class="btn btn-outline-dark btn-square" href="/Home/Detail/@item.id"><i class="fa fa-info-circle"></i></a>
+                                </div>
+                            </div>
+                            <div class="text-center py-4">
+                                <h6>@item.product_name</h6>
+                                <h5>Php @item.price.ToString("N2")</h5>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
         </div>
+    </div>
+</div>
      </div>
  </div>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
- <script>
+<script>
+    $(document).ready(function () {
+        // Sort products by price when the page loads
+        var products = $("#product-list .col-lg-4").get();
+
+        // Sort the products based on data-price attribute (ascending order)
+        products.sort(function (a, b) {
+            var priceA = parseFloat($(a).data("price"));
+            var priceB = parseFloat($(b).data("price"));
+            return priceA - priceB;
+        });
+
+        // Append sorted products back to the container
+        $("#product-list").empty().append(products);
+    });
+</script>
+<script>
      function onAddCart(prodId) {
          var qty = 1; // Default quantity
 
@@ -219,6 +226,70 @@
              }
          });
      }
+
+
 </script>
+<script>
+    $(document).ready(function () {
+        // Function to filter products based on the selected price range
+        function filterProducts() {
+            var minPrice = null;
+            var maxPrice = null;
 
+            // Determine the selected price range from the radio buttons
+            if ($("#price-1").prop("checked")) {
+                minPrice = 0;
+                maxPrice = 100;
+            } else if ($("#price-2").prop("checked")) {
+                minPrice = 100;
+                maxPrice = 200;
+            } else if ($("#price-3").prop("checked")) {
+                minPrice = 200;
+                maxPrice = 300;
+            } else if ($("#price-4").prop("checked")) {
+                minPrice = 300;
+                maxPrice = 400;
+            } else if ($("#price-5").prop("checked")) {
+                minPrice = 1000;
+                maxPrice = 1500;
+            } else if ($("#price-all").prop("checked")) {
+                minPrice = null;  // No price filter, show all products
+                maxPrice = null;
+            }
 
+            // Loop through each product and check if its price is within the selected range
+            $("#product-list .col-lg-4").each(function () {
+                var price = parseFloat($(this).data("price"));  // Get the price from the data attribute
+
+                // Show product if it matches the price range
+                if ((minPrice === null || price >= minPrice) && (maxPrice === null || price <= maxPrice)) {
+                    $(this).show();  // Display the product
+                } else {
+                    $(this).hide();  // Hide the product
+                }
+            });
+        }
+
+        // Call filterProducts when any radio button changes
+        $("input[name='priceFilter']").change(function () {
+            filterProducts();  // Trigger filtering when a radio button is clicked
+        });
+
+        // Initial filtering when the page is loaded (if needed)
+        filterProducts();
+
+        // Sort products by price when the page loads
+        var products = $("#product-list .col-lg-4").get();
+
+        // Sort the products based on data-price attribute (ascending order)
+        products.sort(function (a, b) {
+            var priceA = parseFloat($(a).data("price"));
+            var priceB = parseFloat($(b).data("price"));
+            return priceA - priceB;
+        });
+
+        // Append sorted products back to the container
+        $("#product-list").empty().append(products);
+    });
+
+</script>
