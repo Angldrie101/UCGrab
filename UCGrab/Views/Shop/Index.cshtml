@@ -61,7 +61,7 @@
                             <td>@order.order_id</td>
                             <td>@order.lastname, @order.firstname</td>
                             <td>@(((DateTime)order.order_date).ToString("MM/dd/yyyy"))</td>
-                            <td>@(order.order_status == 0 ? "Open" : order.order_status == 1 ? "Pending":  order.order_status == 2 ? "Cancelled" : order.order_status == 3 ? "Confirmed" : order.order_status == 4 ? "Ready To Deliver" : order.order_status == 5 ? "Deliverd":"Done")</td>
+                            <td>@(order.order_status == 5 ? "Delivered":"Done")</td>
                         </tr>
                     }
                     </tbody>
@@ -70,28 +70,27 @@
         </div>
         <div class="col-lg-6 mb-5">
             <div class="bg-light p-30 mb-30">
-                <h5 class="card-title">Top Selling Products</h5>
+                <h5 class="card-title">Customer Reviews</h5>
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Product ID</th>
+                            <th>Order Id</th>
                             <th>Name</th>
-                            <th>Sales</th>
-                            <th>Revenue</th>
+                            <th>Ratings</th>
+                            <th>Comments</th>
+                            <th>Review Date</th>
                         </tr>
                     </thead>
-                    <tbody id="top-selling-products">
+                    @foreach (var review in Model.Reviews)
+                    {
                         <tr>
-                            
+                            <td>@review.OrderId</td>
+                            <td>@review.LastName, @review.FirstName</td>
+                            <td>@review.Rating</td>
+                            <td>@review.Comment</td>
+                            <td>@((DateTime)review.ReviewDate)</td>
                         </tr>
-                        <tr>
-                            
-                        </tr>
-                        <tr>
-                            
-                        </tr>
-                        <!-- Additional top-selling products -->
-                    </tbody>
+                    }
                 </table>
             </div>
         </div>

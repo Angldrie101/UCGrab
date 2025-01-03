@@ -25,18 +25,15 @@ namespace UCGrab.Controllers
             var userid = User.Identity.Name;
             var userInfo = _userManager.GetUserInfoByUsername(userid);
             var _db = new UCGrabEntities();
-
-            // Sum the total sales for the store
+            
             var totalSales = _db.Order_Detail
                                 .Where(od => od.Order.store_id == userInfo.store_id)
                                 .Sum(od => od.price)??0;
-
-            // Count the total orders for the store
+            
             var totalOrders = _db.Order
                                   .Where(o => o.store_id == userInfo.store_id)
                                   .Count();
-
-            // Count the total products for the store
+            
             var totalProducts = _db.Product
                                     .Where(p => p.Store.id == userInfo.store_id)
                                     .Count();
@@ -45,16 +42,31 @@ namespace UCGrab.Controllers
                                     .Where(p => p.Store.id == userInfo.store_id)
                                     .Count();
             var recentOrders = _db.Order
-                .OrderByDescending(s => s.store_id == userInfo.store_id) // Assuming 'CreatedAt' column exists
-                .Take(5)
-                .ToList();
+                                    .Where(o => o.store_id == userInfo.store_id && o.order_status == (int)OrderStatus.Delivered)
+                                    .OrderByDescending(o => o.order_id) 
+                                    .Take(5)
+                                    .ToList();
+
+            var reviews = _db.Review
+                     .Where(r => r.Order.store_id == userInfo.store_id)
+                     .Select(r => new ReviewModel
+                     {
+                         OrderId = r.Order.order_id,
+                         FirstName = r.User_Information.first_name,
+                         LastName = r.User_Information.last_name,
+                         Rating = r.rating,
+                         Comment = r.comment,
+                         ReviewDate = r.review_date
+                     })
+                     .ToList();
             var dashboardData = new ProviderDashboardViewModel
             {
                 TotalSales = totalSales,
                 TotalOrders = totalOrders,
                 TotalProducts = totalProducts,
                 NewCustomers = newCustomer,
-                RecentOrders = recentOrders
+                RecentOrders = recentOrders,
+                Reviews = reviews
             };
 
             return View(dashboardData);
@@ -103,7 +115,7 @@ namespace UCGrab.Controllers
                     ImageFilePath = od.Product.Image_Product.FirstOrDefault()?.image_file
                 }).ToList(),
                 Total = (Int32)order.Order_Detail.Sum(od => od.price * od.quatity),
-                GCashReceipt = order.gcash_receipt // Include receipt path
+                GCashReceipt = order.gcash_receipt 
 
             }).ToList();
 
@@ -462,7 +474,7 @@ namespace UCGrab.Controllers
 
             Stock stock = new Stock
             {
-                product_id = product.id, // Link the stock to the product
+                product_id = product.id, 
                 quantity = stock_quantity
             };
 
@@ -549,6 +561,114 @@ namespace UCGrab.Controllers
             res.message = ErrorMessage;
 
             return Json(res, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult DiscountVouchers()
+        {
+            var _db = new UCGrabEntities();
+
+            var discountList = _db.Discounts.ToList();  // Get the list of discounts
+            var voucherList = _db.Vouchers.ToList();    // Get the list of vouchers
+
+            var viewModel = new DiscountVoucherViewModel
+            {
+                Discounts = discountList,
+                Vouchers = voucherList
+            };
+
+            return View(viewModel);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DiscountVouchers(DiscountVoucherViewModel model)
+        {
+            var _db = new UCGrabEntities();
+
+            if (ModelState.IsValid)
+            {
+                var username = User.Identity.Name;
+                var userInfo = _userManager.GetUserInfoByUsername(username);
+
+                var storeId = userInfo.id;
+                DateTime startDate = model.StartDate < new DateTime(1753, 1, 1) ? new DateTime(1753, 1, 1) : model.StartDate;
+                DateTime endDate = model.EndDate < new DateTime(1753, 1, 1) ? new DateTime(1753, 1, 1) : model.EndDate;
+
+                // Create new Discount object and save to database
+                var newDiscount = new Discounts
+                {
+                    store_id = storeId,
+                    discount_type = model.DiscountType,
+                    discount_value = model.DiscountValue,
+                    min_order_amount = model.MinOrderAmount,
+                    start_date = startDate,
+                    end_date = endDate,
+                    is_active = model.IsActive
+                };
+
+                _db.Discounts.Add(newDiscount);
+                _db.SaveChanges();
+
+                TempData["SuccessMessage"] = "Discount added successfully!";
+                return RedirectToAction("DiscountVouchers");
+            }
+
+            return View(model);
+        }
+
+        // GET: Shop/AddVoucher
+        public ActionResult AddVoucher()
+        {
+            return View();
+        }
+
+        // POST: Shop/AddVoucher
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddVoucher(string voucher_code, string discount_type, decimal discount_value, decimal min_order_amount, int max_uses, DateTime start_date, DateTime end_date, bool is_active)
+        {
+            var _db = new UCGrabEntities();
+
+            if (ModelState.IsValid)
+            {
+                // Create new Voucher object and save to database
+                var newVoucher = new Vouchers
+                {
+                    voucher_code = voucher_code,
+                    discount_type = discount_type,
+                    discount_value = discount_value,
+                    min_order_amount = min_order_amount,
+                    max_uses = max_uses,
+                    start_date = start_date,
+                    end_date = end_date,
+                    is_active = is_active
+                };
+
+                _db.Vouchers.Add(newVoucher);
+                _db.SaveChanges();
+
+                TempData["SuccessMessage"] = "Voucher added successfully!";
+                return RedirectToAction("DiscountVouchers");
+            }
+
+            return View();
+        }
+
+        // GET: Shop/DiscountList
+        public ActionResult DiscountList()
+        {
+            var _db = new UCGrabEntities();
+
+            var discounts = _db.Discounts.ToList();
+            return View(discounts);
+        }
+
+        // GET: Shop/VoucherList
+        public ActionResult VoucherList()
+        {
+            var _db = new UCGrabEntities();
+
+            var vouchers = _db.Vouchers.ToList();
+            return View(vouchers);
         }
 
     }

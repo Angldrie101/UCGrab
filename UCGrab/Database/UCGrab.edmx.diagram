@@ -42,6 +42,10 @@
         <AssociationConnector Association="UCGrabModel.FK_User_Accounts_User_Role" ManuallyRouted="false" />
         <AssociationConnector Association="UCGrabModel.FK_User_Role_User_Role" ManuallyRouted="false" />
         <AssociationConnector Association="UCGrabModel.FK_User_Role_User_Role1" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="UCGrabModel.Discounts" Width="1.5" PointX="3" PointY="19" />
+        <EntityTypeShape EntityType="UCGrabModel.Vouchers" Width="1.5" PointX="3" PointY="14.875" />
+        <AssociationConnector Association="UCGrabModel.FK_Discounts_Store" />
+        <AssociationConnector Association="UCGrabModel.FK_Vouchers_Store" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

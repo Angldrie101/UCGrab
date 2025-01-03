@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="UCGrabModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="UCGrabModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Category">
           <Key>
             <PropertyRef Name="category_id" />
@@ -22,6 +22,19 @@
           <Property Name="email" Type="varchar" MaxLength="255" />
           <Property Name="subject" Type="varchar" MaxLength="255" />
           <Property Name="description" Type="varchar(max)" />
+        </EntityType>
+        <EntityType Name="Discounts">
+          <Key>
+            <PropertyRef Name="discount_id" />
+          </Key>
+          <Property Name="discount_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="store_id" Type="int" />
+          <Property Name="discount_type" Type="varchar" MaxLength="50" />
+          <Property Name="discount_value" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="min_order_amount" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="start_date" Type="datetime" />
+          <Property Name="end_date" Type="datetime" />
+          <Property Name="is_active" Type="bit" />
         </EntityType>
         <EntityType Name="Favorites">
           <Key>
@@ -184,6 +197,22 @@
           <Property Name="role_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="rolename" Type="nvarchar" MaxLength="50" />
         </EntityType>
+        <EntityType Name="Vouchers">
+          <Key>
+            <PropertyRef Name="voucher_id" />
+          </Key>
+          <Property Name="voucher_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="store_id" Type="int" />
+          <Property Name="voucher_code" Type="varchar" MaxLength="50" />
+          <Property Name="discount_type" Type="varchar" MaxLength="50" />
+          <Property Name="discount_value" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="min_order_amount" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="max_uses" Type="int" />
+          <Property Name="remaining_uses" Type="int" />
+          <Property Name="start_date" Type="datetime" />
+          <Property Name="end_date" Type="datetime" />
+          <Property Name="is_active" Type="bit" />
+        </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="vw_Role">
@@ -215,6 +244,18 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
             </Principal>
             <Dependent Role="ContactUs1">
               <PropertyRef Name="contact_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Discounts_Store">
+          <End Role="Store" Type="Self.Store" Multiplicity="0..1" />
+          <End Role="Discounts" Type="Self.Discounts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Store">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Discounts">
+              <PropertyRef Name="store_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -444,12 +485,25 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Vouchers_Store">
+          <End Role="Store" Type="Self.Store" Multiplicity="0..1" />
+          <End Role="Vouchers" Type="Self.Vouchers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Store">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Vouchers">
+              <PropertyRef Name="store_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Function Name="sp_getCartCountByUserId" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="user_id" Type="nvarchar" Mode="In" />
         </Function>
         <EntityContainer Name="UCGrabModelStoreContainer">
           <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ContactUs" EntityType="Self.ContactUs" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Discounts" EntityType="Self.Discounts" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Favorites" EntityType="Self.Favorites" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="File_Documents" EntityType="Self.File_Documents" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Image" EntityType="Self.Image" Schema="dbo" store:Type="Tables" />
@@ -464,6 +518,7 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
           <EntitySet Name="User_Accounts" EntityType="Self.User_Accounts" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="User_Information" EntityType="Self.User_Information" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="User_Role" EntityType="Self.User_Role" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Vouchers" EntityType="Self.Vouchers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="vw_Role" EntityType="Self.vw_Role" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
 [vw_Role].[id] AS [id], 
@@ -478,6 +533,10 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <AssociationSet Name="FK_ContactUs_ContactUs" Association="Self.FK_ContactUs_ContactUs">
             <End Role="ContactUs" EntitySet="ContactUs" />
             <End Role="ContactUs1" EntitySet="ContactUs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Discounts_Store" Association="Self.FK_Discounts_Store">
+            <End Role="Store" EntitySet="Store" />
+            <End Role="Discounts" EntitySet="Discounts" />
           </AssociationSet>
           <AssociationSet Name="FK_Favorites_Favorites" Association="Self.FK_Favorites_Favorites">
             <End Role="Favorites" EntitySet="Favorites" />
@@ -551,9 +610,12 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <End Role="User_Role" EntitySet="User_Role" />
             <End Role="User_Role1" EntitySet="User_Role" />
           </AssociationSet>
+          <AssociationSet Name="FK_Vouchers_Store" Association="Self.FK_Vouchers_Store">
+            <End Role="Store" EntitySet="Store" />
+            <End Role="Vouchers" EntitySet="Vouchers" />
+          </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="UCGrabModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -729,6 +791,8 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <NavigationProperty Name="Image_Store" Relationship="Self.FK_Image_Store_Image_Store" FromRole="Store" ToRole="Image_Store" />
           <NavigationProperty Name="Order" Relationship="Self.FK_Order_Store" FromRole="Store" ToRole="Order" />
           <NavigationProperty Name="Product" Relationship="Self.FK_Product_Store" FromRole="Store" ToRole="Product" />
+          <NavigationProperty Name="Discounts" Relationship="UCGrabModel.FK_Discounts_Store" FromRole="Store" ToRole="Discounts" />
+          <NavigationProperty Name="Vouchers" Relationship="UCGrabModel.FK_Vouchers_Store" FromRole="Store" ToRole="Vouchers" />
         </EntityType>
         <EntityType Name="User_Accounts">
           <Key>
@@ -1133,9 +1197,74 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <End Role="User_Role1" EntitySet="User_Role" />
           </AssociationSet>
           <FunctionImport Name="sp_getCartCountByUserId" ReturnType="Collection(Int32)">
-            <Parameter Name="user_id" Mode="In" Type="String" />
+          <Parameter Name="user_id" Mode="In" Type="String" />
           </FunctionImport>
+          <EntitySet Name="Discounts" EntityType="UCGrabModel.Discounts" />
+          <EntitySet Name="Vouchers" EntityType="UCGrabModel.Vouchers" />
+          <AssociationSet Name="FK_Discounts_Store" Association="UCGrabModel.FK_Discounts_Store">
+            <End Role="Store" EntitySet="Store" />
+            <End Role="Discounts" EntitySet="Discounts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Vouchers_Store" Association="UCGrabModel.FK_Vouchers_Store">
+            <End Role="Store" EntitySet="Store" />
+            <End Role="Vouchers" EntitySet="Vouchers" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="Discounts">
+          <Key>
+            <PropertyRef Name="discount_id" />
+          </Key>
+          <Property Name="discount_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="store_id" Type="Int32" />
+          <Property Name="discount_type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="discount_value" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="min_order_amount" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="start_date" Type="DateTime" Precision="3" />
+          <Property Name="end_date" Type="DateTime" Precision="3" />
+          <Property Name="is_active" Type="Boolean" />
+          <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Discounts_Store" FromRole="Discounts" ToRole="Store" />
+        </EntityType>
+        <EntityType Name="Vouchers">
+          <Key>
+            <PropertyRef Name="voucher_id" />
+          </Key>
+          <Property Name="voucher_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="store_id" Type="Int32" />
+          <Property Name="voucher_code" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="discount_type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="discount_value" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="min_order_amount" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="max_uses" Type="Int32" />
+          <Property Name="remaining_uses" Type="Int32" />
+          <Property Name="start_date" Type="DateTime" Precision="3" />
+          <Property Name="end_date" Type="DateTime" Precision="3" />
+          <Property Name="is_active" Type="Boolean" />
+          <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Vouchers_Store" FromRole="Vouchers" ToRole="Store" />
+        </EntityType>
+        <Association Name="FK_Discounts_Store">
+          <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Discounts" Role="Discounts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Store">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Discounts">
+              <PropertyRef Name="store_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Vouchers_Store">
+          <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Vouchers" Role="Vouchers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Store">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Vouchers">
+              <PropertyRef Name="store_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1347,6 +1476,37 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             </EntityTypeMapping>
           </EntitySetMapping>
           <FunctionImportMapping FunctionImportName="sp_getCartCountByUserId" FunctionName="UCGrabModel.Store.sp_getCartCountByUserId" />
+          <EntitySetMapping Name="Discounts">
+            <EntityTypeMapping TypeName="UCGrabModel.Discounts">
+              <MappingFragment StoreEntitySet="Discounts">
+                <ScalarProperty Name="is_active" ColumnName="is_active" />
+                <ScalarProperty Name="end_date" ColumnName="end_date" />
+                <ScalarProperty Name="start_date" ColumnName="start_date" />
+                <ScalarProperty Name="min_order_amount" ColumnName="min_order_amount" />
+                <ScalarProperty Name="discount_value" ColumnName="discount_value" />
+                <ScalarProperty Name="discount_type" ColumnName="discount_type" />
+                <ScalarProperty Name="store_id" ColumnName="store_id" />
+                <ScalarProperty Name="discount_id" ColumnName="discount_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Vouchers">
+            <EntityTypeMapping TypeName="UCGrabModel.Vouchers">
+              <MappingFragment StoreEntitySet="Vouchers">
+                <ScalarProperty Name="is_active" ColumnName="is_active" />
+                <ScalarProperty Name="end_date" ColumnName="end_date" />
+                <ScalarProperty Name="start_date" ColumnName="start_date" />
+                <ScalarProperty Name="remaining_uses" ColumnName="remaining_uses" />
+                <ScalarProperty Name="max_uses" ColumnName="max_uses" />
+                <ScalarProperty Name="min_order_amount" ColumnName="min_order_amount" />
+                <ScalarProperty Name="discount_value" ColumnName="discount_value" />
+                <ScalarProperty Name="discount_type" ColumnName="discount_type" />
+                <ScalarProperty Name="voucher_code" ColumnName="voucher_code" />
+                <ScalarProperty Name="store_id" ColumnName="store_id" />
+                <ScalarProperty Name="voucher_id" ColumnName="voucher_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

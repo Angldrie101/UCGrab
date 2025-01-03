@@ -19,6 +19,8 @@ namespace UCGrab.Database
             this.Image_Store = new HashSet<Image_Store>();
             this.Order = new HashSet<Order>();
             this.Product = new HashSet<Product>();
+            this.Discounts = new HashSet<Discounts>();
+            this.Vouchers = new HashSet<Vouchers>();
         }
     
         public int id { get; set; }
@@ -36,5 +38,7 @@ namespace UCGrab.Database
         public virtual ICollection<Image_Store> Image_Store { get; set; }
         public virtual ICollection<Order> Order { get; set; }
         public virtual ICollection<Product> Product { get; set; }
+        public virtual ICollection<Discounts> Discounts { get; set; }
+        public virtual ICollection<Vouchers> Vouchers { get; set; }
     }
 }

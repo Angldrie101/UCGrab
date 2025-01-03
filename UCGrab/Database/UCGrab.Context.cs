@@ -45,6 +45,8 @@ namespace UCGrab.Database
         public DbSet<User_Information> User_Information { get; set; }
         public DbSet<User_Role> User_Role { get; set; }
         public DbSet<vw_Role> vw_Role { get; set; }
+        public DbSet<Discounts> Discounts { get; set; }
+        public DbSet<Vouchers> Vouchers { get; set; }
     
         public virtual ObjectResult<Nullable<int>> sp_getCartCountByUserId(string user_id)
         {

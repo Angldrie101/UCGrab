@@ -286,6 +286,9 @@
     <Compile Include="Database\ContactUs.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>
+    <Compile Include="Database\Discounts.cs">
+      <DependentUpon>UCGrab.tt</DependentUpon>
+    </Compile>
     <Compile Include="Database\Favorites.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>
@@ -343,6 +346,9 @@
     <Compile Include="Database\User_Role.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>
+    <Compile Include="Database\Vouchers.cs">
+      <DependentUpon>UCGrab.tt</DependentUpon>
+    </Compile>
     <Compile Include="Database\vw_Role.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>
@@ -351,11 +357,13 @@
     </Compile>
     <Compile Include="Models\AdminDashBoardViewModel.cs" />
     <Compile Include="Models\CheckOutViewModel.cs" />
+    <Compile Include="Models\DiscountVoucherViewModel.cs" />
     <Compile Include="Models\OrderDeliver.cs" />
     <Compile Include="Models\OrderViewModel.cs" />
     <Compile Include="Models\ProductViewModel.cs" />
     <Compile Include="Models\ProviderDashboardViewModel.cs" />
     <Compile Include="Models\Response.cs" />
+    <Compile Include="Models\ReviewModel.cs" />
     <Compile Include="Models\UserDetailsViewModel.cs" />
     <Compile Include="Models\UserLogged.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -618,6 +626,7 @@
     <Content Include="Views\Delivery\MyProfile.cshtml" />
     <Content Include="Views\Delivery\EditProfile.cshtml" />
     <Content Include="Views\Home\CheckOut.cshtml" />
+    <Content Include="Views\Shop\DiscountVouchers.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

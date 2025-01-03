@@ -14,5 +14,6 @@ namespace UCGrab.Models
         public int NewCustomers { get; set; }
         public List<Order> RecentOrders { get; set; }
         public List<ProductViewModel> TopSellingProducts { get; set; }
+        public List<ReviewModel> Reviews { get; set; }
     }
 }
