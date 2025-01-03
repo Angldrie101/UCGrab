@@ -103,11 +103,11 @@
                         <div class="navbar-nav ml-auto py-0 d-none d-lg-block">
                             <a href="/Home/FavoritedProduct" class="btn px-0">
                                 <i class="fas fa-heart text-primary"></i>
-                                <span class="badge text-secondary border border-secondary rounded-circle" id="lblCountFavorite">0</span>
+                                <span class="badge text-secondary border border-secondary rounded-circle" id="lblCountFavorites">0</span>
                             </a>
                             <a href="~/Home/Cart" class="btn px-0 ml-3">
                                 <i class="fas fa-shopping-cart text-primary"></i>
-                                <span class="badge text-secondary border border-secondary rounded-circle" id="lblCountCart">0</span>
+                                <span class="badge text-secondary border border-secondary rounded-circle" id="lblCountCarts">0</span>
                             </a>
                         </div>
                     </div>
@@ -166,30 +166,48 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+            // Load cart and favorite counts when the page is ready
             loadCartCount();
             loadFavoriteCount();
         });
+
+        // Function to load cart count
         function loadCartCount() {
-            $.get("/Home/GetCartCount")
-                .done(function (data) {
-                    document.getElementById("lblCountCart").innerHTML = data.count || 0;
-                })
-                .fail(function () {
+            $.ajax({
+                url: "/Home/GetCartCount", // API endpoint
+                type: "GET",               // HTTP GET method
+                cache: false,              // Prevent caching
+                success: function (data) { // On success
+                    console.log("Cart Data:", data); // Debug API Response
+                    console.log("Cart Count:", data.count); // Debug Count
+
+                    // Update the cart count (ensure it’s a number)
+                    document.getElementById("lblCountCarts").innerHTML = data.count;
+                },
+                error: function () { // On failure
                     console.error("Failed to load cart count.");
-                    document.getElementById("lblCountCart").innerHTML = 0;
-                });
+                    document.getElementById("lblCountCart").innerHTML = 0; // Default to 0
+                }
+            });
         }
 
+        // Function to load favorite count
         function loadFavoriteCount() {
-            $.get("/Home/GetFavoriteCount")
-                .done(function (data) {
-                    document.getElementById("lblCountFavorite").innerHTML = data.count || 0;
-                })
-                .fail(function () {
+            $.ajax({
+                url: "/Home/GetFavoriteCount", // API endpoint for favorites
+                type: "GET",
+                cache: false,
+                success: function (data) {
+                    console.log("Favorite Count:", data.count); // Debug Favorite Count
+                    document.getElementById("lblCountFavorites").innerHTML = data.count;
+                },
+                error: function () {
                     console.error("Failed to load favorite count.");
-                    document.getElementById("lblCountFavorite").innerHTML = 0;
-                });
+                    document.getElementById("lblCountFavorite").innerHTML = 0; // Default to 0
+                }
+            });
         }
+
     </script>
 </body>
 </html>

@@ -73,13 +73,14 @@ namespace UCGrab.Repository
             
             var orderdet = GetOrderDetailByOrderId(order.order_id);
 
-            
-                var result = AddUpdateCartQty(new Order_Detail
-                {
-                    order_id = order.order_id,
-                    product_id = productId,
-                    quatity = qty,
-                    price = product.price
+
+            var result = AddUpdateCartQty(new Order_Detail
+            {
+                order_id = order.order_id,
+                product_id = productId,
+                quatity = qty,
+                price = product.price,
+                user_id = userId
                 }, order);
 
                 return result;
@@ -211,12 +212,19 @@ namespace UCGrab.Repository
                 .FirstOrDefault(o => o.order_id == id);
         }
 
+        //public int GetCartCountByUserId(String userId)
+        //{
+        //    return _orderDetail._table.Count(o => o.user_id == userId);
+        //}
+
         public int GetCartCountByUserId(String userId)
         {
-            var count = (from o in _db.Order
+
+            int count = (from o in _db.Order
                          join od in _db.Order_Detail on o.order_id equals od.order_id
                          where o.order_status == 0 && o.user_id == userId
                          select od).Count();
+
 
             return count;
         }
@@ -246,7 +254,7 @@ namespace UCGrab.Repository
             return _orderDetail.Delete(id, out err);
         }
         
-        public ErrorCode PlaceOrder(string userId, OrderViewModel model, string gcashReceiptFileName, ref string error)
+        public ErrorCode PlaceOrder(string userId, CheckOutViewModel model, string gcashReceiptFileName, ref string error)
         {
             try
             {

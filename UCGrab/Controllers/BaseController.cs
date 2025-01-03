@@ -36,6 +36,7 @@ namespace UCGrab.Controllers
             _favManager = new FavoritesManager();
 
         }
+   
         public void IsUserLoggedSession()
         {
             UserLogged userLogged = new UserLogged();

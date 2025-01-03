@@ -21,18 +21,32 @@ namespace UCGrab.Controllers
         public ActionResult Index()
         {
             var _db = new UCGrabEntities();
-            
-            var totalRevenue = _db.Order.Sum(o => o.order_id);
+
+            var totalRevenue = 0;
             var totalStores = _db.Store.Count();
             var totalUsers = _db.User_Accounts.Count();
-            //var customerInquiries = _db.Inquiries.Count();
+            var customerInquiries = _db.ContactUs.Count();
+
+            // Fetch the 5 most recent stores
+            var recentStores = _db.Store
+                .OrderByDescending(s => s.store_id) // Assuming 'CreatedAt' column exists
+                .Take(5)
+                .ToList();
+
+            // Fetch the 5 most recent customer inquiries
+            var inquiries = _db.ContactUs
+                .OrderByDescending(c => c.contact_id) // Assuming 'CreatedAt' column exists
+                .Take(5)
+                .ToList();
 
             var dashboardData = new AdminDashBoardViewModel
             {
                 TotalRevenue = totalRevenue,
                 NumberStores = totalStores,
                 NumberAccounts = totalUsers,
-                //NewCustomerInquiries = customerInquiries
+                NewCustomerInquiries = customerInquiries,
+                RecentStores = recentStores,
+                RecentInquiries = inquiries
             };
 
             return View(dashboardData);

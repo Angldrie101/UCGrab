@@ -38,6 +38,7 @@ namespace UCGrab.Database
         public DbSet<Order> Order { get; set; }
         public DbSet<Order_Detail> Order_Detail { get; set; }
         public DbSet<Product> Product { get; set; }
+        public DbSet<Review> Review { get; set; }
         public DbSet<Stock> Stock { get; set; }
         public DbSet<Store> Store { get; set; }
         public DbSet<User_Accounts> User_Accounts { get; set; }

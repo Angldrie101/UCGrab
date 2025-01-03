@@ -30,5 +30,6 @@ namespace UCGrab.Models
         public string StoreQrCode { get; set; }
         public string Receipt { get; set; }
         public string StoreAddress { get; set; }
+        public string GCashReceipt { get; set; }
     }
 }

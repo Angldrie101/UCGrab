@@ -11,8 +11,8 @@ namespace UCGrab.Models
         public decimal TotalRevenue { get; set; }
         public int NumberAccounts { get; set; }
         public int NumberStores { get; set; }
-        public int NumberInquiries { get; set; }
-        public List<User_Accounts> User_Accounts { get; set; }
-        public List<Store> Stores { get; set; }
+        public int NewCustomerInquiries { get; set; }
+        public List<Store> RecentStores { get; set; }
+        public List<ContactUs> RecentInquiries { get; set; }
     }
 }

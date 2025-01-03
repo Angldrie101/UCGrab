@@ -810,13 +810,16 @@ namespace UCGrab.Controllers
             return View(updatedOrders);
         }
 
+
         public JsonResult GetCartCount()
         {
-            var res = new { count = _orderManager.GetCartCountByUserId(UserId) };
-
+            int count = _orderManager.GetCartCountByUserId(UserId);
+            var res = new { count };
             return Json(res, JsonRequestBehavior.AllowGet);
         }
-        
+
+
+
         [AllowAnonymous]
         public ActionResult FavoritedProduct()
         {
@@ -886,56 +889,6 @@ namespace UCGrab.Controllers
 
             return Json(res, JsonRequestBehavior.AllowGet);
         }
-        //public ActionResult Filter(decimal? minPrice, decimal? maxPrice)
-        //{
-        //    try
-        //    {
-        //        var db = new UCGrabEntities();
-        //        var filteredProducts = db.Product.AsQueryable();
-
-        //        // Apply price filtering if the min and max prices are provided
-        //        if (minPrice.HasValue && maxPrice.HasValue)
-        //        {
-        //            filteredProducts = filteredProducts.Where(p => p.price >= minPrice.Value && p.price <= maxPrice.Value);
-        //        }
-        //        else if (minPrice.HasValue) // If only minPrice is specified
-        //        {
-        //            filteredProducts = filteredProducts.Where(p => p.price >= minPrice.Value);
-        //        }
-        //        else if (maxPrice.HasValue) // If only maxPrice is specified
-        //        {
-        //            filteredProducts = filteredProducts.Where(p => p.price <= maxPrice.Value);
-        //        }
-
-        //        var productList = filteredProducts.Select(p => new
-        //        {
-        //            p.id,
-        //            p.product_name,
-        //            p.price,
-        //            Image_Product = p.Image_Product.Select(i => new { i.image_file }).ToList()
-        //        }).ToList();
-
-        //        return Json(productList, JsonRequestBehavior.AllowGet);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new HttpStatusCodeResult(500, "Internal Server Error: " + ex.Message);
-        //    }
-        //}
-        //public ActionResult productSort()
-        //{
-
-        //    var ps = new UCGrabEntities();
-
-        //    // Assuming you have a method to fetch products from the database
-        //    var products = ps.Product.ToList();  // Retrieve all products from the database
-
-        //    // Sort the products by price in ascending order
-        //    var sortedProducts = products.OrderBy(p => p.price).ToList();
-
-        //    // Pass the sorted list to the view
-        //    return View(sortedProducts);
-        //}
         [AllowAnonymous]
         public ActionResult CheckOut()
         {
@@ -972,15 +925,40 @@ namespace UCGrab.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult Checkout(OrderViewModel model, string gcashReceipt)
+        public ActionResult Checkout(CheckOutViewModel model, HttpPostedFileBase gcashReceipt)
         {
             IsUserLoggedSession();
 
             try
             {
-                
                 string errorMessage = string.Empty;
-                var result = _orderManager.PlaceOrder(UserId, model, gcashReceipt, ref errorMessage);
+                string filePath = string.Empty;
+
+                if (gcashReceipt != null && gcashReceipt.ContentLength > 0)
+                {
+                    string fileName = Path.GetFileName(gcashReceipt.FileName);
+                    string directoryPath = Server.MapPath("~/Uploads/Receipts/");
+
+                    if (!Directory.Exists(directoryPath))
+                    {
+                        Directory.CreateDirectory(directoryPath);
+                    }
+
+                    filePath = Path.Combine(directoryPath, fileName);
+                    gcashReceipt.SaveAs(filePath);
+
+                    // Save the relative path to the database
+                    filePath = "/Uploads/Receipts/" + fileName;
+                }
+                else
+                {
+                    // Handle missing file error
+                    ViewBag.Error = "Please upload a receipt.";
+                    return View(model);
+                }
+
+                // Pass the file path to the manager
+                var result = _orderManager.PlaceOrder(UserId, model, filePath, ref errorMessage);
 
                 if (result == ErrorCode.Success)
                 {
@@ -988,14 +966,12 @@ namespace UCGrab.Controllers
                 }
                 else
                 {
-                    // Handle error
                     ViewBag.Error = errorMessage;
                     return View(model);
                 }
             }
             catch (Exception ex)
             {
-                // Handle exception
                 ViewBag.Error = ex.Message;
                 return View(model);
             }
@@ -1086,6 +1062,51 @@ namespace UCGrab.Controllers
         public ActionResult PageNotFound()
         {
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult SubmitReview([FromBody] Review review, int orderId)
+        {
+            var _db = new UCGrabEntities();
+
+            if (review == null || review.rating == 0 || string.IsNullOrEmpty(review.comment))
+            {
+                return Json(new { success = false, message = "Invalid review data." }) as IActionResult;
+            }
+
+            var username = User.Identity.Name;
+            var userInfo = _userManager.GetUserInfoByUsername(username);
+
+            if (userInfo == null)
+            {
+                return Json(new { success = false, message = "User is not logged in." }) as IActionResult;
+            }
+
+            int userId = userInfo.id;
+
+            var reviewEntity = new Review
+            {
+                order_id = orderId,
+                user_id = userId,
+                rating = review.rating,
+                comment = review.comment,
+                review_date = DateTime.Now
+            };
+
+            _db.Review.Add(reviewEntity);
+            _db.SaveChanges();
+
+            return Json(new { success = true, message = "Review submitted successfully." }) as IActionResult;
+        }
+
+        private IActionResult Unauthorized(string v)
+        {
+            throw new NotImplementedException();
+        }
+
+        private IActionResult BadRequest(string v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

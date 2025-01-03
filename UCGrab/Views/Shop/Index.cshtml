@@ -37,7 +37,7 @@
                 <h5 class="card-title text-dark">
                     <i class="fas fa-users mr-2"></i>New Customers
                 </h5>
-                <p class="display-4 text-dark"><span id="new-customers">0</span></p>
+                <p class="display-4 text-dark"><span id="new-customers">@Model.NewCustomers</span></p>
             </div>
         </div>
     </div>
@@ -49,22 +49,21 @@
                     <thead>
                         <tr>
                             <th>Order ID</th>
+                            <th>Customer name</th>
                             <th>Date</th>
-                            <th>Amount</th>
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="recent-orders">
+                    <tbody>
+                    @foreach (var order in Model.RecentOrders)
+                    {
                         <tr>
-                             
+                            <td>@order.order_id</td>
+                            <td>@order.lastname, @order.firstname</td>
+                            <td>@(((DateTime)order.order_date).ToString("MM/dd/yyyy"))</td>
+                            <td>@(order.order_status == 0 ? "Open" : order.order_status == 1 ? "Pending":  order.order_status == 2 ? "Cancelled" : order.order_status == 3 ? "Confirmed" : order.order_status == 4 ? "Ready To Deliver" : order.order_status == 5 ? "Deliverd":"Done")</td>
                         </tr>
-                        <tr>
-                            
-                        </tr>
-                        <tr> 
-
-                        </tr>
-                        <!-- Additional orders -->
+                    }
                     </tbody>
                 </table>
             </div>

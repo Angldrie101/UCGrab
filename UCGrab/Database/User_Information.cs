@@ -17,6 +17,7 @@ namespace UCGrab.Database
         public User_Information()
         {
             this.Image = new HashSet<Image>();
+            this.Review = new HashSet<Review>();
         }
     
         public int id { get; set; }
@@ -29,5 +30,6 @@ namespace UCGrab.Database
         public Nullable<int> store_id { get; set; }
     
         public virtual ICollection<Image> Image { get; set; }
+        public virtual ICollection<Review> Review { get; set; }
     }
 }

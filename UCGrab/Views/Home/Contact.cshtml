@@ -11,7 +11,12 @@
             <div class="col-lg-7 mb-5">
                 <div class="contact-form bg-light p-30">
                     <div id="success"></div>
+
                     <form method="post" action="@Url.Action("Contact", "Home")">
+                        @if (!String.IsNullOrEmpty(TempData["Message"] as String))
+                        {
+                        <div class="alert alert-success" role="alert">@TempData["Message"]</div>
+                        }
                         <div class="control-group" hidden>
                             <input type="text" class="form-control" name="user_id"/>
                             <p class="help-block text-danger"></p>

@@ -149,21 +149,10 @@
                             </div>
 
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                <div class="form-group">
-                                    <label for="operatingHours">Store Operating Hours</label>
-                                    <div class="d-flex">
-                                        <div class="me-2">
-                                            <label for="fromTime" class="form-label">From:</label>
-                                            <input type="time" class="form-control" id="fromTime" required>
-                                        </div>
-                                        <div>
-                                            <label for="toTime" class="form-label">To:</label>
-                                            <input type="time" class="form-control" id="toTime" required>
-                                        </div>
-                                    </div>
-                                    @*<input type="hidden" id="operatingHours" name="operating_hours">*@
-                                    <small class="form-text text-muted">Please specify the store's operating hours.</small>
-                                </div>
+                                <label for="operatingHours">Store Operating Hours</label>
+                                <!-- Displaying operating hours in one input field (e.g., 6:30am-5:00pm) -->
+                                <input type="text" class="form-control" name="operating_hours" value="@Model.operating_hours" required>
+                                <small class="form-text text-muted">Please specify the store's operating hours in the format: 6:30 AM-5:00 PM</small>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12" hidden>
                                 <div class="form-group">

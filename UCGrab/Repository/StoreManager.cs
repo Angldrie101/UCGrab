@@ -85,6 +85,7 @@ namespace UCGrab.Repository
         public Store CreateOrRetrieve(String username, ref String err)
         {
             var user = _userMgr.GetUserByUsername(username);
+            var userinf = _userMgr.GetUserInfoByUsername(username);
             if (user == null)
             {
                 err = "User not found.";
@@ -96,6 +97,12 @@ namespace UCGrab.Repository
 
             if (store != null)
             {
+                // If the store is found and the store_id is null in user_information, update it
+                if (userinf.store_id == null)
+                {
+                    userinf.store_id = store.id;
+                    _userInfo.Update(userinf.id, userinf, out err);
+                }
                 return store;
             }
 

@@ -22,19 +22,39 @@ namespace UCGrab.Controllers
         {
             IsUserLoggedSession();
 
+            var userid = User.Identity.Name;
+            var userInfo = _userManager.GetUserInfoByUsername(userid);
             var _db = new UCGrabEntities();
 
-            var totalales = _db.Order.Sum(o => o.order_id);
-            var totalOrders = _db.Order.Count();
-            var totalProduct = _db.Product.Count();
-            //var newCustoemrs = _db.Inquiries.Count();
+            // Sum the total sales for the store
+            var totalSales = _db.Order_Detail
+                                .Where(od => od.Order.store_id == userInfo.store_id)
+                                .Sum(od => od.price)??0;
 
+            // Count the total orders for the store
+            var totalOrders = _db.Order
+                                  .Where(o => o.store_id == userInfo.store_id)
+                                  .Count();
+
+            // Count the total products for the store
+            var totalProducts = _db.Product
+                                    .Where(p => p.Store.id == userInfo.store_id)
+                                    .Count();
+
+            var newCustomer = _db.Order
+                                    .Where(p => p.Store.id == userInfo.store_id)
+                                    .Count();
+            var recentOrders = _db.Order
+                .OrderByDescending(s => s.store_id == userInfo.store_id) // Assuming 'CreatedAt' column exists
+                .Take(5)
+                .ToList();
             var dashboardData = new ProviderDashboardViewModel
             {
-                TotalSales = totalales,
-                TotalProducts = totalOrders,
-                TotalOrders = totalProduct,
-                //NewCustomers = customerInquiries
+                TotalSales = totalSales,
+                TotalOrders = totalOrders,
+                TotalProducts = totalProducts,
+                NewCustomers = newCustomer,
+                RecentOrders = recentOrders
             };
 
             return View(dashboardData);
@@ -82,7 +102,9 @@ namespace UCGrab.Controllers
                     Price = (Int32)od.price,
                     ImageFilePath = od.Product.Image_Product.FirstOrDefault()?.image_file
                 }).ToList(),
-                Total = (Int32)order.Order_Detail.Sum(od => od.price * od.quatity)
+                Total = (Int32)order.Order_Detail.Sum(od => od.price * od.quatity),
+                GCashReceipt = order.gcash_receipt // Include receipt path
+
             }).ToList();
 
             return View(model);
@@ -307,7 +329,6 @@ namespace UCGrab.Controllers
                     TempData["ErrorMessage"] = "Error updating profile: User not found.";
                     return View(store);
                 }
-                
                 if (profilePicture != null && profilePicture.ContentLength > 0)
                 {
                     var uploadsFolderPath = Server.MapPath("~/UploadedFiles/");

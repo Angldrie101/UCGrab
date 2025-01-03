@@ -39,7 +39,7 @@
                 <h5 class="card-title text-dark">
                     <i class="fas fa-users mr-2"></i>Customer Inquiries
                 </h5>
-                <p class="display-4 text-dark"><span id="new-customers">0</span></p>
+                <p class="display-4 text-dark"><span id="new-customers">@Model.NewCustomerInquiries</span></p>
             </div>
         </div>
     </div>
@@ -50,50 +50,50 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Order ID</th>
-                            <th>Date</th>
-                            <th>Amount</th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="recent-orders">
-                        <tr>
-                            
-                        </tr>
-                        <tr>
-                            
-                        </tr>
-                        <tr>
-                            
-                        </tr>
-                        <!-- Additional orders -->
+                    <tbody id="recent-stores">
+                        @foreach (var store in Model.RecentStores)
+                        {
+                            <tr>
+                                <td>@store.id</td>
+                                <td>@store.store_name</td>
+                                <td>@store.store_description</td>
+                                <td>@(store.status == 1 ? "Active" : "Inactive")</td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="col-lg-6 mb-5">
             <div class="bg-light p-30 mb-30">
-                <h5 class="card-title">Recent Added Accounts</h5>
+                <h5 class="card-title">Customer Inquiries</h5>
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Product ID</th>
+                            <th>ID</th>
                             <th>Name</th>
-                            <th>Sales</th>
-                            <th>Revenue</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Description</th>
                         </tr>
                     </thead>
-                    <tbody id="top-selling-products">
-                        <tr>
-                            
-                        </tr>
-                        <tr>
-                            
-                        </tr>
-                        <tr>
-                           
-                        </tr>
-                        <!-- Additional top-selling products -->
+                    <tbody id="customer-inquiries">
+                        @foreach (var inquiry in Model.RecentInquiries)
+                        {
+                            <tr>
+                                <td>@inquiry.contact_id</td>
+                                <td>@inquiry.name</td>
+                                <td>@inquiry.email</td>
+                                <td>@inquiry.subject</td>
+                                <td>@inquiry.description</td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>

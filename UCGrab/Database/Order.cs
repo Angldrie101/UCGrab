@@ -17,6 +17,7 @@ namespace UCGrab.Database
         public Order()
         {
             this.Order_Detail = new HashSet<Order_Detail>();
+            this.Review = new HashSet<Review>();
         }
     
         public int order_id { get; set; }
@@ -38,8 +39,8 @@ namespace UCGrab.Database
         public string gcash_receipt { get; set; }
     
         public virtual ICollection<Order_Detail> Order_Detail { get; set; }
+        public virtual ICollection<Review> Review { get; set; }
         public virtual Store Store { get; set; }
-
         public virtual ICollection<Product> Products { get; set; }
 
     }

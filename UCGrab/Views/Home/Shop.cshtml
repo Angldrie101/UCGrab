@@ -231,12 +231,31 @@
 </script>
 <script>
     $(document).ready(function () {
-        // Function to filter products based on the selected price range
+        // Function to hide/show size filter based on category
+        function toggleSizeFilter(category) {
+            const sizeFilterSection = $("h5:contains('Filter by size')").parent(); // Select the size filter section
+
+            // Categories that should hide the size filter
+            const hiddenCategories = ["Snacks", "Breakfast", "Lunch"];
+
+            if (hiddenCategories.includes(category)) {
+                sizeFilterSection.hide(); // Hide the size filter
+            } else {
+                sizeFilterSection.show(); // Show the size filter
+            }
+        }
+
+        // Assume category name is passed as a ViewBag variable
+        const currentCategory = '@ViewBag.Category'; // Example: "Snacks"
+
+        // Toggle size filter based on the current category
+        toggleSizeFilter(currentCategory);
+
+        // Price filter function remains unchanged
         function filterProducts() {
             var minPrice = null;
             var maxPrice = null;
 
-            // Determine the selected price range from the radio buttons
             if ($("#price-1").prop("checked")) {
                 minPrice = 0;
                 maxPrice = 100;
@@ -253,43 +272,26 @@
                 minPrice = 1000;
                 maxPrice = 1500;
             } else if ($("#price-all").prop("checked")) {
-                minPrice = null;  // No price filter, show all products
+                minPrice = null;
                 maxPrice = null;
             }
 
-            // Loop through each product and check if its price is within the selected range
             $("#product-list .col-lg-4").each(function () {
-                var price = parseFloat($(this).data("price"));  // Get the price from the data attribute
+                var price = parseFloat($(this).data("price"));
 
-                // Show product if it matches the price range
                 if ((minPrice === null || price >= minPrice) && (maxPrice === null || price <= maxPrice)) {
-                    $(this).show();  // Display the product
+                    $(this).show();
                 } else {
-                    $(this).hide();  // Hide the product
+                    $(this).hide();
                 }
             });
         }
 
-        // Call filterProducts when any radio button changes
         $("input[name='priceFilter']").change(function () {
-            filterProducts();  // Trigger filtering when a radio button is clicked
+            filterProducts();
         });
 
-        // Initial filtering when the page is loaded (if needed)
         filterProducts();
-
-        // Sort products by price when the page loads
-        var products = $("#product-list .col-lg-4").get();
-
-        // Sort the products based on data-price attribute (ascending order)
-        products.sort(function (a, b) {
-            var priceA = parseFloat($(a).data("price"));
-            var priceB = parseFloat($(b).data("price"));
-            return priceA - priceB;
-        });
-
-        // Append sorted products back to the container
-        $("#product-list").empty().append(products);
     });
 
 </script>

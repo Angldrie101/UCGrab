@@ -5,6 +5,35 @@
     Layout = "~/Views/Shared/UserLayout.cshtml";
 }
 
+<style>
+    input[type="radio"] {
+        display: none;
+    }
+
+    label {
+        font-size: 30px;
+        cursor: pointer;
+        color: #d3d3d3; /* Gray color for inactive stars */
+        transition: color 0.2s; /* Smooth color transition */
+    }
+
+    /* Active stars (colored gold when checked) */
+    input[type="radio"]:checked ~ label {
+        color: #ffcc00; /* Gold color for active stars */
+    }
+
+        /* Ensure all previous stars turn gold when selected */
+        input[type="radio"]:checked ~ label ~ label {
+            color: #ffcc00; /* Gold color for all stars before the selected one */
+        }
+
+    /* Make sure the stars align to the left */
+    .text-primary {
+        display: flex;
+        flex-direction: row; /* Align stars in a row from left to right */
+    }
+</style>
+
 <div class="row px-xl-5">
     <div class="col-lg-12 mb-4">
         <ul class="nav nav-tabs">
@@ -70,7 +99,6 @@
             confirmButtonText: 'Yes, cancel it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Create a form and submit it
                 var form = document.createElement("form");
                 form.setAttribute("method", "post");
                 form.setAttribute("action", "/Home/CancelOrder");
@@ -84,6 +112,62 @@
 
                 document.body.appendChild(form);
                 form.submit();
+            }
+        });
+    }
+
+    function showReviewPopup(orderId) {
+        Swal.fire({
+            title: 'Leave a Review',
+            html: `
+                <div class="d-flex my-3">
+                    <p class="mb-0 mr-2">Your Rating *: </p>
+                    <div class="text-primary">
+                        <input type="radio" id="star5" name="rating" value="1"><label for="star5" class="fa fa-star"></label>
+                        <input type="radio" id="star4" name="rating" value="2"><label for="star4" class="fa fa-star"></label>
+                        <input type="radio" id="star3" name="rating" value="3"><label for="star3" class="fa fa-star"></label>
+                        <input type="radio" id="star2" name="rating" value="4"><label for="star2" class="fa fa-star"></label>
+                        <input type="radio" id="star1" name="rating" value="5"><label for="star1" class="fa fa-star"></label>
+                    </div>
+                </div>
+                <form id="reviewForm">
+                    <div class="form-group">
+                        <textarea id="comment" cols="30" rows="5" class="form-control" placeholder="Write your review here..."></textarea>
+                    </div>
+                </form>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Submit',
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                const rating = document.querySelector('input[name="rating"]:checked');
+                const comment = document.getElementById('comment').value;
+
+                if (!rating) {
+                    Swal.showValidationMessage('Rating is required');
+                    return;
+                }
+                if (!comment) {
+                    Swal.showValidationMessage('Review cannot be empty');
+                    return;
+                }
+
+                return fetch(`/Home/SubmitReview`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId: orderId, rating: rating.value, comment: comment })
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error(response.statusText);
+                    }
+                    return response.json();
+                }).catch(error => {
+                    Swal.showValidationMessage(`Request failed: ${error}`);
+                });
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire('Submitted!', 'Your review has been submitted.', 'success');
             }
         });
     }
@@ -123,6 +207,18 @@ else
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <strong>Total: Php @order.Total</strong>
                     </div>
+                    @if (order.Status == "Pending")
+                    {
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-danger" onclick="confirmCancel('@order.OrderId')">Cancel Order</button>
+                        </div>
+                    }
+                    @if (order.Status == "Delivered")
+                    {
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-primary" onclick="showReviewPopup('@order.OrderId')">Submit Review</button>
+                        </div>
+                    }
                 </div>
             </div>
     }
