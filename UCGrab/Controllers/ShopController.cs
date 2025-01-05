@@ -31,7 +31,7 @@ namespace UCGrab.Controllers
                                 .Sum(od => od.price)??0;
             
             var totalOrders = _db.Order
-                                  .Where(o => o.store_id == userInfo.store_id)
+                                  .Where(o => o.store_id == userInfo.store_id && o.order_status == (int)OrderStatus.Pending)
                                   .Count();
             
             var totalProducts = _db.Product
@@ -39,7 +39,7 @@ namespace UCGrab.Controllers
                                     .Count();
 
             var newCustomer = _db.Order
-                                    .Where(p => p.Store.id == userInfo.store_id)
+                                    .Where(p => p.Store.id == userInfo.store_id && p.order_status == (int)OrderStatus.Pending)
                                     .Count();
             var recentOrders = _db.Order
                                     .Where(o => o.store_id == userInfo.store_id && o.order_status == (int)OrderStatus.Delivered)
@@ -567,6 +567,13 @@ namespace UCGrab.Controllers
         {
             var _db = new UCGrabEntities();
 
+            var username = User.Identity.Name;
+            var userInfo = _userManager.GetUserInfoByUsername(username);
+            var products = _productManager.GetProductByStoreId(userInfo.store_id);
+
+            ViewBag.CurrentStoreId = userInfo.store_id;
+            ViewBag.ProductByStoreId = products;
+
             var discountList = _db.Discounts.ToList();  // Get the list of discounts
             var voucherList = _db.Vouchers.ToList();    // Get the list of vouchers
 
@@ -578,97 +585,142 @@ namespace UCGrab.Controllers
 
             return View(viewModel);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DiscountVouchers(DiscountVoucherViewModel model)
+        public ActionResult DiscountVouchers(Discounts model,DateTime startDate,DateTime endDate, int? ProductId, string DiscountType, decimal DiscountValue, decimal? MinOrderAmount)
         {
             var _db = new UCGrabEntities();
+            var errorMessage = string.Empty;
 
             if (ModelState.IsValid)
             {
                 var username = User.Identity.Name;
                 var userInfo = _userManager.GetUserInfoByUsername(username);
 
-                var storeId = userInfo.id;
-                DateTime startDate = model.StartDate < new DateTime(1753, 1, 1) ? new DateTime(1753, 1, 1) : model.StartDate;
-                DateTime endDate = model.EndDate < new DateTime(1753, 1, 1) ? new DateTime(1753, 1, 1) : model.EndDate;
-
-                // Create new Discount object and save to database
-                var newDiscount = new Discounts
+                if (startDate > endDate)
                 {
-                    store_id = storeId,
-                    discount_type = model.DiscountType,
-                    discount_value = model.DiscountValue,
-                    min_order_amount = model.MinOrderAmount,
-                    start_date = startDate,
-                    end_date = endDate,
-                    is_active = model.IsActive
-                };
+                    ModelState.AddModelError("", "Start date cannot be later than end date.");
+                    return View(model);
+                }
 
-                _db.Discounts.Add(newDiscount);
-                _db.SaveChanges();
+                try
+                {
+                    model.store_id = userInfo.store_id;
+                    model.product_id = ProductId;
+                    model.start_date = startDate;
+                    model.end_date = endDate;
+                    model.discount_type = DiscountType;
+                    model.discount_value = DiscountValue;
+                    model.min_product_amount = MinOrderAmount;
 
-                TempData["SuccessMessage"] = "Discount added successfully!";
-                return RedirectToAction("DiscountVouchers");
+                    var existingDiscount = _discountManager.ListDiscountsByStoreId((int)userInfo.store_id)
+                                .FirstOrDefault(d => d.product_id == ProductId);
+
+                    if (existingDiscount != null)
+                    {
+                        if (startDate <= existingDiscount.end_date) // New discount start date is not after the existing one
+                        {
+                            TempData["Error"] = "New discount can only be added if the start date is beyond the existing discount's end date.";
+                            return RedirectToAction("DiscountVouchers");
+                        }
+                    }
+
+                    var result = _discountManager.AddDiscount(model, ref errorMessage);
+
+                    if (result == ErrorCode.Success)
+                    {
+                        TempData["Success"] = "Discount added successfully!";
+                        return RedirectToAction("DiscountVouchers");
+                    }
+                    else
+                    {
+                        TempData["Error"] = $"Error saving discount: {errorMessage}";
+                        return RedirectToAction("DiscountVouchers");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = $"Error saving discount: {ex.Message}";
+                    return RedirectToAction("DiscountVouchers");
+                }
             }
+            var usernames = User.Identity.Name;
+            var userInfos = _userManager.GetUserInfoByUsername(usernames);
 
-            return View(model);
+            var discountsList = _discountManager.ListDiscountsByStoreId((int)userInfos.store_id);
+            var vouchersList = _discountManager.ListVoucherByStoreId((int)userInfos.store_id); 
+
+            var viewModel = new DiscountVoucherViewModel
+            {
+                Discounts = discountsList,
+                Vouchers = vouchersList
+            };
+
+            return View(viewModel);
         }
 
-        // GET: Shop/AddVoucher
-        public ActionResult AddVoucher()
-        {
-            return View();
-        }
-
-        // POST: Shop/AddVoucher
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult AddVoucher(string voucher_code, string discount_type, decimal discount_value, decimal min_order_amount, int max_uses, DateTime start_date, DateTime end_date, bool is_active)
+        public ActionResult AddVoucher(Vouchers model, DateTime startDate, DateTime endDate, string VocherCode, string VDiscountType, decimal VDiscountValue, decimal VMinOrderAmount, int VMaxUses)
         {
             var _db = new UCGrabEntities();
+            var errorMessage = string.Empty;
 
             if (ModelState.IsValid)
             {
-                // Create new Voucher object and save to database
-                var newVoucher = new Vouchers
+                var username = User.Identity.Name;
+                var userInfo = _userManager.GetUserInfoByUsername(username);
+
+                if (startDate > endDate)
                 {
-                    voucher_code = voucher_code,
-                    discount_type = discount_type,
-                    discount_value = discount_value,
-                    min_order_amount = min_order_amount,
-                    max_uses = max_uses,
-                    start_date = start_date,
-                    end_date = end_date,
-                    is_active = is_active
-                };
+                    ModelState.AddModelError("", "Start date cannot be later than end date.");
+                    return View(model);
+                }
 
-                _db.Vouchers.Add(newVoucher);
-                _db.SaveChanges();
+                try
+                {
+                    model.store_id = userInfo.store_id;
+                    model.voucher_code = VocherCode;
+                    model.start_date = startDate;
+                    model.end_date = endDate;
+                    model.max_uses = VMaxUses;
+                    model.discount_type = VDiscountType;
+                    model.discount_value = VDiscountValue;
+                    model.min_order_amount = VMinOrderAmount;
 
-                TempData["SuccessMessage"] = "Voucher added successfully!";
-                return RedirectToAction("DiscountVouchers");
+                    var result = _discountManager.AddVoucher(model, ref errorMessage);
+
+                    if (result == ErrorCode.Success)
+                    {
+                        TempData["SuccessVoucher"] = "Voucher added successfully!";
+                        return RedirectToAction("DiscountVouchers");
+                    }
+                    else
+                    {
+                        TempData["ErrorVoucher"] = $"Error saving voucher: {errorMessage}";
+                        return RedirectToAction("DiscountVouchers");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["ErrorVoucher"] = $"Error saving voucher: {ex.Message}";
+                    return RedirectToAction("DiscountVouchers");
+                }
             }
+            var usernames = User.Identity.Name;
+            var userInfos = _userManager.GetUserInfoByUsername(usernames);
 
-            return View();
-        }
+            var discountsList = _discountManager.ListDiscountsByStoreId((int)userInfos.store_id);
+            var vouchersList = _discountManager.ListVoucherByStoreId((int)userInfos.store_id);
 
-        // GET: Shop/DiscountList
-        public ActionResult DiscountList()
-        {
-            var _db = new UCGrabEntities();
+            var viewModel = new DiscountVoucherViewModel
+            {
+                Discounts = discountsList,
+                Vouchers = vouchersList
+            };
 
-            var discounts = _db.Discounts.ToList();
-            return View(discounts);
-        }
-
-        // GET: Shop/VoucherList
-        public ActionResult VoucherList()
-        {
-            var _db = new UCGrabEntities();
-
-            var vouchers = _db.Vouchers.ToList();
-            return View(vouchers);
+            return View(viewModel);
         }
 
     }

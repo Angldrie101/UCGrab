@@ -3,6 +3,8 @@
 @{
     ViewBag.Title = "DiscountVouchers";
     Layout = "~/Views/Shared/ShopPageLayout.cshtml";
+    var currentstoreId = ViewBag.CurrentStoreId;
+    var productsByStore = ViewBag.ProductByStoreId;
 }
 
 <style>
@@ -18,14 +20,6 @@
     <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
         <span class="bg-secondary pr-3">Discount and Voucher Management</span>
     </h2>
-
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success">
-            @TempData["SuccessMessage"]
-        </div>
-    }
-
     <div class="row px-xl-5">
         <!-- Left Column: Discount Form -->
         <div class="col-lg-6 mb-5">
@@ -33,37 +27,55 @@
                 <h5 class="card-title"><i class="fas fa-percent mr-2"></i>Add Discount</h5>
                 @using (Html.BeginForm("DiscountVouchers", "Shop", FormMethod.Post))
                 {
+                    if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["Success"]</div>
+                    }
+                    if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
                     @Html.AntiForgeryToken()
                     <div class="form-group">
                         <label for="discountType" class="form-label">Discount Type</label>
-                        @Html.DropDownListFor(m => m.DiscountType, new List<SelectListItem>
-                        {
-                            new SelectListItem { Text = "Percentage", Value = "Percentage" },
-                            new SelectListItem { Text = "Amount", Value = "Amount" }
-                        }, new { @class = "form-control", required = "required" })
+                        <select class="form-control" id="discountType" name="DiscountType" required>
+                            <option value="Percentage">Percentage</option>
+                            <option value="Amount">Amount</option>
+                        </select>
                     </div>
+                    <div class="form-group">
+                        <label for="ProductId" class="form-label">Select Product</label>
+                        <select class="form-control" id="ProductId" name="ProductId">
+                            <option value="" selected>Select all products</option>
+
+                            @foreach (var product in productsByStore)
+                            {
+
+                                <option value="@product.id">@product.product_name</option>
+                            }
+                          
+                        </select>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="discountValue" class="form-label">Discount Value</label>
-                        <input type="number" class="form-control" id="discountValue" name="DiscountValue" placeholder="Enter discount value" required>
+                        <input type="number" class="form-control" id="discountValue" name="DiscountValue" min="0" max="100" placeholder="Enter discount value" required>
                     </div>
                     <div class="form-group">
-                        <label for="discountThreshold" class="form-label">Minimum Order Amount</label>
-                        <input type="number" class="form-control" id="discountThreshold" name="MinOrderAmount" placeholder="Enter minimum order amount" required>
+                        <label for="discountThreshold" class="form-label">Minimum Product Price</label>
+                        <input type="number" class="form-control" id="discountThreshold" name="MinOrderAmount" value="0"  placeholder="Enter minimum price" >
                     </div>
                     <div class="form-group">
                         <label for="startdate" class="form-label">Start Date</label>
-                        <input type="date" class="form-control" id="startdate" name="StartDate" placeholder="Enter start date" required>
+                        <input type="date" class="form-control" id="startdate" name="startDate" placeholder="Enter start date" required>
                     </div>
                     <div class="form-group">
                         <label for="endDate" class="form-label">End Date</label>
-                        <input type="date" class="form-control" id="endDate" name="EndDate" placeholder="Enter end date" required>
+                        <input type="date" class="form-control" id="endDate" name="endDate" placeholder="Enter end date" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" hidden>
                         <label for="status" class="form-label">Discount Status</label>
-                        <select class="form-control" id="status" name="IsActive" required>
-                            <option value="0">Inactive</option>
-                            <option value="1">Active</option>
-                        </select>
+                        <input type="hidden" class="form-control" id="endDate" name="is_active" value="1" >
                     </div>
                     <button type="submit" class="btn btn-primary">Add Discount</button>
                 }
@@ -76,44 +88,49 @@
                 <h5 class="card-title"><i class="fas fa-ticket-alt mr-2"></i>Add Voucher</h5>
                 @using (Html.BeginForm("AddVoucher", "Shop", FormMethod.Post))
                 {
+                    if (TempData["SuccessVoucher"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["SuccessVoucher"]</div>
+                    }
+                    if (TempData["ErrorVoucher"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["ErrorVoucher"]</div>
+                    }
                     @Html.AntiForgeryToken()
                     <div class="form-group">
                         <label class="form-label">Voucher Code</label>
-                        <input type="text" class="form-control" id="voucherCode" name="voucher_code" placeholder="Enter voucher code" required>
+                        <input type="text" class="form-control" id="voucherCode" name="VocherCode" placeholder="Enter voucher code" required>
                     </div>
                     <div class="form-group">
                         <label for="voucherDiscountType" class="form-label">Discount Type</label>
-                        <select class="form-control" id="voucherDiscountType" name="discount_type" required>
+                        <select class="form-control" id="voucherDiscountType" name="VDiscountType" required>
                             <option value="Percentage">Percentage</option>
                             <option value="Amount">Amount</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="voucherDiscountValue" class="form-label">Voucher Discount Value</label>
-                        <input type="number" class="form-control" id="voucherDiscountValue" name="discount_value" placeholder="Enter voucher discount value" required>
+                        <input type="number" class="form-control" id="voucherDiscountValue" name="VDiscountValue" placeholder="Enter voucher discount value" required>
                     </div>
                     <div class="form-group">
                         <label for="voucherMinOrder" class="form-label">Minimum Order Amount</label>
-                        <input type="number" class="form-control" id="voucherMinOrder" name="min_order_amount" placeholder="Enter minimum order amount" required>
+                        <input type="number" class="form-control" id="voucherMinOrder" name="VMinOrderAmount" placeholder="Enter minimum order amount" required>
                     </div>
                     <div class="form-group">
                         <label for="voucherMaxUses" class="form-label">Max Uses</label>
-                        <input type="number" class="form-control" id="voucherMaxUses" name="max_uses" placeholder="Enter maximum voucher uses" required>
+                        <input type="number" class="form-control" id="voucherMaxUses" name="VMaxUses" placeholder="Enter maximum voucher uses" required>
                     </div>
                     <div class="form-group">
                         <label for="voucherstartdate" class="form-label">Start Date</label>
-                        <input type="date" class="form-control" id="voucherstartdate" name="start_date" placeholder="Enter start date" required>
+                        <input type="date" class="form-control" id="voucherstartdate" name="startDate" placeholder="Enter start date" required>
                     </div>
                     <div class="form-group">
                         <label for="voucherendDate" class="form-label">End Date</label>
-                        <input type="date" class="form-control" id="voucherendDate" name="end_date" placeholder="Enter end date" required>
+                        <input type="date" class="form-control" id="voucherendDate" name="endDate" placeholder="Enter end date" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" hidden>
                         <label for="voucherstatus" class="form-label">Voucher Status</label>
-                        <select class="form-control" id="voucherstatus" name="is_active" required>
-                            <option value="0">Inactive</option>
-                            <option value="1">Active</option>
-                        </select>
+                        <input type="hidden" class="form-control" id="status" name="is_active" value="1">
                     </div>
                     <button type="submit" class="btn btn-primary">Add Voucher</button>
                 }
@@ -129,35 +146,38 @@
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Product</th>
                             <th>Discount Type</th>
                             <th>Discount Value</th>
-                            <th>Min Order</th>
-                            <th>Actions</th>
+                            <th>Price Limit</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @*@if (Model.Discounts.Any())
+                        @if (Model.Discounts.Any())
                         {
-                            foreach (var discount in Model.Discounts)
+                            foreach (var discount in Model.Discounts.Where(d => d.store_id == currentstoreId))
                             {
                                 <tr>
                                     <td>@discount.discount_id</td>
+                                    <th>@(discount.product_id.HasValue ? discount.product_id.ToString() : "All")</th>
                                     <td>@discount.discount_type</td>
                                     <td>@discount.discount_value</td>
-                                    <td>@discount.min_order_amount</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-warning">Edit</button>
-                                        <button class="btn btn-sm btn-danger">Delete</button>
-                                    </td>
+                                    <td>@discount.min_product_amount</td>
+                                    <td>@(discount.start_date.HasValue ? discount.start_date.Value.ToShortDateString() : "N/A")</td>
+                                    <td>@(discount.end_date.HasValue ? discount.end_date.Value.ToShortDateString() : "N/A")</td>
+                                    <td>@(discount.is_active == 1? "Active":"Inactive")</td>
                                 </tr>
                             }
                         }
                         else
                         {
                             <tr>
-                                <td colspan="5" class="text-center">No available discounts.</td>
+                                <td colspan="7" class="text-center">No available discounts.</td>
                             </tr>
-                        }*@
+                        }
                     </tbody>
                 </table>
             </div>
@@ -174,33 +194,34 @@
                             <th>Discount</th>
                             <th>Min Order</th>
                             <th>Max Uses</th>
-                            <th>Actions</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                       @*@if (Model.Vouchers.Any())
-                       {
-                        foreach (var voucher in Model.Vouchers)
-                        {
+                      @if (Model.Vouchers.Any())
+                      {
+                          foreach (var voucher in Model.Vouchers.Where(v => v.store_id == currentstoreId))
+                          {
                             <tr>
                                 <td>@voucher.voucher_id</td>
                                 <td>@voucher.voucher_code</td>
                                 <td>@voucher.discount_value</td>
                                 <td>@voucher.min_order_amount</td>
                                 <td>@voucher.max_uses</td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning">Edit</button>
-                                    <button class="btn btn-sm btn-danger">Delete</button>
-                                </td>
+                                <td>@(voucher.start_date.HasValue ? voucher.start_date.Value.ToShortDateString() : "N/A")</td>
+                                <td>@(voucher.start_date.HasValue ? voucher.start_date.Value.ToShortDateString() : "N/A")</td>
+                                <td>@(voucher.is_active == 1?"Active":"Inactive")</td>
                             </tr>
-                        }
-                       }
-                       else
-                       {
+                          }
+                      }
+                      else
+                      {
                         <tr>
-                            <td colspan="6" class="text-center">No available vouchers.</td>
+                            <td colspan="8" class="text-center">No available vouchers.</td>
                         </tr>
-                       }*@
+                      }
                     </tbody>
                 </table>
             </div>
@@ -219,6 +240,29 @@
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script type="text/javascript">
-    // Optional: Add any specific interactions like image preview, etc.
+<script>
+    $(document).ready(function () {
+        // Get references to the elements
+        const productDropdown = $('#ProductId'); // Product dropdown
+        const minOrderAmountInput = $('#discountThreshold'); // Minimum Order Amount input
+
+        // Function to handle enabling/disabling the input
+        function toggleMinOrderAmount() {
+            if (productDropdown.val() === "") { // Check if "No Specified Product" is selected
+                minOrderAmountInput.prop('disabled', false); // Enable input
+            } else {
+                minOrderAmountInput.prop('disabled', true); // Disable input
+                minOrderAmountInput.val('0.00'); // Clear input value
+            }
+        }
+
+        // Attach event listener for change in product dropdown
+        productDropdown.change(function () {
+            toggleMinOrderAmount(); // Call the function when the dropdown changes
+        });
+
+        // Initial call to handle pre-selected value
+        toggleMinOrderAmount(); // Ensure the correct state on page load
+    });
+
 </script>

@@ -46,6 +46,11 @@ namespace UCGrab.Repository
             return _product.Get(id);
         }
 
+        public List<Product> GetProductByStoreId(int? storeId)
+        {
+            return _product._table.Where(p => p.store_id == storeId).ToList();
+        }
+
         public Product GetProductBygUId(String gUid)
         {
             return _product._table.Where(m => m.product_id == gUid).FirstOrDefault();

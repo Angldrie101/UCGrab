@@ -714,27 +714,25 @@ namespace UCGrab.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public JsonResult AddCart(int prodId, int qty)
+        public JsonResult AddCart(int prodId, int qty, decimal price)
         {
             var response = new Response();
 
             try
             {
-                // Call the _orderManager to handle adding/updating the cart
-                var result = _orderManager.AddCart(UserId, prodId, qty, ref ErrorMessage);
+                // Pass the price explicitly
+                var result = _orderManager.AddCart(UserId, prodId, qty, price, ref ErrorMessage);
 
                 if (result == ErrorCode.Error)
                 {
                     throw new Exception(ErrorMessage);
                 }
 
-                // Success response
                 response.code = (int)ErrorCode.Success;
                 response.message = "Item added to the cart!";
             }
             catch (Exception ex)
             {
-                // Error handling and logging
                 response.code = (int)ErrorCode.Error;
                 response.message = $"An error occurred while adding the item to the cart: {ex.Message}";
 
@@ -746,9 +744,7 @@ namespace UCGrab.Controllers
                 LogError(ex);
             }
 
-            // Return JSON response
             return Json(response, JsonRequestBehavior.AllowGet);
-
         }
 
         private void LogError(Exception ex)
@@ -1107,6 +1103,80 @@ namespace UCGrab.Controllers
         private IActionResult BadRequest(string v)
         {
             throw new NotImplementedException();
+        }
+
+        public ActionResult DiscountedProducts()
+        {
+            var db = new UCGrabEntities();
+
+            var allDiscountedProducts = (from p in db.Product
+                                         join d in db.Discounts on p.store_id equals d.store_id into discountGroup
+                                         from d in discountGroup.DefaultIfEmpty()
+                                         let hasProductDiscount = d != null && d.product_id == p.id && d.is_active == 1 && d.start_date <= DateTime.Now && d.end_date >= DateTime.Now
+                                         let hasStoreDiscount = d != null && d.product_id == null && d.is_active == 1 && d.start_date <= DateTime.Now && d.end_date >= DateTime.Now
+                                         let discountedPrice = hasProductDiscount
+                                                               ? p.price - (p.price * (d.discount_value ?? 0) / 100)  
+                                                               : hasStoreDiscount
+                                                               ? p.price - (p.price * (d.discount_value ?? 0) / 100)  
+                                                               : p.price  
+                                         where hasProductDiscount || hasStoreDiscount  
+                                         select new ProductViewModel
+                                         {
+                                             ProductId = p.id,
+                                             ProductName = p.product_name,
+                                             OriginalPrice = p.price,
+                                             Price = discountedPrice, 
+                                             ImageFilePath = db.Image_Product.FirstOrDefault(i => i.product_id == p.id).image_file,
+                                             Description = p.product_description,
+                                             IsDiscounted = true  
+                                         }).Distinct().ToList(); 
+
+            return View(allDiscountedProducts);
+        }
+        [HttpPost]
+        public IActionResult ApplyCoupon(string couponCode, IEnumerable<IGrouping<string, Order>> storeOrders)
+        {
+            var _db = new UCGrabEntities();
+            if (string.IsNullOrEmpty(couponCode))
+            {
+                TempData["Error"] = "Please enter a coupon code.";
+                return RedirectToAction("Cart") as IActionResult;
+            }
+
+            var voucher = _db.Vouchers.FirstOrDefault(v => v.voucher_code == couponCode);
+
+            if (voucher == null)
+            {
+                TempData["Error"] = "Invalid coupon code.";
+                return RedirectToAction("Cart") as IActionResult;
+            }
+
+            foreach (var storeGroup in storeOrders)
+            {
+                foreach (var order in storeGroup)
+                {
+                    foreach (var orderDetail in order.Order_Detail)
+                    {
+                        decimal total = (decimal)(orderDetail.quatity ?? 0) * (decimal)(orderDetail.price ?? 0);
+                        decimal discount = 0;
+
+                        if (voucher.min_order_amount <= total)
+                        {
+                            discount = voucher.discount_value ?? 0;
+                        }
+
+                        decimal discountedPrice = ((decimal)(total)) * (1 - (discount / 100));
+
+                        orderDetail.price = discountedPrice;
+                        orderDetail.price = discountedPrice; 
+                    }
+                }
+            }
+
+            _db.SaveChanges(); // Save changes in the database
+
+            TempData["Success"] = "Coupon applied successfully.";
+            return RedirectToAction("Cart") as IActionResult;
         }
     }
 }

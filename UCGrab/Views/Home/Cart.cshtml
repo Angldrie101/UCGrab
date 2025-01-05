@@ -3,6 +3,7 @@
     ViewBag.Title = "Cart";
     Layout = "~/Views/Shared/UserLayout.cshtml";
 }
+
 <style>
     .product-img {
         width: 50px;
@@ -28,61 +29,17 @@
         color: #fff;
     }
 
-    .table-hover tbody tr:hover {
-        background-color: #f8f9fa;
-    }
-
     .cart-summary {
         background-color: #f8f9fa;
         padding: 30px;
         border-radius: 5px;
     }
-
-        .cart-summary h5, .cart-summary h6 {
-            color: #000;
-        }
-
-    .input-group-btn .btn-primary {
-        background-color: #e8e742;
-        border-color: #ffd700;
-    }
-
-        .input-group-btn .btn-primary:hover {
-            background-color: #e6c200;
-            border-color: #e6c200;
-        }
-
-    .table td, .table th {
-        vertical-align: middle;
-    }
-
-    .quantity input[type="text"] {
-        text-align: center;
-        border: 1px solid #ced4da;
-    }
-
-    .quantity .btn-primary {
-        border-radius: 0;
-        background-color: #e8e742;
-        border-color: #ffd700;
-    }
-
-        .quantity .btn-primary:hover {
-            background-color: #e6c200;
-            border-color: #e6c200;
-        }
-
-    .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
-        background-color: #ffd700;
-        border-color: #ffd700;
-    }
 </style>
-<!-- Cart Start -->
+
 @if (Model.Any())
 {
     foreach (var storeGroup in Model)
     {
-
         <div class="container-fluid mb-5">
             <div class="row px-xl-5">
                 <div class="col-lg-8 table-responsive mb-5">
@@ -92,8 +49,8 @@
                             <tr>
                                 <th>Products</th>
                                 <th>Price</th>
+                                <th>Discounted Price</th>
                                 <th>Quantity</th>
-                                <th>Total</th>
                                 <th>Remove</th>
                             </tr>
                         </thead>
@@ -102,7 +59,26 @@
                             {
                                 foreach (var orDetail in order.Order_Detail)
                                 {
-                                    double total = Convert.ToDouble(orDetail.quatity) * Convert.ToDouble(orDetail.price);
+                                    decimal originalPrice = (decimal)(orDetail.price ?? 0);
+                                    decimal discountedPrice = originalPrice;
+                                    decimal discountValue = 0;
+
+                                    if (orDetail.Product.Discounts != null && orDetail.Product.Discounts.Any())
+                                    {
+                                        var discount = orDetail.Product.Discounts.FirstOrDefault(d =>
+                                            d.is_active == 1 &&
+                                            d.start_date <= DateTime.Now &&
+                                            d.end_date >= DateTime.Now);
+
+                                        if (discount != null)
+                                        {
+                                            discountValue = discount.discount_value ?? 0;
+                                            discountedPrice = originalPrice - (originalPrice * discountValue / 100);
+                                        }
+                                    }
+
+                                    decimal totalOriginal = originalPrice * (orDetail.quatity ?? 0);
+                                    decimal totalDiscounted = discountedPrice * (orDetail.quatity ?? 0);
                                     <tr>
                                         <td class="align-middle">
                                             <div class="d-flex align-items-center">
@@ -110,24 +86,9 @@
                                                 @orDetail.Product.product_name
                                             </div>
                                         </td>
-                                        <td class="align-middle">Php @orDetail.price</td>
-                                        <td class="align-middle">
-                                            <input type="hidden" name="orderDtId" value="@orDetail.id" />
-                                            <div class="input-group quantity mx-auto" style="width: 100px;">
-                                                <div class="input-group-btn">
-                                                    <button class="btn btn-sm btn-primary btn-minus" type="submit" name="action" value="&minus;">
-                                                        <i class="fa fa-minus"></i>
-                                                    </button>
-                                                </div>
-                                                <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center" name="qty" value="@orDetail.quatity">
-                                                <div class="input-group-btn">
-                                                    <button class="btn btn-sm btn-primary btn-plus" type="submit" name="action" value="&plus;">
-                                                        <i class="fa fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="align-middle">Php @total.ToString("N2")</td>
+                                        <td class="align-middle">Php @orDetail.Product.price</td>
+                                        <td class="align-middle">Php @((originalPrice) * (orDetail.quatity ?? 1))</td>
+                                        <td class="align-middle">@orDetail.quatity</td>
                                         <td class="align-middle">
                                             <button class="btn btn-sm btn-danger" type="submit" name="action" value="X">
                                                 <i class="fa fa-times"></i>
@@ -142,35 +103,47 @@
                 <div class="col-lg-4">
                     <div class="cart-summary">
                         <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Cart Summary for @storeGroup.Key</span></h5>
-                        <form class="mb-30" action="">
+                        <form class="mb-30" action="@Url.Action("ApplyCoupon", "Home")" method="post">
                             <div class="input-group">
-                                <input type="text" class="form-control border-0 p-4" placeholder="Coupon Code">
+                                <input type="text" name="couponCode" class="form-control border-0 p-4" placeholder="Coupon Code">
                                 <div class="input-group-append">
-                                    <button class="btn btn-primary">Apply Coupon</button>
+                                    <button class="btn btn-primary" type="submit">Apply Coupon</button>
                                 </div>
                             </div>
-                        </form>
-                        <br />
+                        </form> 
                         <div class="border-bottom pb-2">
                             <div class="d-flex justify-content-between mb-3">
                                 <h6>Subtotal</h6>
-                                <h6>Php @storeGroup.Sum(order => order.Order_Detail.Sum(od => od.quatity * od.price))</h6>
+                                <h6>
+                                    Php @storeGroup.Sum(order => order.Order_Detail.Sum(od => od.Product.price * od.quatity))
+                                </h6>
                             </div>
                             <div class="d-flex justify-content-between mb-3">
-                                <h6>Voucher</h6>
-                                <h6>--</h6>
+                                <h6>Discount</h6>
+                                <h6>
+                                    -Php @storeGroup.Sum(order => order.Order_Detail.Sum(od =>
+                                    (od.Product.price > od.price)
+                                        ? (decimal)((od.Product.price - od.price) * (od.quatity ?? 1))
+                                        : 0
+                                )).ToString("N2")
+                                </h6>
                             </div>
                         </div>
                         <div class="pt-2">
-                                <div class="d-flex justify-content-between mt-2">
-                                    <h5>Total</h5>
-                                    @{ 
-                                        var tot = storeGroup.Sum(order => order.Order_Detail.Sum(od => od.quatity * od.price));
-                                    }
-                                    <h5><strong>Php @tot</strong></h5>
-                                </div>
-                                <a href="/Home/Checkout" class="btn btn-block btn-primary font-weight-bold my-3 py-3">Checkout</a>
-                                
+                            <div class="d-flex justify-content-between mt-2">
+                                <h5>Total Amount</h5>
+                                <h5>Php
+                                    @(
+                                    storeGroup.Sum(order => order.Order_Detail.Sum(od =>
+                                        (decimal)((od.Product.price * (od.quatity ?? 1)) -
+                                        ((od.Product.price > od.price)
+                                            ? (od.Product.price - od.price) * (od.quatity ?? 1)
+                                            : 0))
+                                    ))
+                                    )
+                                </h5>
+                            </div>
+                            <a href="/Home/Checkout" class="btn btn-block btn-primary font-weight-bold my-3 py-3">Checkout</a>
                         </div>
                     </div>
                 </div>

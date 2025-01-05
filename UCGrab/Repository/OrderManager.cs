@@ -61,7 +61,7 @@ namespace UCGrab.Repository
             return order;
         }
 
-        public ErrorCode AddCart(String userId, int productId, int qty, ref String error)
+        public ErrorCode AddCart(String userId, int productId, int qty, decimal price, ref String error)
         {
             var product = _productMgr.GetProductById(productId);
             if (product == null)
@@ -69,30 +69,30 @@ namespace UCGrab.Repository
                 error = "Product not found";
                 return ErrorCode.Error;
             }
-            var order = GetOrCreateOrderByUserId(userId, product, ref error);
-            
-            var orderdet = GetOrderDetailByOrderId(order.order_id);
 
+            var order = GetOrCreateOrderByUserId(userId, product, ref error);
+            if (order == null)
+            {
+                error = "Unable to create or retrieve order.";
+                return ErrorCode.Error;
+            }
+
+            var orderdet = GetOrderDetailByOrderId(order.order_id);
 
             var result = AddUpdateCartQty(new Order_Detail
             {
                 order_id = order.order_id,
                 product_id = productId,
                 quatity = qty,
-                price = product.price,
+                price = price, // Use the price passed from the frontend
                 user_id = userId
-                }, order);
+            }, order);
 
-                return result;
-
-            
-
-
-            //if (result == ErrorCode.Error)
-            //{
-            //    error = Message;
-            //    return ErrorCode.Error;
-            //}
+            if (result == ErrorCode.Error)
+            {
+                error = "Failed to add/update cart.";
+                return ErrorCode.Error;
+            }
 
             return ErrorCode.Success;
         }

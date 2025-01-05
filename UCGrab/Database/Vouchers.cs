@@ -24,7 +24,7 @@ namespace UCGrab.Database
         public Nullable<int> remaining_uses { get; set; }
         public Nullable<System.DateTime> start_date { get; set; }
         public Nullable<System.DateTime> end_date { get; set; }
-        public Nullable<bool> is_active { get; set; }
+        public Nullable<int> is_active { get; set; }
     
         public virtual Store Store { get; set; }
     }

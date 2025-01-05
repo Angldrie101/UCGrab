@@ -16,10 +16,10 @@ namespace UCGrab.Database
     {
         public Store()
         {
+            this.Discounts = new HashSet<Discounts>();
             this.Image_Store = new HashSet<Image_Store>();
             this.Order = new HashSet<Order>();
             this.Product = new HashSet<Product>();
-            this.Discounts = new HashSet<Discounts>();
             this.Vouchers = new HashSet<Vouchers>();
         }
     
@@ -35,10 +35,10 @@ namespace UCGrab.Database
         public string operating_hours { get; set; }
         public Nullable<int> status { get; set; }
     
+        public virtual ICollection<Discounts> Discounts { get; set; }
         public virtual ICollection<Image_Store> Image_Store { get; set; }
         public virtual ICollection<Order> Order { get; set; }
         public virtual ICollection<Product> Product { get; set; }
-        public virtual ICollection<Discounts> Discounts { get; set; }
         public virtual ICollection<Vouchers> Vouchers { get; set; }
     }
 }

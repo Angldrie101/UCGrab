@@ -16,6 +16,7 @@ namespace UCGrab.Database
     {
         public Product()
         {
+            this.Discounts = new HashSet<Discounts>();
             this.Favorites = new HashSet<Favorites>();
             this.Image_Product = new HashSet<Image_Product>();
             this.Order_Detail = new HashSet<Order_Detail>();
@@ -35,6 +36,7 @@ namespace UCGrab.Database
         public Nullable<int> store_id { get; set; }
     
         public virtual Category Category { get; set; }
+        public virtual ICollection<Discounts> Discounts { get; set; }
         public virtual ICollection<Favorites> Favorites { get; set; }
         public virtual ICollection<Image_Product> Image_Product { get; set; }
         public virtual ICollection<Order_Detail> Order_Detail { get; set; }

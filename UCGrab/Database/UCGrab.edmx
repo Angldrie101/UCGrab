@@ -29,12 +29,13 @@
           </Key>
           <Property Name="discount_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="store_id" Type="int" />
+          <Property Name="product_id" Type="int" />
           <Property Name="discount_type" Type="varchar" MaxLength="50" />
           <Property Name="discount_value" Type="decimal" Precision="10" Scale="2" />
-          <Property Name="min_order_amount" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="min_product_amount" Type="decimal" Precision="10" Scale="2" />
           <Property Name="start_date" Type="datetime" />
           <Property Name="end_date" Type="datetime" />
-          <Property Name="is_active" Type="bit" />
+          <Property Name="is_active" Type="int" />
         </EntityType>
         <EntityType Name="Favorites">
           <Key>
@@ -211,7 +212,7 @@
           <Property Name="remaining_uses" Type="int" />
           <Property Name="start_date" Type="datetime" />
           <Property Name="end_date" Type="datetime" />
-          <Property Name="is_active" Type="bit" />
+          <Property Name="is_active" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -244,6 +245,18 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
             </Principal>
             <Dependent Role="ContactUs1">
               <PropertyRef Name="contact_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Discounts_Product">
+          <End Role="Product" Type="Self.Product" Multiplicity="0..1" />
+          <End Role="Discounts" Type="Self.Discounts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Discounts">
+              <PropertyRef Name="product_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -534,6 +547,10 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <End Role="ContactUs" EntitySet="ContactUs" />
             <End Role="ContactUs1" EntitySet="ContactUs" />
           </AssociationSet>
+          <AssociationSet Name="FK_Discounts_Product" Association="Self.FK_Discounts_Product">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="Discounts" EntitySet="Discounts" />
+          </AssociationSet>
           <AssociationSet Name="FK_Discounts_Store" Association="Self.FK_Discounts_Store">
             <End Role="Store" EntitySet="Store" />
             <End Role="Discounts" EntitySet="Discounts" />
@@ -619,15 +636,131 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="UCGrabModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="UCGrabEntities" annotation:LazyLoadingEnabled="true">
+          <FunctionImport Name="sp_getCartCountByUserId" ReturnType="Collection(Int32)">
+          <Parameter Name="user_id" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="Category" EntityType="UCGrabModel.Category" />
+          <EntitySet Name="ContactUs" EntityType="UCGrabModel.ContactUs" />
+          <EntitySet Name="Discounts" EntityType="UCGrabModel.Discounts" />
+          <EntitySet Name="Favorites" EntityType="UCGrabModel.Favorites" />
+          <EntitySet Name="File_Documents" EntityType="UCGrabModel.File_Documents" />
+          <EntitySet Name="Image" EntityType="UCGrabModel.Image" />
+          <EntitySet Name="Image_Product" EntityType="UCGrabModel.Image_Product" />
+          <EntitySet Name="Image_Store" EntityType="UCGrabModel.Image_Store" />
+          <EntitySet Name="Order" EntityType="UCGrabModel.Order" />
+          <EntitySet Name="Order_Detail" EntityType="UCGrabModel.Order_Detail" />
+          <EntitySet Name="Product" EntityType="UCGrabModel.Product" />
+          <EntitySet Name="Review" EntityType="UCGrabModel.Review" />
+          <EntitySet Name="Stock" EntityType="UCGrabModel.Stock" />
+          <EntitySet Name="Store" EntityType="UCGrabModel.Store" />
+          <EntitySet Name="User_Accounts" EntityType="UCGrabModel.User_Accounts" />
+          <EntitySet Name="User_Information" EntityType="UCGrabModel.User_Information" />
+          <EntitySet Name="User_Role" EntityType="UCGrabModel.User_Role" />
+          <EntitySet Name="Vouchers" EntityType="UCGrabModel.Vouchers" />
+          <EntitySet Name="vw_Role" EntityType="UCGrabModel.vw_Role" />
+          <AssociationSet Name="FK_Category_Category" Association="UCGrabModel.FK_Category_Category">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="Category1" EntitySet="Category" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Product_Category" Association="UCGrabModel.FK_Product_Category">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="Product" EntitySet="Product" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ContactUs_ContactUs" Association="UCGrabModel.FK_ContactUs_ContactUs">
+            <End Role="ContactUs" EntitySet="ContactUs" />
+            <End Role="ContactUs1" EntitySet="ContactUs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Discounts_Product" Association="UCGrabModel.FK_Discounts_Product">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="Discounts" EntitySet="Discounts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Discounts_Store" Association="UCGrabModel.FK_Discounts_Store">
+            <End Role="Store" EntitySet="Store" />
+            <End Role="Discounts" EntitySet="Discounts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Favorites_Favorites" Association="UCGrabModel.FK_Favorites_Favorites">
+            <End Role="Favorites" EntitySet="Favorites" />
+            <End Role="Favorites1" EntitySet="Favorites" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Favorites_Product" Association="UCGrabModel.FK_Favorites_Product">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="Favorites" EntitySet="Favorites" />
+          </AssociationSet>
+          <AssociationSet Name="FK_File_Documents_File_Documents" Association="UCGrabModel.FK_File_Documents_File_Documents">
+            <End Role="User_Accounts" EntitySet="User_Accounts" />
+            <End Role="File_Documents" EntitySet="File_Documents" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Image_User_Accounts" Association="UCGrabModel.FK_Image_User_Accounts">
+            <End Role="User_Information" EntitySet="User_Information" />
+            <End Role="Image" EntitySet="Image" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Product_Image_Product" Association="UCGrabModel.FK_Product_Image_Product">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="Image_Product" EntitySet="Image_Product" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Image_Store_Image_Store" Association="UCGrabModel.FK_Image_Store_Image_Store">
+            <End Role="Store" EntitySet="Store" />
+            <End Role="Image_Store" EntitySet="Image_Store" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Order_Detail_Order" Association="UCGrabModel.FK_Order_Detail_Order">
+            <End Role="Order" EntitySet="Order" />
+            <End Role="Order_Detail" EntitySet="Order_Detail" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Order_Review" Association="UCGrabModel.FK_Order_Review">
+            <End Role="Order" EntitySet="Order" />
+            <End Role="Review" EntitySet="Review" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Order_Store" Association="UCGrabModel.FK_Order_Store">
+            <End Role="Store" EntitySet="Store" />
+            <End Role="Order" EntitySet="Order" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Order_Detail_Product" Association="UCGrabModel.FK_Order_Detail_Product">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="Order_Detail" EntitySet="Order_Detail" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Product_Store" Association="UCGrabModel.FK_Product_Store">
+            <End Role="Store" EntitySet="Store" />
+            <End Role="Product" EntitySet="Product" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Stock_Product" Association="UCGrabModel.FK_Stock_Product">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="Stock" EntitySet="Stock" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Review_User_Information" Association="UCGrabModel.FK_Review_User_Information">
+            <End Role="User_Information" EntitySet="User_Information" />
+            <End Role="Review" EntitySet="Review" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Vouchers_Store" Association="UCGrabModel.FK_Vouchers_Store">
+            <End Role="Store" EntitySet="Store" />
+            <End Role="Vouchers" EntitySet="Vouchers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_User_Accounts_User_Accounts1" Association="UCGrabModel.FK_User_Accounts_User_Accounts1">
+            <End Role="User_Accounts" EntitySet="User_Accounts" />
+            <End Role="User_Accounts1" EntitySet="User_Accounts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_User_Accounts_User_Role" Association="UCGrabModel.FK_User_Accounts_User_Role">
+            <End Role="User_Role" EntitySet="User_Role" />
+            <End Role="User_Accounts" EntitySet="User_Accounts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_User_Role_User_Role" Association="UCGrabModel.FK_User_Role_User_Role">
+            <End Role="User_Role" EntitySet="User_Role" />
+            <End Role="User_Role1" EntitySet="User_Role" />
+          </AssociationSet>
+          <AssociationSet Name="FK_User_Role_User_Role1" Association="UCGrabModel.FK_User_Role_User_Role1">
+            <End Role="User_Role" EntitySet="User_Role" />
+            <End Role="User_Role1" EntitySet="User_Role" />
+          </AssociationSet>
+          </EntityContainer>
         <EntityType Name="Category">
           <Key>
             <PropertyRef Name="category_id" />
           </Key>
           <Property Name="category_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="category_name" Type="String" MaxLength="255" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="Category1" Relationship="Self.FK_Category_Category" FromRole="Category" ToRole="Category1" />
-          <NavigationProperty Name="Category2" Relationship="Self.FK_Category_Category" FromRole="Category1" ToRole="Category" />
-          <NavigationProperty Name="Product" Relationship="Self.FK_Product_Category" FromRole="Category" ToRole="Product" />
+          <Property Name="category_name" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Category1" Relationship="UCGrabModel.FK_Category_Category" FromRole="Category" ToRole="Category1" />
+          <NavigationProperty Name="Category2" Relationship="UCGrabModel.FK_Category_Category" FromRole="Category1" ToRole="Category" />
+          <NavigationProperty Name="Product" Relationship="UCGrabModel.FK_Product_Category" FromRole="Category" ToRole="Product" />
         </EntityType>
         <EntityType Name="ContactUs">
           <Key>
@@ -639,8 +772,24 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="subject" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="ContactUs1" Relationship="Self.FK_ContactUs_ContactUs" FromRole="ContactUs" ToRole="ContactUs1" />
-          <NavigationProperty Name="ContactUs2" Relationship="Self.FK_ContactUs_ContactUs" FromRole="ContactUs1" ToRole="ContactUs" />
+          <NavigationProperty Name="ContactUs1" Relationship="UCGrabModel.FK_ContactUs_ContactUs" FromRole="ContactUs" ToRole="ContactUs1" />
+          <NavigationProperty Name="ContactUs2" Relationship="UCGrabModel.FK_ContactUs_ContactUs" FromRole="ContactUs1" ToRole="ContactUs" />
+        </EntityType>
+        <EntityType Name="Discounts">
+          <Key>
+            <PropertyRef Name="discount_id" />
+          </Key>
+          <Property Name="discount_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="store_id" Type="Int32" />
+          <Property Name="product_id" Type="Int32" />
+          <Property Name="discount_type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="discount_value" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="min_product_amount" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="start_date" Type="DateTime" Precision="3" />
+          <Property Name="end_date" Type="DateTime" Precision="3" />
+          <Property Name="is_active" Type="Int32" />
+          <NavigationProperty Name="Product" Relationship="UCGrabModel.FK_Discounts_Product" FromRole="Discounts" ToRole="Product" />
+          <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Discounts_Store" FromRole="Discounts" ToRole="Store" />
         </EntityType>
         <EntityType Name="Favorites">
           <Key>
@@ -650,9 +799,9 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="product_id" Type="Int32" />
           <Property Name="user_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="quantity" Type="Int32" />
-          <NavigationProperty Name="Favorites1" Relationship="Self.FK_Favorites_Favorites" FromRole="Favorites" ToRole="Favorites1" />
-          <NavigationProperty Name="Favorites2" Relationship="Self.FK_Favorites_Favorites" FromRole="Favorites1" ToRole="Favorites" />
-          <NavigationProperty Name="Product" Relationship="Self.FK_Favorites_Product" FromRole="Favorites" ToRole="Product" />
+          <NavigationProperty Name="Favorites1" Relationship="UCGrabModel.FK_Favorites_Favorites" FromRole="Favorites" ToRole="Favorites1" />
+          <NavigationProperty Name="Favorites2" Relationship="UCGrabModel.FK_Favorites_Favorites" FromRole="Favorites1" ToRole="Favorites" />
+          <NavigationProperty Name="Product" Relationship="UCGrabModel.FK_Favorites_Product" FromRole="Favorites" ToRole="Product" />
         </EntityType>
         <EntityType Name="File_Documents">
           <Key>
@@ -661,7 +810,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="user_id" Type="Int32" />
           <Property Name="file_document" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="User_Accounts" Relationship="Self.FK_File_Documents_File_Documents" FromRole="File_Documents" ToRole="User_Accounts" />
+          <NavigationProperty Name="User_Accounts" Relationship="UCGrabModel.FK_File_Documents_File_Documents" FromRole="File_Documents" ToRole="User_Accounts" />
         </EntityType>
         <EntityType Name="Image">
           <Key>
@@ -670,7 +819,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="image_id" Type="Int32" />
           <Property Name="image_file" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="User_Information" Relationship="Self.FK_Image_User_Accounts" FromRole="Image" ToRole="User_Information" />
+          <NavigationProperty Name="User_Information" Relationship="UCGrabModel.FK_Image_User_Accounts" FromRole="Image" ToRole="User_Information" />
         </EntityType>
         <EntityType Name="Image_Product">
           <Key>
@@ -679,7 +828,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="product_id" Type="Int32" />
           <Property Name="image_file" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Product" Relationship="Self.FK_Product_Image_Product" FromRole="Image_Product" ToRole="Product" />
+          <NavigationProperty Name="Product" Relationship="UCGrabModel.FK_Product_Image_Product" FromRole="Image_Product" ToRole="Product" />
         </EntityType>
         <EntityType Name="Image_Store">
           <Key>
@@ -689,7 +838,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="store_id" Type="Int32" />
           <Property Name="image_file" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="qr_file" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Store" Relationship="Self.FK_Image_Store_Image_Store" FromRole="Image_Store" ToRole="Store" />
+          <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Image_Store_Image_Store" FromRole="Image_Store" ToRole="Store" />
         </EntityType>
         <EntityType Name="Order">
           <Key>
@@ -712,9 +861,9 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="delivery_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="gcash_receipt" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Order_Detail" Relationship="Self.FK_Order_Detail_Order" FromRole="Order" ToRole="Order_Detail" />
-          <NavigationProperty Name="Review" Relationship="Self.FK_Order_Review" FromRole="Order" ToRole="Review" />
-          <NavigationProperty Name="Store" Relationship="Self.FK_Order_Store" FromRole="Order" ToRole="Store" />
+          <NavigationProperty Name="Order_Detail" Relationship="UCGrabModel.FK_Order_Detail_Order" FromRole="Order" ToRole="Order_Detail" />
+          <NavigationProperty Name="Review" Relationship="UCGrabModel.FK_Order_Review" FromRole="Order" ToRole="Review" />
+          <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Order_Store" FromRole="Order" ToRole="Store" />
         </EntityType>
         <EntityType Name="Order_Detail">
           <Key>
@@ -726,8 +875,8 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="quatity" Type="Int32" />
           <Property Name="price" Type="Decimal" Precision="10" Scale="2" />
           <Property Name="user_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Order" Relationship="Self.FK_Order_Detail_Order" FromRole="Order_Detail" ToRole="Order" />
-          <NavigationProperty Name="Product" Relationship="Self.FK_Order_Detail_Product" FromRole="Order_Detail" ToRole="Product" />
+          <NavigationProperty Name="Order" Relationship="UCGrabModel.FK_Order_Detail_Order" FromRole="Order_Detail" ToRole="Order" />
+          <NavigationProperty Name="Product" Relationship="UCGrabModel.FK_Order_Detail_Product" FromRole="Order_Detail" ToRole="Product" />
         </EntityType>
         <EntityType Name="Product">
           <Key>
@@ -735,21 +884,22 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="product_id" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
-          <Property Name="product_name" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="product_description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="product_name" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="product_description" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="category_id" Type="Int32" Nullable="false" />
           <Property Name="size" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="price" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
+          <Property Name="price" Type="Decimal" Nullable="false" Precision="10" Scale="2" />
           <Property Name="date_created" Type="DateTime" Precision="0" />
           <Property Name="status" Type="Int32" Nullable="false" />
           <Property Name="user_id" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="store_id" Type="Int32" />
-          <NavigationProperty Name="Category" Relationship="Self.FK_Product_Category" FromRole="Product" ToRole="Category" />
-          <NavigationProperty Name="Favorites" Relationship="Self.FK_Favorites_Product" FromRole="Product" ToRole="Favorites" />
-          <NavigationProperty Name="Image_Product" Relationship="Self.FK_Product_Image_Product" FromRole="Product" ToRole="Image_Product" />
-          <NavigationProperty Name="Order_Detail" Relationship="Self.FK_Order_Detail_Product" FromRole="Product" ToRole="Order_Detail" />
-          <NavigationProperty Name="Store" Relationship="Self.FK_Product_Store" FromRole="Product" ToRole="Store" />
-          <NavigationProperty Name="Stock" Relationship="Self.FK_Stock_Product" FromRole="Product" ToRole="Stock" />
+          <NavigationProperty Name="Category" Relationship="UCGrabModel.FK_Product_Category" FromRole="Product" ToRole="Category" />
+          <NavigationProperty Name="Discounts" Relationship="UCGrabModel.FK_Discounts_Product" FromRole="Product" ToRole="Discounts" />
+          <NavigationProperty Name="Favorites" Relationship="UCGrabModel.FK_Favorites_Product" FromRole="Product" ToRole="Favorites" />
+          <NavigationProperty Name="Image_Product" Relationship="UCGrabModel.FK_Product_Image_Product" FromRole="Product" ToRole="Image_Product" />
+          <NavigationProperty Name="Order_Detail" Relationship="UCGrabModel.FK_Order_Detail_Product" FromRole="Product" ToRole="Order_Detail" />
+          <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Product_Store" FromRole="Product" ToRole="Store" />
+          <NavigationProperty Name="Stock" Relationship="UCGrabModel.FK_Stock_Product" FromRole="Product" ToRole="Stock" />
         </EntityType>
         <EntityType Name="Review">
           <Key>
@@ -761,8 +911,8 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="rating" Type="Int32" />
           <Property Name="comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="review_date" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="Order" Relationship="Self.FK_Order_Review" FromRole="Review" ToRole="Order" />
-          <NavigationProperty Name="User_Information" Relationship="Self.FK_Review_User_Information" FromRole="Review" ToRole="User_Information" />
+          <NavigationProperty Name="Order" Relationship="UCGrabModel.FK_Order_Review" FromRole="Review" ToRole="Order" />
+          <NavigationProperty Name="User_Information" Relationship="UCGrabModel.FK_Review_User_Information" FromRole="Review" ToRole="User_Information" />
         </EntityType>
         <EntityType Name="Stock">
           <Key>
@@ -771,7 +921,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="stock_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="product_id" Type="Int32" Nullable="false" />
           <Property Name="quantity" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Product" Relationship="Self.FK_Stock_Product" FromRole="Stock" ToRole="Product" />
+          <NavigationProperty Name="Product" Relationship="UCGrabModel.FK_Stock_Product" FromRole="Stock" ToRole="Product" />
         </EntityType>
         <EntityType Name="Store">
           <Key>
@@ -788,10 +938,10 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="gnumber" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="operating_hours" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="status" Type="Int32" />
-          <NavigationProperty Name="Image_Store" Relationship="Self.FK_Image_Store_Image_Store" FromRole="Store" ToRole="Image_Store" />
-          <NavigationProperty Name="Order" Relationship="Self.FK_Order_Store" FromRole="Store" ToRole="Order" />
-          <NavigationProperty Name="Product" Relationship="Self.FK_Product_Store" FromRole="Store" ToRole="Product" />
           <NavigationProperty Name="Discounts" Relationship="UCGrabModel.FK_Discounts_Store" FromRole="Store" ToRole="Discounts" />
+          <NavigationProperty Name="Image_Store" Relationship="UCGrabModel.FK_Image_Store_Image_Store" FromRole="Store" ToRole="Image_Store" />
+          <NavigationProperty Name="Order" Relationship="UCGrabModel.FK_Order_Store" FromRole="Store" ToRole="Order" />
+          <NavigationProperty Name="Product" Relationship="UCGrabModel.FK_Product_Store" FromRole="Store" ToRole="Product" />
           <NavigationProperty Name="Vouchers" Relationship="UCGrabModel.FK_Vouchers_Store" FromRole="Store" ToRole="Vouchers" />
         </EntityType>
         <EntityType Name="User_Accounts">
@@ -808,10 +958,10 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="verify_code" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="date_created" Type="DateTime" Precision="3" />
           <Property Name="date_modified" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="File_Documents" Relationship="Self.FK_File_Documents_File_Documents" FromRole="User_Accounts" ToRole="File_Documents" />
-          <NavigationProperty Name="User_Accounts1" Relationship="Self.FK_User_Accounts_User_Accounts1" FromRole="User_Accounts" ToRole="User_Accounts1" />
-          <NavigationProperty Name="User_Accounts2" Relationship="Self.FK_User_Accounts_User_Accounts1" FromRole="User_Accounts1" ToRole="User_Accounts" />
-          <NavigationProperty Name="User_Role" Relationship="Self.FK_User_Accounts_User_Role" FromRole="User_Accounts" ToRole="User_Role" />
+          <NavigationProperty Name="File_Documents" Relationship="UCGrabModel.FK_File_Documents_File_Documents" FromRole="User_Accounts" ToRole="File_Documents" />
+          <NavigationProperty Name="User_Accounts1" Relationship="UCGrabModel.FK_User_Accounts_User_Accounts1" FromRole="User_Accounts" ToRole="User_Accounts1" />
+          <NavigationProperty Name="User_Accounts2" Relationship="UCGrabModel.FK_User_Accounts_User_Accounts1" FromRole="User_Accounts1" ToRole="User_Accounts" />
+          <NavigationProperty Name="User_Role" Relationship="UCGrabModel.FK_User_Accounts_User_Role" FromRole="User_Accounts" ToRole="User_Role" />
         </EntityType>
         <EntityType Name="User_Information">
           <Key>
@@ -825,8 +975,8 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="status" Type="Int32" />
           <Property Name="store_id" Type="Int32" />
-          <NavigationProperty Name="Image" Relationship="Self.FK_Image_User_Accounts" FromRole="User_Information" ToRole="Image" />
-          <NavigationProperty Name="Review" Relationship="Self.FK_Review_User_Information" FromRole="User_Information" ToRole="Review" />
+          <NavigationProperty Name="Image" Relationship="UCGrabModel.FK_Image_User_Accounts" FromRole="User_Information" ToRole="Image" />
+          <NavigationProperty Name="Review" Relationship="UCGrabModel.FK_Review_User_Information" FromRole="User_Information" ToRole="Review" />
         </EntityType>
         <EntityType Name="User_Role">
           <Key>
@@ -834,395 +984,11 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </Key>
           <Property Name="role_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="rolename" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="User_Accounts" Relationship="Self.FK_User_Accounts_User_Role" FromRole="User_Role" ToRole="User_Accounts" />
-          <NavigationProperty Name="User_Role1" Relationship="Self.FK_User_Role_User_Role" FromRole="User_Role" ToRole="User_Role1" />
-          <NavigationProperty Name="User_Role2" Relationship="Self.FK_User_Role_User_Role" FromRole="User_Role1" ToRole="User_Role" />
-          <NavigationProperty Name="User_Role11" Relationship="Self.FK_User_Role_User_Role1" FromRole="User_Role" ToRole="User_Role1" />
-          <NavigationProperty Name="User_Role3" Relationship="Self.FK_User_Role_User_Role1" FromRole="User_Role1" ToRole="User_Role" />
-        </EntityType>
-        <EntityType Name="vw_Role">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" />
-          <Property Name="username" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="rolename" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <Association Name="FK_Category_Category">
-          <End Role="Category" Type="Self.Category" Multiplicity="1" />
-          <End Role="Category1" Type="Self.Category" Multiplicity="0..1" />
-          <ReferentialConstraint>
-            <Principal Role="Category">
-              <PropertyRef Name="category_id" />
-            </Principal>
-            <Dependent Role="Category1">
-              <PropertyRef Name="category_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Product_Category">
-          <End Role="Category" Type="Self.Category" Multiplicity="1" />
-          <End Role="Product" Type="Self.Product" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Category">
-              <PropertyRef Name="category_id" />
-            </Principal>
-            <Dependent Role="Product">
-              <PropertyRef Name="category_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ContactUs_ContactUs">
-          <End Role="ContactUs" Type="Self.ContactUs" Multiplicity="1" />
-          <End Role="ContactUs1" Type="Self.ContactUs" Multiplicity="0..1" />
-          <ReferentialConstraint>
-            <Principal Role="ContactUs">
-              <PropertyRef Name="contact_id" />
-            </Principal>
-            <Dependent Role="ContactUs1">
-              <PropertyRef Name="contact_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Favorites_Favorites">
-          <End Role="Favorites" Type="Self.Favorites" Multiplicity="1" />
-          <End Role="Favorites1" Type="Self.Favorites" Multiplicity="0..1" />
-          <ReferentialConstraint>
-            <Principal Role="Favorites">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Favorites1">
-              <PropertyRef Name="id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Favorites_Product">
-          <End Role="Product" Type="Self.Product" Multiplicity="0..1" />
-          <End Role="Favorites" Type="Self.Favorites" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Product">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Favorites">
-              <PropertyRef Name="product_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_File_Documents_File_Documents">
-          <End Role="User_Accounts" Type="Self.User_Accounts" Multiplicity="0..1" />
-          <End Role="File_Documents" Type="Self.File_Documents" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User_Accounts">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="File_Documents">
-              <PropertyRef Name="user_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Image_User_Accounts">
-          <End Role="User_Information" Type="Self.User_Information" Multiplicity="0..1" />
-          <End Role="Image" Type="Self.Image" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User_Information">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Image">
-              <PropertyRef Name="image_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Product_Image_Product">
-          <End Role="Product" Type="Self.Product" Multiplicity="0..1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="Image_Product" Type="Self.Image_Product" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Product">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Image_Product">
-              <PropertyRef Name="product_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Image_Store_Image_Store">
-          <End Role="Store" Type="Self.Store" Multiplicity="0..1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="Image_Store" Type="Self.Image_Store" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Store">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Image_Store">
-              <PropertyRef Name="store_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Order_Detail_Order">
-          <End Role="Order" Type="Self.Order" Multiplicity="0..1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="Order_Detail" Type="Self.Order_Detail" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Order">
-              <PropertyRef Name="order_id" />
-            </Principal>
-            <Dependent Role="Order_Detail">
-              <PropertyRef Name="order_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Order_Review">
-          <End Role="Order" Type="Self.Order" Multiplicity="0..1" />
-          <End Role="Review" Type="Self.Review" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Order">
-              <PropertyRef Name="order_id" />
-            </Principal>
-            <Dependent Role="Review">
-              <PropertyRef Name="order_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Order_Store">
-          <End Role="Store" Type="Self.Store" Multiplicity="0..1" />
-          <End Role="Order" Type="Self.Order" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Store">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Order">
-              <PropertyRef Name="store_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Order_Detail_Product">
-          <End Role="Product" Type="Self.Product" Multiplicity="0..1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="Order_Detail" Type="Self.Order_Detail" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Product">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Order_Detail">
-              <PropertyRef Name="product_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Product_Store">
-          <End Role="Store" Type="Self.Store" Multiplicity="0..1" />
-          <End Role="Product" Type="Self.Product" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Store">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Product">
-              <PropertyRef Name="store_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Stock_Product">
-          <End Role="Product" Type="Self.Product" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="Stock" Type="Self.Stock" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Product">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Stock">
-              <PropertyRef Name="product_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Review_User_Information">
-          <End Role="User_Information" Type="Self.User_Information" Multiplicity="0..1" />
-          <End Role="Review" Type="Self.Review" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User_Information">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Review">
-              <PropertyRef Name="user_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_User_Accounts_User_Accounts1">
-          <End Role="User_Accounts" Type="Self.User_Accounts" Multiplicity="1" />
-          <End Role="User_Accounts1" Type="Self.User_Accounts" Multiplicity="0..1" />
-          <ReferentialConstraint>
-            <Principal Role="User_Accounts">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="User_Accounts1">
-              <PropertyRef Name="id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_User_Accounts_User_Role">
-          <End Role="User_Role" Type="Self.User_Role" Multiplicity="0..1" />
-          <End Role="User_Accounts" Type="Self.User_Accounts" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User_Role">
-              <PropertyRef Name="role_id" />
-            </Principal>
-            <Dependent Role="User_Accounts">
-              <PropertyRef Name="role_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_User_Role_User_Role">
-          <End Role="User_Role" Type="Self.User_Role" Multiplicity="1" />
-          <End Role="User_Role1" Type="Self.User_Role" Multiplicity="0..1" />
-          <ReferentialConstraint>
-            <Principal Role="User_Role">
-              <PropertyRef Name="role_id" />
-            </Principal>
-            <Dependent Role="User_Role1">
-              <PropertyRef Name="role_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_User_Role_User_Role1">
-          <End Role="User_Role" Type="Self.User_Role" Multiplicity="1" />
-          <End Role="User_Role1" Type="Self.User_Role" Multiplicity="0..1" />
-          <ReferentialConstraint>
-            <Principal Role="User_Role">
-              <PropertyRef Name="role_id" />
-            </Principal>
-            <Dependent Role="User_Role1">
-              <PropertyRef Name="role_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityContainer Name="UCGrabEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Category" EntityType="Self.Category" />
-          <EntitySet Name="ContactUs" EntityType="Self.ContactUs" />
-          <EntitySet Name="Favorites" EntityType="Self.Favorites" />
-          <EntitySet Name="File_Documents" EntityType="Self.File_Documents" />
-          <EntitySet Name="Image" EntityType="Self.Image" />
-          <EntitySet Name="Image_Product" EntityType="Self.Image_Product" />
-          <EntitySet Name="Image_Store" EntityType="Self.Image_Store" />
-          <EntitySet Name="Order" EntityType="Self.Order" />
-          <EntitySet Name="Order_Detail" EntityType="Self.Order_Detail" />
-          <EntitySet Name="Product" EntityType="Self.Product" />
-          <EntitySet Name="Review" EntityType="Self.Review" />
-          <EntitySet Name="Stock" EntityType="Self.Stock" />
-          <EntitySet Name="Store" EntityType="Self.Store" />
-          <EntitySet Name="User_Accounts" EntityType="Self.User_Accounts" />
-          <EntitySet Name="User_Information" EntityType="Self.User_Information" />
-          <EntitySet Name="User_Role" EntityType="Self.User_Role" />
-          <EntitySet Name="vw_Role" EntityType="Self.vw_Role" />
-          <AssociationSet Name="FK_Category_Category" Association="Self.FK_Category_Category">
-            <End Role="Category" EntitySet="Category" />
-            <End Role="Category1" EntitySet="Category" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Product_Category" Association="Self.FK_Product_Category">
-            <End Role="Category" EntitySet="Category" />
-            <End Role="Product" EntitySet="Product" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ContactUs_ContactUs" Association="Self.FK_ContactUs_ContactUs">
-            <End Role="ContactUs" EntitySet="ContactUs" />
-            <End Role="ContactUs1" EntitySet="ContactUs" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Favorites_Favorites" Association="Self.FK_Favorites_Favorites">
-            <End Role="Favorites" EntitySet="Favorites" />
-            <End Role="Favorites1" EntitySet="Favorites" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Favorites_Product" Association="Self.FK_Favorites_Product">
-            <End Role="Product" EntitySet="Product" />
-            <End Role="Favorites" EntitySet="Favorites" />
-          </AssociationSet>
-          <AssociationSet Name="FK_File_Documents_File_Documents" Association="Self.FK_File_Documents_File_Documents">
-            <End Role="User_Accounts" EntitySet="User_Accounts" />
-            <End Role="File_Documents" EntitySet="File_Documents" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Image_User_Accounts" Association="Self.FK_Image_User_Accounts">
-            <End Role="User_Information" EntitySet="User_Information" />
-            <End Role="Image" EntitySet="Image" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Product_Image_Product" Association="Self.FK_Product_Image_Product">
-            <End Role="Product" EntitySet="Product" />
-            <End Role="Image_Product" EntitySet="Image_Product" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Image_Store_Image_Store" Association="Self.FK_Image_Store_Image_Store">
-            <End Role="Store" EntitySet="Store" />
-            <End Role="Image_Store" EntitySet="Image_Store" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Order_Detail_Order" Association="Self.FK_Order_Detail_Order">
-            <End Role="Order" EntitySet="Order" />
-            <End Role="Order_Detail" EntitySet="Order_Detail" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Order_Review" Association="Self.FK_Order_Review">
-            <End Role="Order" EntitySet="Order" />
-            <End Role="Review" EntitySet="Review" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Order_Store" Association="Self.FK_Order_Store">
-            <End Role="Store" EntitySet="Store" />
-            <End Role="Order" EntitySet="Order" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Order_Detail_Product" Association="Self.FK_Order_Detail_Product">
-            <End Role="Product" EntitySet="Product" />
-            <End Role="Order_Detail" EntitySet="Order_Detail" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Product_Store" Association="Self.FK_Product_Store">
-            <End Role="Store" EntitySet="Store" />
-            <End Role="Product" EntitySet="Product" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Stock_Product" Association="Self.FK_Stock_Product">
-            <End Role="Product" EntitySet="Product" />
-            <End Role="Stock" EntitySet="Stock" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Review_User_Information" Association="Self.FK_Review_User_Information">
-            <End Role="User_Information" EntitySet="User_Information" />
-            <End Role="Review" EntitySet="Review" />
-          </AssociationSet>
-          <AssociationSet Name="FK_User_Accounts_User_Accounts1" Association="Self.FK_User_Accounts_User_Accounts1">
-            <End Role="User_Accounts" EntitySet="User_Accounts" />
-            <End Role="User_Accounts1" EntitySet="User_Accounts" />
-          </AssociationSet>
-          <AssociationSet Name="FK_User_Accounts_User_Role" Association="Self.FK_User_Accounts_User_Role">
-            <End Role="User_Role" EntitySet="User_Role" />
-            <End Role="User_Accounts" EntitySet="User_Accounts" />
-          </AssociationSet>
-          <AssociationSet Name="FK_User_Role_User_Role" Association="Self.FK_User_Role_User_Role">
-            <End Role="User_Role" EntitySet="User_Role" />
-            <End Role="User_Role1" EntitySet="User_Role" />
-          </AssociationSet>
-          <AssociationSet Name="FK_User_Role_User_Role1" Association="Self.FK_User_Role_User_Role1">
-            <End Role="User_Role" EntitySet="User_Role" />
-            <End Role="User_Role1" EntitySet="User_Role" />
-          </AssociationSet>
-          <FunctionImport Name="sp_getCartCountByUserId" ReturnType="Collection(Int32)">
-          <Parameter Name="user_id" Mode="In" Type="String" />
-          </FunctionImport>
-          <EntitySet Name="Discounts" EntityType="UCGrabModel.Discounts" />
-          <EntitySet Name="Vouchers" EntityType="UCGrabModel.Vouchers" />
-          <AssociationSet Name="FK_Discounts_Store" Association="UCGrabModel.FK_Discounts_Store">
-            <End Role="Store" EntitySet="Store" />
-            <End Role="Discounts" EntitySet="Discounts" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Vouchers_Store" Association="UCGrabModel.FK_Vouchers_Store">
-            <End Role="Store" EntitySet="Store" />
-            <End Role="Vouchers" EntitySet="Vouchers" />
-          </AssociationSet>
-        </EntityContainer>
-        <EntityType Name="Discounts">
-          <Key>
-            <PropertyRef Name="discount_id" />
-          </Key>
-          <Property Name="discount_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="store_id" Type="Int32" />
-          <Property Name="discount_type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="discount_value" Type="Decimal" Precision="10" Scale="2" />
-          <Property Name="min_order_amount" Type="Decimal" Precision="10" Scale="2" />
-          <Property Name="start_date" Type="DateTime" Precision="3" />
-          <Property Name="end_date" Type="DateTime" Precision="3" />
-          <Property Name="is_active" Type="Boolean" />
-          <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Discounts_Store" FromRole="Discounts" ToRole="Store" />
+          <NavigationProperty Name="User_Accounts" Relationship="UCGrabModel.FK_User_Accounts_User_Role" FromRole="User_Role" ToRole="User_Accounts" />
+          <NavigationProperty Name="User_Role1" Relationship="UCGrabModel.FK_User_Role_User_Role" FromRole="User_Role" ToRole="User_Role1" />
+          <NavigationProperty Name="User_Role2" Relationship="UCGrabModel.FK_User_Role_User_Role" FromRole="User_Role1" ToRole="User_Role" />
+          <NavigationProperty Name="User_Role11" Relationship="UCGrabModel.FK_User_Role_User_Role1" FromRole="User_Role" ToRole="User_Role1" />
+          <NavigationProperty Name="User_Role3" Relationship="UCGrabModel.FK_User_Role_User_Role1" FromRole="User_Role1" ToRole="User_Role" />
         </EntityType>
         <EntityType Name="Vouchers">
           <Key>
@@ -1238,9 +1004,65 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="remaining_uses" Type="Int32" />
           <Property Name="start_date" Type="DateTime" Precision="3" />
           <Property Name="end_date" Type="DateTime" Precision="3" />
-          <Property Name="is_active" Type="Boolean" />
+          <Property Name="is_active" Type="Int32" />
           <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Vouchers_Store" FromRole="Vouchers" ToRole="Store" />
         </EntityType>
+        <EntityType Name="vw_Role">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="username" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="rolename" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <Association Name="FK_Category_Category">
+          <End Type="UCGrabModel.Category" Role="Category" Multiplicity="1" />
+          <End Type="UCGrabModel.Category" Role="Category1" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="category_id" />
+            </Principal>
+            <Dependent Role="Category1">
+              <PropertyRef Name="category_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Product_Category">
+          <End Type="UCGrabModel.Category" Role="Category" Multiplicity="1" />
+          <End Type="UCGrabModel.Product" Role="Product" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="category_id" />
+            </Principal>
+            <Dependent Role="Product">
+              <PropertyRef Name="category_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ContactUs_ContactUs">
+          <End Type="UCGrabModel.ContactUs" Role="ContactUs" Multiplicity="1" />
+          <End Type="UCGrabModel.ContactUs" Role="ContactUs1" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="ContactUs">
+              <PropertyRef Name="contact_id" />
+            </Principal>
+            <Dependent Role="ContactUs1">
+              <PropertyRef Name="contact_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Discounts_Product">
+          <End Type="UCGrabModel.Product" Role="Product" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Discounts" Role="Discounts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Discounts">
+              <PropertyRef Name="product_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Discounts_Store">
           <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1" />
           <End Type="UCGrabModel.Discounts" Role="Discounts" Multiplicity="*" />
@@ -1250,6 +1072,172 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             </Principal>
             <Dependent Role="Discounts">
               <PropertyRef Name="store_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Favorites_Favorites">
+          <End Type="UCGrabModel.Favorites" Role="Favorites" Multiplicity="1" />
+          <End Type="UCGrabModel.Favorites" Role="Favorites1" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Favorites">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Favorites1">
+              <PropertyRef Name="id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Favorites_Product">
+          <End Type="UCGrabModel.Product" Role="Product" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Favorites" Role="Favorites" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Favorites">
+              <PropertyRef Name="product_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_File_Documents_File_Documents">
+          <End Type="UCGrabModel.User_Accounts" Role="User_Accounts" Multiplicity="0..1" />
+          <End Type="UCGrabModel.File_Documents" Role="File_Documents" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User_Accounts">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="File_Documents">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Image_User_Accounts">
+          <End Type="UCGrabModel.User_Information" Role="User_Information" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Image" Role="Image" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User_Information">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Image">
+              <PropertyRef Name="image_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Product_Image_Product">
+          <End Type="UCGrabModel.Product" Role="Product" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="UCGrabModel.Image_Product" Role="Image_Product" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Image_Product">
+              <PropertyRef Name="product_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Image_Store_Image_Store">
+          <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="UCGrabModel.Image_Store" Role="Image_Store" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Store">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Image_Store">
+              <PropertyRef Name="store_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Order_Detail_Order">
+          <End Type="UCGrabModel.Order" Role="Order" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="UCGrabModel.Order_Detail" Role="Order_Detail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Order">
+              <PropertyRef Name="order_id" />
+            </Principal>
+            <Dependent Role="Order_Detail">
+              <PropertyRef Name="order_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Order_Review">
+          <End Type="UCGrabModel.Order" Role="Order" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Review" Role="Review" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Order">
+              <PropertyRef Name="order_id" />
+            </Principal>
+            <Dependent Role="Review">
+              <PropertyRef Name="order_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Order_Store">
+          <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Order" Role="Order" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Store">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Order">
+              <PropertyRef Name="store_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Order_Detail_Product">
+          <End Type="UCGrabModel.Product" Role="Product" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="UCGrabModel.Order_Detail" Role="Order_Detail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Order_Detail">
+              <PropertyRef Name="product_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Product_Store">
+          <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Product" Role="Product" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Store">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Product">
+              <PropertyRef Name="store_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Stock_Product">
+          <End Type="UCGrabModel.Product" Role="Product" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="UCGrabModel.Stock" Role="Stock" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Stock">
+              <PropertyRef Name="product_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Review_User_Information">
+          <End Type="UCGrabModel.User_Information" Role="User_Information" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Review" Role="Review" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User_Information">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Review">
+              <PropertyRef Name="user_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1265,228 +1253,268 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             </Dependent>
           </ReferentialConstraint>
         </Association>
-      </Schema>
+        <Association Name="FK_User_Accounts_User_Accounts1">
+          <End Type="UCGrabModel.User_Accounts" Role="User_Accounts" Multiplicity="1" />
+          <End Type="UCGrabModel.User_Accounts" Role="User_Accounts1" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="User_Accounts">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="User_Accounts1">
+              <PropertyRef Name="id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_User_Accounts_User_Role">
+          <End Type="UCGrabModel.User_Role" Role="User_Role" Multiplicity="0..1" />
+          <End Type="UCGrabModel.User_Accounts" Role="User_Accounts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User_Role">
+              <PropertyRef Name="role_id" />
+            </Principal>
+            <Dependent Role="User_Accounts">
+              <PropertyRef Name="role_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_User_Role_User_Role">
+          <End Type="UCGrabModel.User_Role" Role="User_Role" Multiplicity="1" />
+          <End Type="UCGrabModel.User_Role" Role="User_Role1" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="User_Role">
+              <PropertyRef Name="role_id" />
+            </Principal>
+            <Dependent Role="User_Role1">
+              <PropertyRef Name="role_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_User_Role_User_Role1">
+          <End Type="UCGrabModel.User_Role" Role="User_Role" Multiplicity="1" />
+          <End Type="UCGrabModel.User_Role" Role="User_Role1" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="User_Role">
+              <PropertyRef Name="role_id" />
+            </Principal>
+            <Dependent Role="User_Role1">
+              <PropertyRef Name="role_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="UCGrabModelStoreContainer" CdmEntityContainer="UCGrabEntities">
+          <FunctionImportMapping FunctionImportName="sp_getCartCountByUserId" FunctionName="UCGrabModel.Store.sp_getCartCountByUserId" />
           <EntitySetMapping Name="Category">
             <EntityTypeMapping TypeName="UCGrabModel.Category">
               <MappingFragment StoreEntitySet="Category">
-                <ScalarProperty Name="category_id" ColumnName="category_id" />
                 <ScalarProperty Name="category_name" ColumnName="category_name" />
+                <ScalarProperty Name="category_id" ColumnName="category_id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="ContactUs">
             <EntityTypeMapping TypeName="UCGrabModel.ContactUs">
               <MappingFragment StoreEntitySet="ContactUs">
-                <ScalarProperty Name="contact_id" ColumnName="contact_id" />
-                <ScalarProperty Name="user_id" ColumnName="user_id" />
-                <ScalarProperty Name="name" ColumnName="name" />
-                <ScalarProperty Name="email" ColumnName="email" />
-                <ScalarProperty Name="subject" ColumnName="subject" />
                 <ScalarProperty Name="description" ColumnName="description" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Favorites">
-            <EntityTypeMapping TypeName="UCGrabModel.Favorites">
-              <MappingFragment StoreEntitySet="Favorites">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="product_id" ColumnName="product_id" />
-                <ScalarProperty Name="user_id" ColumnName="user_id" />
-                <ScalarProperty Name="quantity" ColumnName="quantity" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="File_Documents">
-            <EntityTypeMapping TypeName="UCGrabModel.File_Documents">
-              <MappingFragment StoreEntitySet="File_Documents">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="user_id" ColumnName="user_id" />
-                <ScalarProperty Name="file_document" ColumnName="file_document" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Image">
-            <EntityTypeMapping TypeName="UCGrabModel.Image">
-              <MappingFragment StoreEntitySet="Image">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="image_id" ColumnName="image_id" />
-                <ScalarProperty Name="image_file" ColumnName="image_file" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Image_Product">
-            <EntityTypeMapping TypeName="UCGrabModel.Image_Product">
-              <MappingFragment StoreEntitySet="Image_Product">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="product_id" ColumnName="product_id" />
-                <ScalarProperty Name="image_file" ColumnName="image_file" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Image_Store">
-            <EntityTypeMapping TypeName="UCGrabModel.Image_Store">
-              <MappingFragment StoreEntitySet="Image_Store">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="store_id" ColumnName="store_id" />
-                <ScalarProperty Name="image_file" ColumnName="image_file" />
-                <ScalarProperty Name="qr_file" ColumnName="qr_file" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Order">
-            <EntityTypeMapping TypeName="UCGrabModel.Order">
-              <MappingFragment StoreEntitySet="Order">
-                <ScalarProperty Name="order_id" ColumnName="order_id" />
-                <ScalarProperty Name="user_id" ColumnName="user_id" />
-                <ScalarProperty Name="order_status" ColumnName="order_status" />
-                <ScalarProperty Name="store_id" ColumnName="store_id" />
-                <ScalarProperty Name="order_date" ColumnName="order_date" />
-                <ScalarProperty Name="shipped_date" ColumnName="shipped_date" />
-                <ScalarProperty Name="building" ColumnName="building" />
-                <ScalarProperty Name="room" ColumnName="room" />
-                <ScalarProperty Name="payment_method" ColumnName="payment_method" />
-                <ScalarProperty Name="additional_info" ColumnName="additional_info" />
-                <ScalarProperty Name="checkOut_option" ColumnName="checkOut_option" />
-                <ScalarProperty Name="firstname" ColumnName="firstname" />
-                <ScalarProperty Name="lastname" ColumnName="lastname" />
-                <ScalarProperty Name="phone" ColumnName="phone" />
+                <ScalarProperty Name="subject" ColumnName="subject" />
                 <ScalarProperty Name="email" ColumnName="email" />
-                <ScalarProperty Name="delivery_id" ColumnName="delivery_id" />
-                <ScalarProperty Name="gcash_receipt" ColumnName="gcash_receipt" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Order_Detail">
-            <EntityTypeMapping TypeName="UCGrabModel.Order_Detail">
-              <MappingFragment StoreEntitySet="Order_Detail">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="order_id" ColumnName="order_id" />
-                <ScalarProperty Name="product_id" ColumnName="product_id" />
-                <ScalarProperty Name="quatity" ColumnName="quatity" />
-                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="contact_id" ColumnName="contact_id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Product">
-            <EntityTypeMapping TypeName="UCGrabModel.Product">
-              <MappingFragment StoreEntitySet="Product">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="product_id" ColumnName="product_id" />
-                <ScalarProperty Name="product_name" ColumnName="product_name" />
-                <ScalarProperty Name="product_description" ColumnName="product_description" />
-                <ScalarProperty Name="category_id" ColumnName="category_id" />
-                <ScalarProperty Name="size" ColumnName="size" />
-                <ScalarProperty Name="price" ColumnName="price" />
-                <ScalarProperty Name="date_created" ColumnName="date_created" />
-                <ScalarProperty Name="status" ColumnName="status" />
-                <ScalarProperty Name="user_id" ColumnName="user_id" />
-                <ScalarProperty Name="store_id" ColumnName="store_id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Review">
-            <EntityTypeMapping TypeName="UCGrabModel.Review">
-              <MappingFragment StoreEntitySet="Review">
-                <ScalarProperty Name="review_id" ColumnName="review_id" />
-                <ScalarProperty Name="order_id" ColumnName="order_id" />
-                <ScalarProperty Name="user_id" ColumnName="user_id" />
-                <ScalarProperty Name="rating" ColumnName="rating" />
-                <ScalarProperty Name="comment" ColumnName="comment" />
-                <ScalarProperty Name="review_date" ColumnName="review_date" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Stock">
-            <EntityTypeMapping TypeName="UCGrabModel.Stock">
-              <MappingFragment StoreEntitySet="Stock">
-                <ScalarProperty Name="stock_id" ColumnName="stock_id" />
-                <ScalarProperty Name="product_id" ColumnName="product_id" />
-                <ScalarProperty Name="quantity" ColumnName="quantity" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Store">
-            <EntityTypeMapping TypeName="UCGrabModel.Store">
-              <MappingFragment StoreEntitySet="Store">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="store_id" ColumnName="store_id" />
-                <ScalarProperty Name="user_id" ColumnName="user_id" />
-                <ScalarProperty Name="store_name" ColumnName="store_name" />
-                <ScalarProperty Name="store_description" ColumnName="store_description" />
-                <ScalarProperty Name="store_address" ColumnName="store_address" />
-                <ScalarProperty Name="phone" ColumnName="phone" />
-                <ScalarProperty Name="email" ColumnName="email" />
-                <ScalarProperty Name="gnumber" ColumnName="gnumber" />
-                <ScalarProperty Name="operating_hours" ColumnName="operating_hours" />
-                <ScalarProperty Name="status" ColumnName="status" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="User_Accounts">
-            <EntityTypeMapping TypeName="UCGrabModel.User_Accounts">
-              <MappingFragment StoreEntitySet="User_Accounts">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="user_id" ColumnName="user_id" />
-                <ScalarProperty Name="username" ColumnName="username" />
-                <ScalarProperty Name="password" ColumnName="password" />
-                <ScalarProperty Name="email" ColumnName="email" />
-                <ScalarProperty Name="role_id" ColumnName="role_id" />
-                <ScalarProperty Name="status" ColumnName="status" />
-                <ScalarProperty Name="verify_code" ColumnName="verify_code" />
-                <ScalarProperty Name="date_created" ColumnName="date_created" />
-                <ScalarProperty Name="date_modified" ColumnName="date_modified" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="User_Information">
-            <EntityTypeMapping TypeName="UCGrabModel.User_Information">
-              <MappingFragment StoreEntitySet="User_Information">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="user_id" ColumnName="user_id" />
-                <ScalarProperty Name="last_name" ColumnName="last_name" />
-                <ScalarProperty Name="first_name" ColumnName="first_name" />
-                <ScalarProperty Name="phone" ColumnName="phone" />
-                <ScalarProperty Name="email" ColumnName="email" />
-                <ScalarProperty Name="status" ColumnName="status" />
-                <ScalarProperty Name="store_id" ColumnName="store_id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="User_Role">
-            <EntityTypeMapping TypeName="UCGrabModel.User_Role">
-              <MappingFragment StoreEntitySet="User_Role">
-                <ScalarProperty Name="role_id" ColumnName="role_id" />
-                <ScalarProperty Name="rolename" ColumnName="rolename" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="vw_Role">
-            <EntityTypeMapping TypeName="UCGrabModel.vw_Role">
-              <MappingFragment StoreEntitySet="vw_Role">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="username" ColumnName="username" />
-                <ScalarProperty Name="rolename" ColumnName="rolename" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="sp_getCartCountByUserId" FunctionName="UCGrabModel.Store.sp_getCartCountByUserId" />
           <EntitySetMapping Name="Discounts">
             <EntityTypeMapping TypeName="UCGrabModel.Discounts">
               <MappingFragment StoreEntitySet="Discounts">
                 <ScalarProperty Name="is_active" ColumnName="is_active" />
                 <ScalarProperty Name="end_date" ColumnName="end_date" />
                 <ScalarProperty Name="start_date" ColumnName="start_date" />
-                <ScalarProperty Name="min_order_amount" ColumnName="min_order_amount" />
+                <ScalarProperty Name="min_product_amount" ColumnName="min_product_amount" />
                 <ScalarProperty Name="discount_value" ColumnName="discount_value" />
                 <ScalarProperty Name="discount_type" ColumnName="discount_type" />
+                <ScalarProperty Name="product_id" ColumnName="product_id" />
                 <ScalarProperty Name="store_id" ColumnName="store_id" />
                 <ScalarProperty Name="discount_id" ColumnName="discount_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Favorites">
+            <EntityTypeMapping TypeName="UCGrabModel.Favorites">
+              <MappingFragment StoreEntitySet="Favorites">
+                <ScalarProperty Name="quantity" ColumnName="quantity" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="product_id" ColumnName="product_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="File_Documents">
+            <EntityTypeMapping TypeName="UCGrabModel.File_Documents">
+              <MappingFragment StoreEntitySet="File_Documents">
+                <ScalarProperty Name="file_document" ColumnName="file_document" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Image">
+            <EntityTypeMapping TypeName="UCGrabModel.Image">
+              <MappingFragment StoreEntitySet="Image">
+                <ScalarProperty Name="image_file" ColumnName="image_file" />
+                <ScalarProperty Name="image_id" ColumnName="image_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Image_Product">
+            <EntityTypeMapping TypeName="UCGrabModel.Image_Product">
+              <MappingFragment StoreEntitySet="Image_Product">
+                <ScalarProperty Name="image_file" ColumnName="image_file" />
+                <ScalarProperty Name="product_id" ColumnName="product_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Image_Store">
+            <EntityTypeMapping TypeName="UCGrabModel.Image_Store">
+              <MappingFragment StoreEntitySet="Image_Store">
+                <ScalarProperty Name="qr_file" ColumnName="qr_file" />
+                <ScalarProperty Name="image_file" ColumnName="image_file" />
+                <ScalarProperty Name="store_id" ColumnName="store_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Order">
+            <EntityTypeMapping TypeName="UCGrabModel.Order">
+              <MappingFragment StoreEntitySet="Order">
+                <ScalarProperty Name="gcash_receipt" ColumnName="gcash_receipt" />
+                <ScalarProperty Name="delivery_id" ColumnName="delivery_id" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="phone" ColumnName="phone" />
+                <ScalarProperty Name="lastname" ColumnName="lastname" />
+                <ScalarProperty Name="firstname" ColumnName="firstname" />
+                <ScalarProperty Name="checkOut_option" ColumnName="checkOut_option" />
+                <ScalarProperty Name="additional_info" ColumnName="additional_info" />
+                <ScalarProperty Name="payment_method" ColumnName="payment_method" />
+                <ScalarProperty Name="room" ColumnName="room" />
+                <ScalarProperty Name="building" ColumnName="building" />
+                <ScalarProperty Name="shipped_date" ColumnName="shipped_date" />
+                <ScalarProperty Name="order_date" ColumnName="order_date" />
+                <ScalarProperty Name="store_id" ColumnName="store_id" />
+                <ScalarProperty Name="order_status" ColumnName="order_status" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="order_id" ColumnName="order_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Order_Detail">
+            <EntityTypeMapping TypeName="UCGrabModel.Order_Detail">
+              <MappingFragment StoreEntitySet="Order_Detail">
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="quatity" ColumnName="quatity" />
+                <ScalarProperty Name="product_id" ColumnName="product_id" />
+                <ScalarProperty Name="order_id" ColumnName="order_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Product">
+            <EntityTypeMapping TypeName="UCGrabModel.Product">
+              <MappingFragment StoreEntitySet="Product">
+                <ScalarProperty Name="store_id" ColumnName="store_id" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="date_created" ColumnName="date_created" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="size" ColumnName="size" />
+                <ScalarProperty Name="category_id" ColumnName="category_id" />
+                <ScalarProperty Name="product_description" ColumnName="product_description" />
+                <ScalarProperty Name="product_name" ColumnName="product_name" />
+                <ScalarProperty Name="product_id" ColumnName="product_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Review">
+            <EntityTypeMapping TypeName="UCGrabModel.Review">
+              <MappingFragment StoreEntitySet="Review">
+                <ScalarProperty Name="review_date" ColumnName="review_date" />
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="rating" ColumnName="rating" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="order_id" ColumnName="order_id" />
+                <ScalarProperty Name="review_id" ColumnName="review_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Stock">
+            <EntityTypeMapping TypeName="UCGrabModel.Stock">
+              <MappingFragment StoreEntitySet="Stock">
+                <ScalarProperty Name="quantity" ColumnName="quantity" />
+                <ScalarProperty Name="product_id" ColumnName="product_id" />
+                <ScalarProperty Name="stock_id" ColumnName="stock_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Store">
+            <EntityTypeMapping TypeName="UCGrabModel.Store">
+              <MappingFragment StoreEntitySet="Store">
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="operating_hours" ColumnName="operating_hours" />
+                <ScalarProperty Name="gnumber" ColumnName="gnumber" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="phone" ColumnName="phone" />
+                <ScalarProperty Name="store_address" ColumnName="store_address" />
+                <ScalarProperty Name="store_description" ColumnName="store_description" />
+                <ScalarProperty Name="store_name" ColumnName="store_name" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="store_id" ColumnName="store_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="User_Accounts">
+            <EntityTypeMapping TypeName="UCGrabModel.User_Accounts">
+              <MappingFragment StoreEntitySet="User_Accounts">
+                <ScalarProperty Name="date_modified" ColumnName="date_modified" />
+                <ScalarProperty Name="date_created" ColumnName="date_created" />
+                <ScalarProperty Name="verify_code" ColumnName="verify_code" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="role_id" ColumnName="role_id" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="User_Information">
+            <EntityTypeMapping TypeName="UCGrabModel.User_Information">
+              <MappingFragment StoreEntitySet="User_Information">
+                <ScalarProperty Name="store_id" ColumnName="store_id" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="phone" ColumnName="phone" />
+                <ScalarProperty Name="first_name" ColumnName="first_name" />
+                <ScalarProperty Name="last_name" ColumnName="last_name" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="User_Role">
+            <EntityTypeMapping TypeName="UCGrabModel.User_Role">
+              <MappingFragment StoreEntitySet="User_Role">
+                <ScalarProperty Name="rolename" ColumnName="rolename" />
+                <ScalarProperty Name="role_id" ColumnName="role_id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1507,7 +1535,16 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-        </EntityContainerMapping>
+          <EntitySetMapping Name="vw_Role">
+            <EntityTypeMapping TypeName="UCGrabModel.vw_Role">
+              <MappingFragment StoreEntitySet="vw_Role">
+                <ScalarProperty Name="rolename" ColumnName="rolename" />
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
   </edmx:Runtime>

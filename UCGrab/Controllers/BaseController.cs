@@ -20,6 +20,7 @@ namespace UCGrab.Controllers
         public CategoryManager _categoryManager;
         public OrderManager _orderManager;
         public FavoritesManager _favManager;
+        public DiscountVoucherManager _discountManager;
 
         public String Username { get { return User.Identity.Name; } }
         public String UserId { get { return _userManager.GetUserByUsername(Username).user_id; } }
@@ -34,6 +35,7 @@ namespace UCGrab.Controllers
             _categoryManager = new CategoryManager();
             _orderManager = new OrderManager();
             _favManager = new FavoritesManager();
+            _discountManager = new DiscountVoucherManager();
 
         }
    

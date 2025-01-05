@@ -28,5 +28,8 @@ namespace UCGrab.Models
         public decimal Total { get; set; }
         
         public int ProductId { get; set; }
+        public string Description { get; set; }
+        public decimal OriginalPrice { get; set; }
+        public bool IsDiscounted { get; set; }
     }
 }

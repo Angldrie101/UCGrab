@@ -16,13 +16,15 @@ namespace UCGrab.Database
     {
         public int discount_id { get; set; }
         public Nullable<int> store_id { get; set; }
+        public Nullable<int> product_id { get; set; }
         public string discount_type { get; set; }
         public Nullable<decimal> discount_value { get; set; }
-        public Nullable<decimal> min_order_amount { get; set; }
+        public Nullable<decimal> min_product_amount { get; set; }
         public Nullable<System.DateTime> start_date { get; set; }
         public Nullable<System.DateTime> end_date { get; set; }
-        public Nullable<bool> is_active { get; set; }
+        public Nullable<int> is_active { get; set; }
     
+        public virtual Product Product { get; set; }
         public virtual Store Store { get; set; }
     }
 }

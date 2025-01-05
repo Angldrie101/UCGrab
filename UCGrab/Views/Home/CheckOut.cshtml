@@ -192,22 +192,20 @@
         var shippingFeeText = document.getElementById("shipping-text");
         var shippingFee = document.getElementById("shipping-fee");
         var Cod = document.getElementById("paymentCash");
-        // Check if 'subtotal' element exists and parse subtotal
-        var subtotalElement = document.querySelector(".pt-2 h6"); // Locate subtotal dynamically
+        var subtotalElement = document.querySelector(".pt-2 h6");
         var subtotal = parseFloat(subtotalElement.innerText.replace('₱', '').replace(',', ''));
 
-        // Apply changes based on selection
         if (pickUp.checked) {
-            shippingAddress.style.display = "none"; // Hide shipping info
-            pickUpInfo.style.display = "block";    // Show pick-up info
-            shippingFeeText.style.display = "none"; // Hide shipping fee label
-            shippingFee.style.display = "none";     // Hide shipping fee
+            shippingAddress.style.display = "none"; 
+            pickUpInfo.style.display = "block";    
+            shippingFeeText.style.display = "none"; 
+            shippingFee.style.display = "none";     
             Cod.style.display = "none";
         } else {
-            shippingAddress.style.display = "block"; // Show shipping info
-            pickUpInfo.style.display = "none";      // Hide pick-up info
-            shippingFeeText.style.display = "block"; // Show shipping fee label
-            shippingFee.style.display = "block";     // Show shipping fee
+            shippingAddress.style.display = "block"; 
+            pickUpInfo.style.display = "none";      
+            shippingFeeText.style.display = "block"; 
+            shippingFee.style.display = "block";    
             Cod.style.display = "block";
         }
     }
