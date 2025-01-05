@@ -33,7 +33,79 @@
         background-color: #f8f9fa;
         padding: 30px;
         border-radius: 5px;
-    }
+        .voucher-list {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    max-width: 600px;
+    margin: 20px auto;
+    font-family: 'Arial', sans-serif;
+}
+
+.voucher-list {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    max-width: 600px;
+    margin: 20px auto;
+    font-family: 'Arial', sans-serif;
+}
+
+.voucher-list h6 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.voucher-card {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.voucher-card:hover {
+    transform: translateY(-5px);
+}
+
+.voucher-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.voucher-code {
+    font-size: 16px;
+    font-weight: bold;
+    color: #007bff;
+    margin: 0;
+}
+
+.voucher-discount {
+    font-size: 16px;
+    font-weight: bold;
+    color: #28a745;
+    margin: 0;
+}
+
+.voucher-details {
+    font-size: 14px;
+    color: #555;
+    margin-top: 5px;
+}
+
+.no-voucher {
+    font-size: 14px;
+    color: #888;
+    text-align: center;
+    margin-top: 10px;
+}
+
 </style>
 
 @if (Model.Any())
@@ -103,7 +175,55 @@
                 <div class="col-lg-4">
                     <div class="cart-summary">
                         <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Cart Summary for @storeGroup.Key</span></h5>
+                        <div class="voucher-list">
+                            <h6>Available Vouchers </h6>
+                            @{
+                                var subtotal = storeGroup.Sum(order => order.Order_Detail.Sum(od => od.quatity * od.price));
+                                var availableVouchers = ViewBag.AvailableVouchers as List<UCGrab.Database.Vouchers>;
+                                var filteredVouchers = availableVouchers?.Where(v =>
+                                    v.store_id == storeGroup.FirstOrDefault()?.Store.id &&
+                                    v.is_active == 1 &&
+                                    v.start_date <= DateTime.Now &&
+                                    v.end_date >= DateTime.Now).ToList();
+
+                                if (filteredVouchers != null && filteredVouchers.Any())
+                                {
+                                    foreach (var voucher in filteredVouchers)
+                                    {
+                                        <div class="voucher-card">
+                                            <div class="voucher-content">
+                                                <p class="voucher-code">Code: <strong>@voucher.voucher_code</strong></p>
+                                                <p class="voucher-discount">
+                                                    @if (voucher.discount_type == "Percentage")
+                                                    {
+                                                    <p>@voucher.discount_value%</p>
+                                                    }
+                                                    else
+                                                    {
+                                                     <p> Php @voucher.discount_value</p>
+                                                    }
+                                            </div>
+                                            <p class="voucher-details">Minimum Spend: Php @voucher.min_order_amount</p>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <p class="no-voucher">No vouchers available.</p>
+                                }
+                            }
+
+                        </div>
+
                         <form class="mb-30" action="@Url.Action("ApplyCoupon", "Home")" method="post">
+                            @if (TempData["Error"] != null)
+                            {
+                                <div class="alert alert-danger">@TempData["Error"]</div>
+                            }
+                            @if (TempData["Success"] != null)
+                            {
+                                <div class="alert alert-success">@TempData["Success"]</div>
+                            }
                             <div class="input-group">
                                 <input type="text" name="couponCode" class="form-control border-0 p-4" placeholder="Coupon Code">
                                 <div class="input-group-append">

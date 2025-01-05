@@ -772,6 +772,15 @@ namespace UCGrab.Controllers
             var groupedOrders = orders
                 .GroupBy(order => order.Store?.store_name)
                 .ToList();
+
+            var _db = new UCGrabEntities();
+            var availableVouchers = _db.Vouchers.Where(v =>
+                v.is_active == 1 &&
+                (v.start_date == null || v.start_date <= DateTime.Now) &&
+                (v.end_date == null || v.end_date >= DateTime.Now)).ToList();
+
+            ViewBag.AvailableVouchers = availableVouchers;
+
             return View(groupedOrders);
         }
         [HttpPost]
@@ -943,17 +952,14 @@ namespace UCGrab.Controllers
                     filePath = Path.Combine(directoryPath, fileName);
                     gcashReceipt.SaveAs(filePath);
 
-                    // Save the relative path to the database
                     filePath = "/Uploads/Receipts/" + fileName;
                 }
                 else
                 {
-                    // Handle missing file error
                     ViewBag.Error = "Please upload a receipt.";
                     return View(model);
                 }
 
-                // Pass the file path to the manager
                 var result = _orderManager.PlaceOrder(UserId, model, filePath, ref errorMessage);
 
                 if (result == ErrorCode.Success)
@@ -985,7 +991,6 @@ namespace UCGrab.Controllers
             {
                 using (var db = new UCGrabEntities())
                 {
-                    // Optional: Retrieve logged-in user ID
                     var userId = UserId;
                     inquiry.user_id = userId;
 
@@ -1140,49 +1145,53 @@ namespace UCGrab.Controllers
             return View(allDiscountedProducts);
         }
         [HttpPost]
-        public IActionResult ApplyCoupon(string couponCode, IEnumerable<IGrouping<string, Order>> storeOrders)
+        [AllowAnonymous]
+        public ActionResult ApplyCoupon(string couponCode)
         {
             var _db = new UCGrabEntities();
+
             if (string.IsNullOrEmpty(couponCode))
             {
                 TempData["Error"] = "Please enter a coupon code.";
-                return RedirectToAction("Cart") as IActionResult;
+                return RedirectToAction("Cart");
             }
 
-            var voucher = _db.Vouchers.FirstOrDefault(v => v.voucher_code == couponCode);
+            var voucher = _db.Vouchers.FirstOrDefault(v => v.voucher_code == couponCode && v.is_active == 1);
 
-            if (voucher == null)
+            if (voucher == null || (voucher.start_date != null && voucher.start_date > DateTime.Now) || (voucher.end_date != null && voucher.end_date < DateTime.Now))
             {
-                TempData["Error"] = "Invalid coupon code.";
-                return RedirectToAction("Cart") as IActionResult;
+                TempData["Error"] = "Invalid or expired coupon code.";
+                return RedirectToAction("Cart");
+            }
+            
+            var userId = UserId;
+            var orders = _db.Order.Where(o => o.user_id == userId && o.order_status == 0 && o.store_id == voucher.store_id).ToList();
+
+            decimal cartSubtotal = (decimal)orders.Sum(order => order.Order_Detail.Sum(od => od.quatity * od.Product.price));
+
+            if (cartSubtotal < voucher.min_order_amount)
+            {
+                TempData["Error"] = "Your cart total does not meet the minimum order amount for this voucher.";
+                return RedirectToAction("Cart");
             }
 
-            foreach (var storeGroup in storeOrders)
+            foreach (var order in orders)
             {
-                foreach (var order in storeGroup)
+                foreach (var orderDetail in order.Order_Detail)
                 {
-                    foreach (var orderDetail in order.Order_Detail)
-                    {
-                        decimal total = (decimal)(orderDetail.quatity ?? 0) * (decimal)(orderDetail.price ?? 0);
-                        decimal discount = 0;
+                    decimal originalPrice = (decimal)(orderDetail.price ?? 0);
+                    decimal discountValue = voucher.discount_type == "Percentage"
+                        ? originalPrice * (voucher.discount_value ?? 0) / 100
+                        : (voucher.discount_value ?? 0);
 
-                        if (voucher.min_order_amount <= total)
-                        {
-                            discount = voucher.discount_value ?? 0;
-                        }
-
-                        decimal discountedPrice = ((decimal)(total)) * (1 - (discount / 100));
-
-                        orderDetail.price = discountedPrice;
-                        orderDetail.price = discountedPrice; 
-                    }
+                    orderDetail.price = originalPrice - discountValue;
                 }
             }
 
-            _db.SaveChanges(); // Save changes in the database
+            _db.SaveChanges();
 
-            TempData["Success"] = "Coupon applied successfully.";
-            return RedirectToAction("Cart") as IActionResult;
+            TempData["Success"] = "Coupon applied successfully!";
+            return RedirectToAction("Cart");
         }
     }
 }
