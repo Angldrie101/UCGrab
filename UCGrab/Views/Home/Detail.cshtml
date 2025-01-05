@@ -83,7 +83,7 @@
                             </button>
                         </div>
                     </div>
-                    <button class="btn btn-primary px-3" onclick="onAddCart(@Model.id)"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart </button>
+                    <button class="btn btn-primary px-3" onclick="onAddCart(@Model.id, @Model.price.ToString("N2"))"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart </button>
                 </div>
                 <div class="d-flex pt-2">
                     <strong class="text-dark mr-2">Share on:</strong>
@@ -311,8 +311,8 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    function onAddCart(prodId) {
-        var qty = document.getElementById("txtQty").value;
+    function onAddCart(prodId, price) {
+        var qty = 1; // Default quantity
 
         Swal.fire({
             title: "Are you sure?",
@@ -323,19 +323,23 @@
             confirmButtonText: "OK",
         }).then((result) => {
             if (result.isConfirmed) {
-                // save here
                 $.post("/Home/AddCart",
                     {
                         prodId: prodId,
-                        qty: qty
+                        qty: qty,
+                        price: price // Pass the discounted price
                     },
                     function (data, status) {
                         if (data.code == 0) {
                             Swal.fire(data.message, "", "success");
-                            loadCartCount();
+                            if (typeof loadCartCount === "function") {
+                                loadCartCount();
+                            }
                         } else {
                             Swal.fire(data.message, "", "error");
                         }
+                    }).fail(function (xhr, status, error) {
+                        Swal.fire("Error adding to cart!", error, "error");
                     });
             }
         });

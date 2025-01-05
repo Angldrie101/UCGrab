@@ -101,64 +101,73 @@ namespace UCGrab.Controllers
         }
         [AllowAnonymous]
         [HttpPost]
-        public ActionResult ChangePass(string username, string email, string password)
+        public ActionResult ChangePass(string username, string password)
         {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                TempData["error"] = "Username is required.";
+                return View();
+            }
+
             var user = _userManager.GetUserByUsername(username);
 
-            if (user != null)
+            if (user == null)
             {
-                user.email = email;
-                user.password = password;
-                
-                User_Accounts updatedUser = new User_Accounts
-                {
-                    id = user.id,
-                    user_id = user.user_id,
-                    username = user.username,
-                    role_id = user.role_id,
-                    status = user.status,
-                    verify_code = user.verify_code,
-                    date_created = user.date_created,
-                    email = email,
-                    password = password
-                };
-                
-                string errMsg = string.Empty;
-                var result = _userManager.UpdateUser(updatedUser, ref errMsg);
-
-                if (result == ErrorCode.Success)
-                {
-                    string verificationCode = user.verify_code;
-                    
-                    string emailBody = $"Your verification code is: {verificationCode}";
-                    string errorMessage = "";
-
-                    var mailManager = new MailManager();
-                    bool emailSent = mailManager.SendEmail(email, "Verification Code", emailBody, ref errorMessage);
-
-                    if (!emailSent)
-                    {
-                        ModelState.AddModelError(String.Empty, errorMessage);
-                        return View();
-                    }
-                    TempData["username"] = updatedUser.username;
-
-                    return RedirectToAction("Verify");
-                }
-                else
-                {
-                    TempData["error"] = "Failed to update the user details. " + errMsg;
-                }
+                TempData["error"] = "User not found. Please ensure the username is correct.";
+                return View();
             }
-            TempData["error"] = "User not found or invalid details.";
+
+            // Update only the password
+            user.password = password;
+
+            User_Accounts updatedUser = new User_Accounts
+            {
+                id = user.id,
+                user_id = user.user_id,
+                username = user.username,
+                role_id = user.role_id,
+                status = user.status,
+                verify_code = user.verify_code,
+                date_created = user.date_created,
+                email = user.email, // Use existing email
+                password = password
+            };
+
+            string errMsg = string.Empty;
+            var result = _userManager.UpdateUser(updatedUser, ref errMsg);
+
+            if (result == ErrorCode.Success)
+            {
+                string verificationCode = user.verify_code;
+
+                string emailBody = $"Your verification code is: {verificationCode}";
+                string errorMessage = "";
+
+                var mailManager = new MailManager();
+                bool emailSent = mailManager.SendEmail(user.email, "Verification Code", emailBody, ref errorMessage);
+
+                if (!emailSent)
+                {
+                    ModelState.AddModelError(string.Empty, errorMessage);
+                    return View();
+                }
+                TempData["username"] = updatedUser.username;
+
+                return RedirectToAction("Verify");
+            }
+            else
+            {
+                TempData["error"] = "Failed to update the password. " + errMsg;
+            }
+
             return View();
         }
 
         [AllowAnonymous]
         public ActionResult Verify()
         {
-            if (String.IsNullOrEmpty(TempData["username"] as String))
-                return RedirectToAction("Login");
+            if (string.IsNullOrEmpty(TempData["username"] as string))
+                return RedirectToAction("Index");
 
             return View();
         }
@@ -168,7 +177,7 @@ namespace UCGrab.Controllers
         public ActionResult Verify(string verify_code, string username)
         {
             if (String.IsNullOrEmpty(username))
-                return RedirectToAction("Login");
+                return RedirectToAction("Index");
 
             TempData["username"] = username;
 
@@ -185,9 +194,6 @@ namespace UCGrab.Controllers
 
             user.status = (Int32)Status.Active;
             _userManager.UpdateUser(user, ref ErrorMessage);
-            var store = _storeManager.CreateOrRetrieve(username, ref ErrorMessage);
-            store.user_id = user.user_id; 
-            _storeManager.UpdateStore(store.id,store, ref ErrorMessage);
 
 
             SendActivationNotificationEmail(user.email);
@@ -299,22 +305,6 @@ namespace UCGrab.Controllers
                 ModelState.AddModelError(string.Empty, "Student ID is required.");
                 return View(ua);
             }
-            var users = _userManager.GetUserByEmail(ua.email);
-            string verificationCode = ua.verify_code;
-
-            string emailBody = $"Your verification code is: {verificationCode}";
-            string errorMessages = "";
-
-            var mailManager = new MailManager();
-            bool emailSent = mailManager.SendEmail(ua.email, "Verification Code", emailBody, ref errorMessages);
-
-            if (!emailSent)
-            {
-                ModelState.AddModelError(String.Empty, errorMessages);
-                ViewBag.Role = Utilities.ListRole;
-                return View(ua);
-            }
-
             TempData["SuccessMessage"] = "Registration successful. Admin will validate your registration.";
             return RedirectToAction("Verify", "Home");
         }
@@ -379,21 +369,6 @@ namespace UCGrab.Controllers
             else
             {
                 ModelState.AddModelError(string.Empty, "Business permit is required.");
-                return View(ua);
-            }
-            var user = _userManager.GetUserByEmail(ua.email);
-            string verificationCode = ua.verify_code;
-
-            string emailBody = $"Your verification code is: {verificationCode}";
-            string errorMessages = "";
-
-            var mailManager = new MailManager();
-            bool emailSent = mailManager.SendEmail(ua.email, "Verification Code", emailBody, ref errorMessages);
-
-            if (!emailSent)
-            {
-                ModelState.AddModelError(String.Empty, errorMessage);
-                ViewBag.Role = Utilities.ListRole;
                 return View(ua);
             }
 
@@ -484,22 +459,7 @@ namespace UCGrab.Controllers
                 ModelState.AddModelError(string.Empty, "Business permit is required.");
                 return View(ua);
             }
-            var users = _userManager.GetUserByEmail(ua.email);
-            string verificationCode = ua.verify_code;
-
-            string emailBody = $"Your verification code is: {verificationCode}";
-            string errorMessages = "";
-
-            var mailManager = new MailManager();
-            bool emailSent = mailManager.SendEmail(ua.email, "Verification Code", emailBody, ref errorMessages);
-
-            if (!emailSent)
-            {
-                ModelState.AddModelError(String.Empty, errorMessages);
-                ViewBag.Role = Utilities.ListRole;
-                return View(ua);
-            }
-
+            
             TempData["SuccessMessage"] = "Registration successful. Admin will validate your registration.";
             return RedirectToAction("Driver", "Home");
 
@@ -785,34 +745,46 @@ namespace UCGrab.Controllers
         }
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult Cart(int qty, int orderDtId, string action)
+        public ActionResult Cart(int? qty, int orderDtId, string action)
         {
             switch (action)
             {
-                case "&plus;":
-                    qty++;
-                    break;
-                case "&minus;":
-                    qty--;
-                    break;
                 case "X":
                     _orderManager.DeleteOrderDetail(orderDtId, ref ErrorMessage);
-                    return View(_orderManager.GetOrderByUserId(UserId));
+                    break;
+                default:
+                    if (qty <= 0)
+                    {
+                        _orderManager.DeleteOrderDetail(orderDtId, ref ErrorMessage);
+                    }
+                    else
+                    {
+                        var orderDt = _orderManager.GetOrderDetailById(orderDtId);
+                        orderDt.quatity = qty;
+                        _orderManager.UpdateOrderDetail(orderDt.id, orderDt, ref ErrorMessage);
+                    }
+                    break;
             }
 
-            if (qty <= 0)
-            {
-                _orderManager.DeleteOrderDetail(orderDtId, ref ErrorMessage);
-                return View(_orderManager.GetOrderByUserId(UserId));
-            }
+            // Fetch updated orders and group them again
+            var updatedOrders = _orderManager.GetOrderByUserId(UserId)
+                .Where(order => order.Order_Detail.Any()) // Exclude orders with no details
+                .ToList();
 
-            var orderDt = _orderManager.GetOrderDetailById(orderDtId);
-            orderDt.quatity = qty;
+            var groupedOrders = updatedOrders
+                .GroupBy(order => order.Store?.store_name)
+                .Where(group => group.Any()) // Ensure each group has at least one order
+                .ToList();
 
-            _orderManager.UpdateOrderDetail(orderDt.id, orderDt, ref ErrorMessage);
+            var _db = new UCGrabEntities();
+            var availableVouchers = _db.Vouchers.Where(v =>
+                v.is_active == 1 &&
+                (v.start_date == null || v.start_date <= DateTime.Now) &&
+                (v.end_date == null || v.end_date >= DateTime.Now)).ToList();
 
-            var updatedOrders = _orderManager.GetOrderByUserId(UserId);
-            return View(updatedOrders);
+            ViewBag.AvailableVouchers = availableVouchers;
+
+            return View(groupedOrders);
         }
 
 

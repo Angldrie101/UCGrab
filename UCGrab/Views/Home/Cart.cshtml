@@ -162,9 +162,15 @@
                                         <td class="align-middle">Php @originalPrice</td>
                                         <td class="align-middle">@orDetail.quatity</td>
                                         <td class="align-middle">
-                                            <button class="btn btn-sm btn-danger" type="submit" name="action" value="X">
-                                                <i class="fa fa-times"></i>
-                                            </button>
+                                            <form method="post" action="@Url.Action("Cart", "Home")" class="delete-cart-item-form">
+                                                
+                                                <input type="hidden" name="orderDtId" value="@orDetail.id" />
+                                                <input type="hidden" name="qty" value="0" />
+                                                <input type="hidden" name="action" value="X" />
+                                                <button type="button" class="btn btn-sm btn-danger delete-cart-item-btn">
+                                                    <i class="fa fa-times"></i>
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 }
@@ -280,4 +286,43 @@ else
             </div>
         </div>
     </div>
+}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Add click event listener to delete buttons
+        document.querySelectorAll('.delete-cart-item-btn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const form = this.closest('form'); // Find the corresponding form
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This product will be removed from your cart.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit(); // Submit the form after confirmation
+                    }
+                });
+            });
+        });
+    });
+
+</script>
+@if (TempData["Success"] != null)
+{
+    <script>
+                                                        Swal.fire({
+                                                            title: 'Deleted!',
+                                                            text: '@TempData["Success"]',
+                                                            icon: 'success',
+                                                            confirmButtonColor: '#3085d6'
+                                                        });
+    </script>
 }

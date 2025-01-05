@@ -120,15 +120,14 @@ namespace UCGrab.Controllers
                 return RedirectToAction("UserAccounts", "Admin");
             }
 
-            // Update fields
             existingUser.username = user.username ?? existingUser.username;
             existingUser.password = user.password ?? existingUser.password;
             existingUser.email = user.email ?? existingUser.email;
+            existingUser.status = user.status; 
 
-            // Assume UpdateUser returns an ErrorCode
             ErrorCode updateResult = _userManager.UpdateUser(existingUser, ref errorMessage);
 
-            if (updateResult == ErrorCode.Success) // Check explicitly
+            if (updateResult == ErrorCode.Success) 
             {
                 TempData["SuccessMessage"] = "User updated successfully.";
                 return RedirectToAction("UserAccounts", "Admin");
@@ -228,11 +227,20 @@ namespace UCGrab.Controllers
             {
                 return HttpNotFound();
             }
-
             user.status = (int)Status.Rejected;
 
             _db.SaveChanges();
-            
+
+            string emailBody = "We regret to inform you that your account has been rejected. If you have any questions, please contact support.";
+            string errorMessage = "";
+
+            var mailManager = new MailManager();
+            bool emailSent = mailManager.SendEmail(user.email, "Account Rejection Notice", emailBody, ref errorMessage);
+
+            if (!emailSent)
+            {
+                ModelState.AddModelError(string.Empty, $"Failed to send rejection email: {errorMessage}");
+            }
 
             return RedirectToAction("UserAccounts", "Admin");
         }

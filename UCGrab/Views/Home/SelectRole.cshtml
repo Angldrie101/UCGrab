@@ -8,17 +8,23 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="~/Assets/login/css/style.css">
     <style>
+        body {
+            font-family: 'Lato', sans-serif;
+        }
+
         .login-wrap {
             border: 1px solid #ddd;
             border-radius: 10px;
             padding: 20px;
             background-color: white;
-            max-width: 800px; /* Expanded width */
+            max-width: 800px;
             margin: 50px auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .role-selection {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-around;
             margin-top: 50px;
         }
@@ -30,16 +36,25 @@
             width: 30%;
             text-align: center;
             transition: transform 0.3s;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-            .role-card:hover {
-                transform: scale(1.05);
-            }
+        .role-card:hover {
+            transform: scale(1.05);
+        }
 
-            .role-card i {
-                font-size: 50px;
-                margin-bottom: 20px;
-            }
+        .role-card i {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .role-card h4 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -47,9 +62,8 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-10 col-lg-8">
-                    <!-- Adjusted column size for centering -->
                     <div class="login-wrap p-4 p-md-5">
-                        <img class="icon d-flex align-items-center justify-content-center" src="~/Assets/login/images/UCGRAB.jpg" />
+                        <img class="icon d-flex align-items-center justify-content-center" src="~/Assets/login/images/UCGRAB.jpg" alt="UC Grab Logo" />
                         <h3 class="text-center mb-4">Registered as</h3>
                         <div class="role-selection">
                             <div class="role-card">
