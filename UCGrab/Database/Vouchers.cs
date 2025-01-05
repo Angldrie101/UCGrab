@@ -14,6 +14,11 @@ namespace UCGrab.Database
     
     public partial class Vouchers
     {
+        public Vouchers()
+        {
+            this.VoucherUsage = new HashSet<VoucherUsage>();
+        }
+    
         public int voucher_id { get; set; }
         public Nullable<int> store_id { get; set; }
         public string voucher_code { get; set; }
@@ -27,5 +32,6 @@ namespace UCGrab.Database
         public Nullable<int> is_active { get; set; }
     
         public virtual Store Store { get; set; }
+        public virtual ICollection<VoucherUsage> VoucherUsage { get; set; }
     }
 }

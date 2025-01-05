@@ -349,6 +349,9 @@
     <Compile Include="Database\Vouchers.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>
+    <Compile Include="Database\VoucherUsage.cs">
+      <DependentUpon>UCGrab.tt</DependentUpon>
+    </Compile>
     <Compile Include="Database\vw_Role.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>

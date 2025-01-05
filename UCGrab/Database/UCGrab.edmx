@@ -167,7 +167,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="user_id" Type="varchar(max)" />
           <Property Name="username" Type="nvarchar" MaxLength="50" />
           <Property Name="password" Type="nvarchar" MaxLength="50" />
@@ -213,6 +213,15 @@
           <Property Name="start_date" Type="datetime" />
           <Property Name="end_date" Type="datetime" />
           <Property Name="is_active" Type="int" />
+        </EntityType>
+        <EntityType Name="VoucherUsage">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="voucher_id" Type="int" />
+          <Property Name="user_id" Type="nvarchar(max)" />
+          <Property Name="usage_date" Type="datetime" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -261,7 +270,9 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Discounts_Store">
-          <End Role="Store" Type="Self.Store" Multiplicity="0..1" />
+          <End Role="Store" Type="Self.Store" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="Discounts" Type="Self.Discounts" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Store">
@@ -297,7 +308,9 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_File_Documents_File_Documents">
-          <End Role="User_Accounts" Type="Self.User_Accounts" Multiplicity="0..1" />
+          <End Role="User_Accounts" Type="Self.User_Accounts" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="File_Documents" Type="Self.File_Documents" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="User_Accounts">
@@ -510,6 +523,18 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_VoucherUsage_Vouchers">
+          <End Role="Vouchers" Type="Self.Vouchers" Multiplicity="0..1" />
+          <End Role="VoucherUsage" Type="Self.VoucherUsage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vouchers">
+              <PropertyRef Name="voucher_id" />
+            </Principal>
+            <Dependent Role="VoucherUsage">
+              <PropertyRef Name="voucher_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Function Name="sp_getCartCountByUserId" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="user_id" Type="nvarchar" Mode="In" />
         </Function>
@@ -532,6 +557,7 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
           <EntitySet Name="User_Information" EntityType="Self.User_Information" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="User_Role" EntityType="Self.User_Role" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Vouchers" EntityType="Self.Vouchers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="VoucherUsage" EntityType="Self.VoucherUsage" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="vw_Role" EntityType="Self.vw_Role" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
 [vw_Role].[id] AS [id], 
@@ -630,6 +656,10 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <AssociationSet Name="FK_Vouchers_Store" Association="Self.FK_Vouchers_Store">
             <End Role="Store" EntitySet="Store" />
             <End Role="Vouchers" EntitySet="Vouchers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_VoucherUsage_Vouchers" Association="Self.FK_VoucherUsage_Vouchers">
+            <End Role="Vouchers" EntitySet="Vouchers" />
+            <End Role="VoucherUsage" EntitySet="VoucherUsage" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -750,6 +780,11 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <AssociationSet Name="FK_User_Role_User_Role1" Association="UCGrabModel.FK_User_Role_User_Role1">
             <End Role="User_Role" EntitySet="User_Role" />
             <End Role="User_Role1" EntitySet="User_Role" />
+          </AssociationSet>
+          <EntitySet Name="VoucherUsage" EntityType="UCGrabModel.VoucherUsage" />
+          <AssociationSet Name="FK_VoucherUsage_Vouchers" Association="UCGrabModel.FK_VoucherUsage_Vouchers">
+            <End Role="Vouchers" EntitySet="Vouchers" />
+            <End Role="VoucherUsage" EntitySet="VoucherUsage" />
           </AssociationSet>
           </EntityContainer>
         <EntityType Name="Category">
@@ -948,7 +983,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="user_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="username" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
@@ -1006,6 +1041,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="end_date" Type="DateTime" Precision="3" />
           <Property Name="is_active" Type="Int32" />
           <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Vouchers_Store" FromRole="Vouchers" ToRole="Store" />
+          <NavigationProperty Name="VoucherUsage" Relationship="UCGrabModel.FK_VoucherUsage_Vouchers" FromRole="Vouchers" ToRole="VoucherUsage" />
         </EntityType>
         <EntityType Name="vw_Role">
           <Key>
@@ -1064,7 +1100,9 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Discounts_Store">
-          <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Type="UCGrabModel.Discounts" Role="Discounts" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Store">
@@ -1100,7 +1138,9 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_File_Documents_File_Documents">
-          <End Type="UCGrabModel.User_Accounts" Role="User_Accounts" Multiplicity="0..1" />
+          <End Type="UCGrabModel.User_Accounts" Role="User_Accounts" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Type="UCGrabModel.File_Documents" Role="File_Documents" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="User_Accounts">
@@ -1298,6 +1338,28 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             </Principal>
             <Dependent Role="User_Role1">
               <PropertyRef Name="role_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="VoucherUsage">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="voucher_id" Type="Int32" />
+          <Property Name="user_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="usage_date" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Vouchers" Relationship="UCGrabModel.FK_VoucherUsage_Vouchers" FromRole="VoucherUsage" ToRole="Vouchers" />
+        </EntityType>
+        <Association Name="FK_VoucherUsage_Vouchers">
+          <End Type="UCGrabModel.Vouchers" Role="Vouchers" Multiplicity="0..1" />
+          <End Type="UCGrabModel.VoucherUsage" Role="VoucherUsage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vouchers">
+              <PropertyRef Name="voucher_id" />
+            </Principal>
+            <Dependent Role="VoucherUsage">
+              <PropertyRef Name="voucher_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1540,6 +1602,16 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
               <MappingFragment StoreEntitySet="vw_Role">
                 <ScalarProperty Name="rolename" ColumnName="rolename" />
                 <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VoucherUsage">
+            <EntityTypeMapping TypeName="UCGrabModel.VoucherUsage">
+              <MappingFragment StoreEntitySet="VoucherUsage">
+                <ScalarProperty Name="usage_date" ColumnName="usage_date" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="voucher_id" ColumnName="voucher_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

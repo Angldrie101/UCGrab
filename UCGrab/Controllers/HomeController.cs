@@ -1145,7 +1145,6 @@ namespace UCGrab.Controllers
             return View(allDiscountedProducts);
         }
         [HttpPost]
-        [AllowAnonymous]
         public ActionResult ApplyCoupon(string couponCode)
         {
             var _db = new UCGrabEntities();
@@ -1163,8 +1162,25 @@ namespace UCGrab.Controllers
                 TempData["Error"] = "Invalid or expired coupon code.";
                 return RedirectToAction("Cart");
             }
-            
-            var userId = UserId;
+
+            var userId = UserId; // Replace with logic to get the current user's ID
+
+            // Check if the user has already used this voucher
+            var hasUsedVoucher = _db.VoucherUsage.Any(vu => vu.user_id == userId && vu.voucher_id == voucher.voucher_id);
+
+            if (hasUsedVoucher)
+            {
+                TempData["Error"] = "You have already used this voucher.";
+                return RedirectToAction("Cart");
+            }
+
+            // Check if max uses are exceeded
+            if (voucher.max_uses.HasValue && voucher.max_uses <= 0)
+            {
+                TempData["Error"] = "This voucher has already been fully redeemed.";
+                return RedirectToAction("Cart");
+            }
+
             var orders = _db.Order.Where(o => o.user_id == userId && o.order_status == 0 && o.store_id == voucher.store_id).ToList();
 
             decimal cartSubtotal = (decimal)orders.Sum(order => order.Order_Detail.Sum(od => od.quatity * od.Product.price));
@@ -1174,6 +1190,8 @@ namespace UCGrab.Controllers
                 TempData["Error"] = "Your cart total does not meet the minimum order amount for this voucher.";
                 return RedirectToAction("Cart");
             }
+
+            decimal voucherAmount = 0;
 
             foreach (var order in orders)
             {
@@ -1185,10 +1203,33 @@ namespace UCGrab.Controllers
                         : (voucher.discount_value ?? 0);
 
                     orderDetail.price = originalPrice - discountValue;
+                    voucherAmount += discountValue;
                 }
             }
 
+            // Deduct one use from max_uses
+            if (voucher.max_uses.HasValue)
+            {
+                voucher.max_uses -= 1;
+
+                // Optionally deactivate the voucher if no uses remain
+                if (voucher.max_uses <= 0)
+                {
+                    voucher.is_active = 0;
+                }
+            }
+
+            // Record the voucher usage
+            _db.VoucherUsage.Add(new VoucherUsage
+            {
+                user_id = userId,
+                voucher_id = voucher.voucher_id,
+                usage_date = DateTime.Now
+            });
+
             _db.SaveChanges();
+
+            ViewBag.VoucherAmount = voucherAmount;
 
             TempData["Success"] = "Coupon applied successfully!";
             return RedirectToAction("Cart");
