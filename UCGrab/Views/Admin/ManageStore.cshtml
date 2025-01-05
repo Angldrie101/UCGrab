@@ -34,8 +34,8 @@
                                 <td>@store.phone</td>
                                 <td>@store.email</td>
                                 <td>
-                                    <a href="/Admin/EditStore/@store.id" class="btn btn-primary btn-sm">Detail</a>
-                                    <a href="/Admin/DeleteStore/@store.id" class="btn btn-danger btn-sm">Delete</a>
+                                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#detailModal" data-id="@store.id" data-name="@store.store_name" data-address="@store.store_address" data-phone="@store.phone" data-email="@store.email">Detail</button>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-id="@store.id">Delete</button>
                                 </td>
                             </tr>
                         }
@@ -46,15 +46,103 @@
     </div>
 </div>
 <!-- Store Management End -->
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="detailModalLabel">Store Details</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-4 font-weight-bold">ID:</div>
+                    <div class="col-8" id="modal-store-id"></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-4 font-weight-bold">Name:</div>
+                    <div class="col-8" id="modal-store-name"></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-4 font-weight-bold">Address:</div>
+                    <div class="col-8" id="modal-store-address"></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-4 font-weight-bold">Phone:</div>
+                    <div class="col-8" id="modal-store-phone"></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-4 font-weight-bold">Email:</div>
+                    <div class="col-8" id="modal-store-email"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- JavaScript Libraries -->
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-<script src="/Assets/Shop/lib/easing/easing.min.js"></script>
-<script src="/Assets/Shop/lib/owlcarousel/owl.carousel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<!-- Contact Javascript File -->
-<script src="/Assets/Shop/mail/jqBootstrapValidation.min.js"></script>
-<script src="/Assets/Shop/mail/contact.js"></script>
+<script>
+    // Populate modal with store details
+    $('#detailModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var id = button.data('id');
+        var name = button.data('name');
+        var address = button.data('address');
+        var phone = button.data('phone');
+        var email = button.data('email');
 
-<!-- Template Javascript -->
-<script src="/Assets/Shop/js/main.js"></script>
+        // Update the modal's content
+        $('#modal-store-id').text(id);
+        $('#modal-store-name').text(name);
+        $('#modal-store-address').text(address);
+        $('#modal-store-phone').text(phone);
+        $('#modal-store-email').text(email);
+    });
+
+    // Delete confirmation with SweetAlert
+    $(document).on('click', '.delete-btn', function () {
+        var storeId = $(this).data('id');
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/Admin/DeleteStore/' + storeId,
+                    type: 'POST',
+                    success: function (response) {
+                        Swal.fire(
+                            'Deleted!',
+                            'The store has been deleted.',
+                            'success'
+                        ).then(() => {
+                            location.reload(); // Reload the page
+                        });
+                    },
+                    error: function () {
+                        Swal.fire(
+                            'Error!',
+                            'An error occurred while trying to delete the store.',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    });
+
+</script>

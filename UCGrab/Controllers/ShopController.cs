@@ -27,7 +27,7 @@ namespace UCGrab.Controllers
             var _db = new UCGrabEntities();
             
             var totalSales = _db.Order_Detail
-                                .Where(od => od.Order.store_id == userInfo.store_id)
+                                .Where(od => od.Order.store_id == userInfo.store_id && od.Order.order_status == (int)OrderStatus.Delivered)
                                 .Sum(od => od.price)??0;
             
             var totalOrders = _db.Order
@@ -81,6 +81,14 @@ namespace UCGrab.Controllers
             System.Diagnostics.Debug.WriteLine($"Logged in UserId: {userId}");
 
             var store = _storeManager.GetStoreByUserId(userId);
+
+            ViewBag.ToConfirmCount = store.Order.Count(o => o.order_status == 1);
+            ViewBag.ToDeliverCount = store.Order.Count(o => o.order_status == 3);
+            ViewBag.ToReceiveCount = store.Order.Count(o => o.order_status == 4);
+            ViewBag.DeliveredCount = store.Order.Count(o => o.order_status == 5);
+            ViewBag.CancelledCount = store.Order.Count(o => o.order_status == 2);
+            ViewBag.RejectedCount = store.Order.Count(o => o.order_status == 7);
+
             if (store == null)
             {
                 return HttpNotFound("Store not found.");
@@ -127,6 +135,21 @@ namespace UCGrab.Controllers
         public ActionResult ConfirmOrder(int orderId)
         {
             var result = _orderManager.ConfirmOrder(orderId);
+
+            if (result == ErrorCode.Success)
+            {
+                return RedirectToAction("ListOrders");
+            }
+            else
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Unable to confirm the order.");
+            }
+        }
+        [HttpPost]
+        [Authorize]
+        public ActionResult RejectOrder(int orderId)
+        {
+            var result = _orderManager.RejectOrder(orderId);
 
             if (result == ErrorCode.Success)
             {

@@ -25,6 +25,11 @@ namespace UCGrab.Repository
         {
             return _userAcc.Get(Id);
         }
+        public User_Accounts GetUserByIds(int id)
+        {
+            return _userAcc._table.Where(m => m.id == id).FirstOrDefault();
+        }
+
         public User_Accounts GetUserByUserId(String userId)
         {
             return _userAcc._table.Where(m => m.user_id == userId).FirstOrDefault();

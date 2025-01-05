@@ -34,13 +34,16 @@
     <div class="col-lg-12 mb-4">
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#toReceive">To Receive</a>
+                <a class="nav-link active" data-toggle="tab" href="#toReceive">To Receive (@ViewBag.ToReceiveCount)</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#toReview">To Review</a>
+                <a class="nav-link" data-toggle="tab" href="#toReview">To Review (@ViewBag.ToReviewCount)</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#cancelled">Cancelled</a>
+                <a class="nav-link" data-toggle="tab" href="#cancelled">Cancelled (@ViewBag.CancelledCount)</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#rejected">Rejected (@ViewBag.RejectedCount)</a>
             </li>
         </ul>
     </div>
@@ -67,6 +70,10 @@
                     <div class="tab-pane fade" id="cancelled">
                         @RenderOrders(Model.Where(o => o.Status == "Cancelled")
                     .OrderByDescending(o => o.OrderDate), "Order Cancelled")
+                    </div>
+                    <div class="tab-pane fade" id="rejected">
+                        @RenderOrders(Model.Where(o => o.Status == "Rejected")
+                        .OrderByDescending(o => o.OrderDate), "Order Rejected")
                     </div>
                 </div>
 

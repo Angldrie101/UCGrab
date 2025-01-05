@@ -1004,8 +1004,14 @@ namespace UCGrab.Controllers
         {
             IsUserLoggedSession();
 
-            var userId = UserId; // Assuming you have a way to get the logged-in user's ID
+            var _db = new UCGrabEntities();
+            var userId = UserId; 
             var orders = _orderManager.GetUserOrderByUserId(userId);
+
+            ViewBag.ToReceiveCount = orders.Count(o => o.order_status == 1 || o.order_status == 3 || o.order_status == 4);
+            ViewBag.ToReviewCount = orders.Count(o => o.order_status == 5);
+            ViewBag.CancelledCount = orders.Count(o => o.order_status == 2);
+            ViewBag.RejectedCount = orders.Count(o => o.order_status == 7);
 
             var model = orders.Select(order => new OrderViewModel
             {

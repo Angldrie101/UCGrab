@@ -153,6 +153,29 @@ namespace UCGrab.Repository
             }
         }
 
+        public ErrorCode DeleteStore(int storeId, ref string errorMessage)
+        {
+            var _db = new UCGrabEntities();
+            try
+            {
+                var store = _db.Store.FirstOrDefault(s => s.id == storeId);
+                if (store == null)
+                {
+                    errorMessage = "Store not found.";
+                    return ErrorCode.Error;
+                }
+
+                _db.Store.Remove(store);
+                _db.SaveChanges(); 
+
+                return ErrorCode.Success;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"An error occurred while deleting the store: {ex.Message}";
+                return ErrorCode.Error;
+            }
+        }
 
 
     }

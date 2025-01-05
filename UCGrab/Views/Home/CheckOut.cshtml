@@ -177,7 +177,6 @@
                     </div>
                 </div>
 
-                <!-- Place Order Button -->
                 <button type="button" class="btn btn-block btn-primary font-weight-bold py-3" onclick="confirmOrder()">Place Order</button>
             </div>
         </div>
@@ -213,10 +212,9 @@
     function confirmOrder() {
         const paymentMethod = document.querySelector('input[name="PaymentMethod"]:checked').value;
 
-        if (paymentMethod === "1") { // GCash selected
+        if (paymentMethod === "1") { 
             $('#gcashModal').modal('show');
         } else {
-            // Cash on Delivery
             Swal.fire({
                 title: 'Confirm Order',
                 text: "Do you want to place the order?",
@@ -236,14 +234,12 @@
     function submitGcashOrder() {
         var form = document.getElementById("checkout-form");
 
-        // Validate receipt file
         var receiptInput = document.getElementById("gcashReceipt");
         if (!receiptInput.files.length) {
             Swal.fire('Error!', 'Please upload your GCash receipt.', 'error');
             return;
         }
 
-        // Submit the form
         form.submit();
     }
 
@@ -258,7 +254,6 @@
             confirmButtonText: 'Yes, cancel it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Create a form and submit it
                 var form = document.createElement("form");
                 form.setAttribute("method", "post");
                 form.setAttribute("action", "/Home/CancelOrder");
@@ -276,7 +271,6 @@
         });
     }
 
-    // Ensure forms toggle correctly on page load
     document.addEventListener('DOMContentLoaded', toggleForms);
 </script>
 

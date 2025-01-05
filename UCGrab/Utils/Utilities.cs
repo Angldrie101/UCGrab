@@ -65,7 +65,8 @@ namespace UCGrab.Utils
         Confirmed,
         ReadyToDeliver,
         Delivered,
-        Done
+        Done,
+        Rejected
     }
 
     public enum PayMethod

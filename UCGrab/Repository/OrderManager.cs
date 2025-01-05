@@ -425,6 +425,29 @@ namespace UCGrab.Repository
                 return ErrorCode.Error;
             }
         }
+        public ErrorCode RejectOrder(int orderId)
+        {
+            try
+            {
+                var order = _order.Get(orderId);
+                if (order != null && order.order_status == (int)OrderStatus.Pending)
+                {
+                    order.order_status = (int)OrderStatus.Rejected;
+                    string error;
+                    _order.Update(order.order_id, order, out error);
+                    return ErrorCode.Success;
+                }
+                else
+                {
+                    return ErrorCode.Error;
+                }
+            }
+            catch (Exception ex)
+            {
+                Message = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
 
         public Order GetOpenOrderByUserId(string userId)
         {

@@ -10,6 +10,7 @@
         <span class="bg-secondary pr-3">User Accounts Management</span>
     </h2>
     <div class="row px-xl-5">
+        <!-- Add New Customer Form -->
         <div class="col-lg-5 mb-5">
             <div class="bg-light p-30 mb-30">
                 <h5 class="card-title">Add New Customer</h5>
@@ -19,7 +20,7 @@
                         <input type="text" id="username" name="username" class="form-control" placeholder="Enter customer's ID number" required />
                     </div>
                     <div class="form-group">
-                        <label for="username">Password</label>
+                        <label for="password">Password</label>
                         <input type="text" id="password" name="password" class="form-control" placeholder="Enter default password" required />
                     </div>
                     <div class="form-group">
@@ -30,6 +31,7 @@
             </div>
         </div>
 
+        <!-- User Accounts List -->
         <div class="col-lg-7 mb-5">
             <div class="bg-light p-30 mb-30">
                 <h5 class="card-title">User Accounts List</h5>
@@ -52,17 +54,21 @@
                                 <td>@user.username</td>
                                 <td>@user.email</td>
                                 <td>@user.User_Role.rolename</td>
-                                <td>@(user.status == 1 ? "Active" : user.status == 0 ? "Inactive" : user.status == 2 ? "Accepted" : "Rejected" )</td>
+                                <td>@(user.status == 1 ? "Active" : user.status == 0 ? "Inactive" : user.status == 2 ? "Accepted" : "Rejected")</td>
                                 <td>
-                                    @if ((user.role_id == 2 || user.role_id == 4 || user.role_id ==1) && user.status == 0)
-                                    {
-                                        <a href="@Url.Action("ViewUser", "Admin", new { userId = user.id })" class="btn btn-info btn-sm">View</a>
-                                    }
-                                    else
-                                    {
-                                        <a href="/Admin/EditUser/@user.user_id" class="btn btn-primary btn-sm">Edit</a>
-                                        <a class="btn btn-danger btn-sm" onclick="confirmDelete('@user.user_id')">Delete</a>
-                                    }
+                                    <button class="btn btn-primary btn-sm"
+                                            onclick="openEditModal(
+                                            '@user.id',
+                                            '@user.username',
+                                            '@user.password',
+                                            '@user.email',
+                                            '@user.role_id',
+                                            '@user.status',
+                                            '@user.verify_code'
+                                        )">
+                                        Edit
+                                    </button>
+                                    <a class="btn btn-danger btn-sm" onclick="confirmDelete('@user.id')">Delete</a>
                                 </td>
                             </tr>
                         }
@@ -72,12 +78,97 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editUserModalLabel">Edit User Information</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="/Admin/UpdateUser">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success">
+                        @TempData["SuccessMessage"]
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger">
+                        @TempData["ErrorMessage"]
+                    </div>
+                }
+                <div class="modal-body">
+                    <div class="row">
+                        <input type="hidden" id="editUserId" name="id" />
+                        <div class="col-md-6 mb-3">
+                            <label for="editUsername" class="form-label font-weight-bold">Username</label>
+                            <input type="text" id="editUsername" name="username" class="form-control" placeholder="Enter username" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editEmail" class="form-label font-weight-bold">Email</label>
+                            <input type="email" id="editEmail" name="email" class="form-control" placeholder="Enter email" disabled />
+                        </div>
+                        <!-- Read-only Role -->
+                        <div class="col-md-6 mb-3">
+                            <label for="editRoleId" class="form-label font-weight-bold">Role</label>
+                            <input type="text" id="editRoleId" name="role_id" class="form-control"  readonly />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editStatus" class="form-label font-weight-bold">Status</label>
+                            <select id="editStatus" name="status" class="form-control">
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                                <option value="2">Accepted</option>
+                                <option value="3">Rejected</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editVerifyCode" class="form-label font-weight-bold">Verify Code</label>
+                            <input type="text" id="editVerifyCode" name="verify_code" class="form-control" disabled />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    function openEditModal(id, username, password, email, role_id, status, verify_code) {
+        $('#editUserId').val(id);
+        $('#editUsername').val(username);
+        $('#editPassword').val(password);
+        $('#editEmail').val(email);
+        $('#editRoleId').val(role_id);
+        $('#editStatus').val(status);
+        $('#editVerifyCode').val(verify_code);
+
+        $('#editUserModal').modal('show');
+    }
+    $.post("/Admin/UpdateUser", formData, function (response) {
+        if (response.code === 1) {
+            // Redirect to User Accounts on success
+            window.location.href = "/Admin/UserAccounts";
+        } else {
+            // Show error message on failure
+            alert(response.message || "Failed to update user.");
+        }
+    });
+
     function confirmDelete(userId) {
         Swal.fire({
             title: 'Are you sure?',
@@ -89,16 +180,19 @@
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`/Admin/UserDelete/${userId}`, { method: 'POST' })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire('Deleted!', 'The user has been deleted.', 'success')
-                                .then(() => location.reload());
-                        } else {
-                            Swal.fire('Error!', data.message, 'error');
-                        }
-                    });
+                fetch(`/Admin/UserDelete/${userId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 1) {
+                        Swal.fire('Deleted!', 'The user has been deleted.', 'success')
+                            .then(() => location.reload());
+                    } else {
+                        Swal.fire('Error!', data.message || 'Failed to delete user.', 'error');
+                    }
+                });
             }
         });
     }

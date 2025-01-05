@@ -27,13 +27,11 @@ namespace UCGrab.Controllers
             var totalUsers = _db.User_Accounts.Count();
             var customerInquiries = _db.ContactUs.Count();
 
-            // Fetch the 5 most recent stores
             var recentStores = _db.Store
                 .OrderByDescending(s => s.store_id) // Assuming 'CreatedAt' column exists
                 .Take(5)
                 .ToList();
 
-            // Fetch the 5 most recent customer inquiries
             var inquiries = _db.ContactUs
                 .OrderByDescending(c => c.contact_id) // Assuming 'CreatedAt' column exists
                 .Take(5)
@@ -90,14 +88,56 @@ namespace UCGrab.Controllers
             return RedirectToAction("UserAccounts");
         }
 
-        [AllowAnonymous]
+        [HttpPost]
         public JsonResult UserDelete(int id)
         {
             var res = new Response();
-            res.code = (Int32)_userManager.DeleteUser(id, ref ErrorMessage);
-            res.message = ErrorMessage;
+            string errorMessage = string.Empty;
 
-            return Json(res, JsonRequestBehavior.AllowGet);
+            try
+            {
+                res.code = (int)_userManager.DeleteUser(id, ref errorMessage);
+                res.message = res.code == 1 ? "User deleted successfully." : errorMessage;
+            }
+            catch (Exception ex)
+            {
+                res.code = 0;
+                res.message = $"An error occurred: {ex.Message}";
+            }
+
+            return Json(res);
+        }
+        [HttpPost]
+        [AllowAnonymous]
+        public ActionResult UpdateUser(User_Accounts user)
+        {
+            string errorMessage = string.Empty;
+
+            var existingUser = _userManager.GetUserById(user.id);
+            if (existingUser == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("UserAccounts", "Admin");
+            }
+
+            // Update fields
+            existingUser.username = user.username ?? existingUser.username;
+            existingUser.password = user.password ?? existingUser.password;
+            existingUser.email = user.email ?? existingUser.email;
+
+            // Assume UpdateUser returns an ErrorCode
+            ErrorCode updateResult = _userManager.UpdateUser(existingUser, ref errorMessage);
+
+            if (updateResult == ErrorCode.Success) // Check explicitly
+            {
+                TempData["SuccessMessage"] = "User updated successfully.";
+                return RedirectToAction("UserAccounts", "Admin");
+            }
+            else
+            {
+                TempData["ErrorMessage"] = errorMessage ?? "Failed to update user.";
+                return RedirectToAction("UserAccounts", "Admin");
+            }
         }
 
         [Authorize]
@@ -106,7 +146,7 @@ namespace UCGrab.Controllers
             var stores = _storeManager.ManageStore();
             return View(stores);
         }
-
+        
         [AllowAnonymous]
         public ActionResult Logout()
         {
@@ -211,6 +251,26 @@ namespace UCGrab.Controllers
         public ActionResult Inquires()
         {
             return View();
+        }
+
+        [HttpPost]
+        public ActionResult DeleteStore(int id)
+        {
+            var res = new Response();
+            string errorMessage = string.Empty;
+
+            try
+            {
+                res.code = (int)_storeManager.DeleteStore(id, ref errorMessage);
+                res.message = res.code == 1 ? "User deleted successfully." : errorMessage;
+            }
+            catch (Exception ex)
+            {
+                res.code = 0;
+                res.message = $"An error occurred: {ex.Message}";
+            }
+
+            return Json(res);
         }
     }
 }
