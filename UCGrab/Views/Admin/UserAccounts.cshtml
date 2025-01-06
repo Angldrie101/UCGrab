@@ -10,27 +10,63 @@
         <span class="bg-secondary pr-3">User Accounts Management</span>
     </h2>
     <div class="row px-xl-5">
-        <!-- Add New Customer Form -->
+        <!-- Add New Customer Form or Upload File -->
         <div class="col-lg-5 mb-5">
             <div class="bg-light p-30 mb-30">
-                <h5 class="card-title">Add New Customer</h5>
-                <form method="post" action="/Admin/AddUser">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" class="form-control" placeholder="Enter customer's ID number" required />
+                <h5 class="card-title">Add New Customer or Upload File</h5>
+                <!-- Tabs for options -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success">
+                        @TempData["SuccessMessage"]
                     </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="text" id="password" name="password" class="form-control" placeholder="Enter default password" required />
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger">
+                        @TempData["ErrorMessage"]
                     </div>
-                    <div class="form-group">
-                        <input type="text" id="role_id" name="role_id" class="form-control" value="1" hidden />
+                }
+                <ul class="nav nav-tabs" id="accountTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="add-account-tab" data-toggle="tab" href="#add-account" role="tab">Add Account</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="upload-file-tab" data-toggle="tab" href="#upload-file" role="tab">Upload File</a>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3">
+                    <!-- Add Account Form -->
+                    <div class="tab-pane fade show active" id="add-account" role="tabpanel">
+                        <form method="post" action="/Admin/UploadUserAccounts" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" id="username" name="username" class="form-control" placeholder="Enter customer's ID number" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="text" id="password" name="password" class="form-control" placeholder="Enter default password" required />
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="role_id" name="role_id" class="form-control" value="1" hidden />
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Add Account</button>
+                        </form>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Add Account</button>
-                </form>
+                    <!-- Upload File Form -->
+                    <div class="tab-pane fade" id="upload-file" role="tabpanel">
+                        <form method="post" action="/Admin/UploadUserAccounts" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="fileUpload">Select CSV File</label>
+                                <input type="file" id="fileUpload" name="fileUpload" class="form-control" accept=".csv" required />
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Upload</button>
+                        </form>
+                    </div>
+                </div>
+                
             </div>
         </div>
-
         <!-- User Accounts List -->
         <div class="col-lg-7 mb-5">
             <div class="bg-light p-30 mb-30">
@@ -62,8 +98,8 @@
                                     }
                                     else
                                     {
-                                    <button class="btn btn-primary btn-sm"
-                                            onclick="openEditModal(
+                                        <button class="btn btn-primary btn-sm"
+                                                onclick="openEditModal(
                                             '@user.id',
                                             '@user.username',
                                             '@user.password',
@@ -72,9 +108,9 @@
                                             '@user.status',
                                             '@user.verify_code'
                                         )">
-                                        Edit
-                                    </button>
-                                    <a class="btn btn-danger btn-sm" onclick="confirmDelete('@user.id')">Delete</a>
+                                            Edit
+                                        </button>
+                                        <a class="btn btn-danger btn-sm" onclick="confirmDelete('@user.id')">Delete</a>
                                     }
                                 </td>
                             </tr>
@@ -85,6 +121,7 @@
         </div>
     </div>
 </div>
+
 
 <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -119,10 +156,9 @@
                             <label for="editEmail" class="form-label font-weight-bold">Email</label>
                             <input type="email" id="editEmail" name="email" class="form-control" placeholder="Enter email" disabled />
                         </div>
-                        <!-- Read-only Role -->
                         <div class="col-md-6 mb-3">
                             <label for="editRoleId" class="form-label font-weight-bold">Role</label>
-                            <input type="text" id="editRoleId" name="role_id" class="form-control"  readonly />
+                            <input type="text" id="editRoleId" name="role_id" class="form-control" readonly />
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="editStatus" class="form-label font-weight-bold">Status</label>
@@ -147,6 +183,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Scripts -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

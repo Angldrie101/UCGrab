@@ -1,17 +1,15 @@
 ﻿<!doctype html>
 <html lang="en">
 <head>
-    <title>UC Grab - Change Password</title>
+    <title>UC Grab - Activate Account</title>
     <meta charset="utf-8">
-    <link href="/Assets/Shop/img/5-removebg-preview.png" rel="icon">
-
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="~/Assets/login/css/style.css">
 </head>
 <body>
-    @using (Html.BeginForm("ChangePass", "Home", FormMethod.Post))
+    @using (Html.BeginForm("ActivateAccount", "Home", FormMethod.Post))
     {
         <section class="ftco-section">
             <div class="container">
@@ -22,9 +20,9 @@
                             @TempData["error"]
 
                             <br />
-                            <label>Username</label>
+                            <label>Email</label>
                             <div class="form-group d-flex">
-                                <input type="text" name="username" class="form-control rounded-left" placeholder="Enter your username" required />
+                                <input type="email" name="email" class="form-control rounded-left" placeholder="Enter your email" required />
                             </div>
                             <label>Create New Password</label>
                             <div class="form-group d-flex">
@@ -32,7 +30,7 @@
                                        title="Must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character."
                                        required />
                             </div>
-                            <div class="form-text">NOTE: A verification code will be sent to your registered email to confirm this change.</div> <br />
+                            <div class="form-text">NOTE: A verification code will be sent to your email you inputted to confirm this change.</div> <br />
                             <div class="form-group">
                                 <input type="submit" class="form-control btn btn-primary rounded submit px-3" value="Proceed">
                             </div>

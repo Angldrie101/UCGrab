@@ -41,6 +41,11 @@ namespace UCGrab.Repository
             return _product._table.Where(m => m.user_id == user.user_id).ToList();
         }
 
+        public List<Product> DashboardProduct()
+        {
+            return _product._table.Where(m => m.status == (Int32)ProductStatus.HasStock).ToList();
+        }
+
         public Product GetProductById(int? id)
         {
             return _product.Get(id);

@@ -9,6 +9,7 @@ using UCGrab.Models;
 using UCGrab.Database;
 using System.IO;
 using UCGrab.Repository;
+using System.Data.Entity;
 
 namespace UCGrab.Controllers
 {
@@ -20,6 +21,23 @@ namespace UCGrab.Controllers
         public ActionResult Index()
         {
             IsUserLoggedSession();
+
+            using (var db = new UCGrabEntities())
+            {
+                var shops = db.Store
+                              .Where(s => s.status == 1)
+                              .Include(s => s.Image_Store) // Ensure navigation property is loaded
+                              .ToList();
+
+                var products = db.Product
+                                 .Where(p => p.status == 1)
+                                 .Include(p => p.Image_Product) // Ensure navigation property is loaded
+                                 .ToList();
+
+                // Check for null and assign empty lists if needed
+                ViewBag.Shops = shops ?? new List<Store>();
+                ViewBag.Products = products ?? new List<Product>();
+            }
 
             return View();
         }
@@ -54,7 +72,7 @@ namespace UCGrab.Controllers
                 if (user.email == null)
                 {
                     TempData["username"] = username;
-                    return RedirectToAction("ChangePass");
+                    return RedirectToAction("ActivateAccount");
                 }
                 else if (user.status != (int)Status.Active)
                 {
@@ -95,10 +113,76 @@ namespace UCGrab.Controllers
         }
 
         [AllowAnonymous]
+        public ActionResult ActivateAccount()
+        {
+            return View();
+        }
+        [HttpPost]
+        [AllowAnonymous]
+        public ActionResult ActivateAccount(string username, string email, string password)
+        {
+            var user = _userManager.GetUserByUsername(username);
+
+            if (user != null)
+            {
+                user.email = email;
+                user.password = password;
+
+                User_Accounts updatedUser = new User_Accounts
+                {
+                    id = user.id,
+                    user_id = user.user_id,
+                    username = user.username,
+                    role_id = user.role_id,
+                    status = user.status,
+                    verify_code = user.verify_code,
+                    date_created = user.date_created,
+                    email = email,
+                    password = password
+                };
+
+                string errMsg = string.Empty;
+                var result = _userManager.UpdateUser(updatedUser, ref errMsg);
+
+                if (result == ErrorCode.Success)
+                {
+                    string verificationCode = user.verify_code;
+
+                    string emailBody = $"Your verification code is: {verificationCode}";
+                    string errorMessage = "";
+
+                    var mailManager = new MailManager();
+                    bool emailSent = mailManager.SendEmail(email, "Verification Code", emailBody, ref errorMessage);
+
+                    if (!emailSent)
+                    {
+                        ModelState.AddModelError(String.Empty, errorMessage);
+                        return View();
+                    }
+                    TempData["username"] = updatedUser.username;
+
+                    return RedirectToAction("Verify");
+                }
+                else
+                {
+                    TempData["error"] = "Failed to update the user details. " + errMsg;
+                }
+            }
+            TempData["error"] = "User not found or invalid details.";
+            return View();
+        }
+        private string HashPassword(string password)
+        {
+            // Implement your password hashing logic here
+            return password;  // Replace with actual hashing, e.g., using SHA256 or bcrypt
+        }
+
+        [AllowAnonymous]
         public ActionResult ChangePass()
         {
             return View();
         }
+
         [AllowAnonymous]
         [HttpPost]
         public ActionResult ChangePass(string username, string password)
@@ -1206,5 +1290,6 @@ namespace UCGrab.Controllers
             TempData["Success"] = "Coupon applied successfully!";
             return RedirectToAction("Cart");
         }
+
     }
 }

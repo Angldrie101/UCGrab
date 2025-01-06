@@ -89,6 +89,85 @@ namespace UCGrab.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
+        public ActionResult UploadUserAccounts()
+        {
+            var db = new UCGrabEntities();
+            var file = Request.Files["fileUpload"]; // Get the uploaded file
+
+            if (file != null && file.ContentLength > 0)
+            {
+                // Set the path where the file will be saved on the server
+                string folderPath = Server.MapPath("~/Uploads");
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                // Set the file path (use the original file name)
+                string filePath = Path.Combine(folderPath, file.FileName);
+
+                // Save the file to the server
+                file.SaveAs(filePath);
+
+                // Process the file (e.g., read the file to import user accounts)
+                try
+                {
+                    using (var reader = new StreamReader(file.InputStream))
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            // Split the line by commas assuming it's a CSV
+                            string[] fields = line.Split(',');
+
+                            if (fields.Length >= 4) // Ensure enough columns are available
+                            {
+                                string username = fields[0].Trim();
+                                string password = fields[1].Trim();
+                                string roleId = fields[2].Trim();
+                                string status = fields[3].Trim();
+
+                                // Insert the new user account into the database
+                                // Assuming you have a method to add user account
+                                AddUserAccount(username, password, roleId, status);
+                            }
+                        }
+                    }
+
+                    TempData["SuccessMessage"] = "File uploaded and accounts added successfully.";
+                }
+                catch (Exception ex)
+                {
+                    TempData["ErrorMessage"] = $"An error occurred while processing the file: {ex.Message}";
+                }
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "No file uploaded or file is empty.";
+            }
+
+            return RedirectToAction("UserAccounts");
+        }
+        private void AddUserAccount(string username, string password, string roleId, string status)
+        {
+            // Example code to save to the database, modify according to your context
+            var userAccount = new User_Accounts
+            {
+                username = username,
+                password = password, // You might want to hash the password
+                role_id = int.Parse(roleId),
+                status = int.Parse(status)
+            };
+
+            // Assuming you have a database context
+            using (var context = new UCGrabEntities())
+            {
+                context.User_Accounts.Add(userAccount);
+                context.SaveChanges();
+            }
+        }
+        [HttpPost]
         public JsonResult UserDelete(int id)
         {
             var res = new Response();

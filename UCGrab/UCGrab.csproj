@@ -633,6 +633,7 @@
     <Content Include="Views\Home\CheckOut.cshtml" />
     <Content Include="Views\Shop\DiscountVouchers.cshtml" />
     <Content Include="Views\Home\DiscountedProducts.cshtml" />
+    <Content Include="Views\Home\ActivateAccount.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
