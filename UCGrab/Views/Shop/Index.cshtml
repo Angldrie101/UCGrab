@@ -41,6 +41,13 @@
             </div>
         </div>
     </div>
+    <div class="row px-xl-5 mb-4">
+        <div class="col-lg-12 text-right">
+            <button id="generateReportsBtn" class="btn btn-primary">
+                <i class="fas fa-file-download"></i> Generate Reports
+            </button>
+        </div>
+    </div>
     <div class="row px-xl-5">
         <div class="col-lg-6 mb-5">
             <div class="bg-light p-30 mb-30">
@@ -109,3 +116,8 @@
 
 <!-- Template Javascript -->
 <script src="/Assets/Shop/js/main.js"></script>
+<script>
+    document.getElementById('generateReportsBtn').addEventListener('click', function () {
+        window.location.href = '@Url.Action("GenerateReports", "Shop")';
+    });
+</script>

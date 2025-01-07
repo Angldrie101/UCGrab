@@ -328,17 +328,23 @@ namespace UCGrab.Repository
 
             return order;
         }
-        public decimal GetTotalByOrderId(int orderId)
+        public void UpdateOrderInvoicePath(int orderId, string invoicePath)
         {
-            // Fetch all order details for the given orderId
-            var orderdetails = _orderDetail._table.Where(o => o.order_id == orderId);
-
-            // Multiply price and quantity for each order detail and sum them up
-            var totalOrder = orderdetails.Sum(o => o.price * o.quatity) ?? 0m; // Use 0m if the result is null
-
-            return totalOrder;
+            var order = _db.Order.Find(orderId);
+            if (order != null)
+            {
+                order.invoice = invoicePath;
+                _db.SaveChanges();
+            }
         }
 
+        public Order GetLastOrderByUserId(string userId)
+        {
+            return _db.Order
+                .Where(o => o.user_id == userId)
+                .OrderByDescending(o => o.order_date)
+                .FirstOrDefault();
+        }
 
 
         public List<Order_Detail> GetOrderDetailsByOrderId(int orderId)

@@ -1035,14 +1035,39 @@ namespace UCGrab.Controllers
                     ViewBag.Error = "Please upload a receipt.";
                     return View(model);
                 }
-                
 
-                var invoiceFilePath = GenerateInvoicePDF(model);
-
-                var result = _orderManager.PlaceOrder(UserId, model, filePath, invoiceFilePath, ref errorMessage);
+                // Place the order first
+                var result = _orderManager.PlaceOrder(UserId, model, filePath, null, ref errorMessage);
 
                 if (result == ErrorCode.Success)
                 {
+                    // Retrieve the newly created order details
+                    var order = _orderManager.GetLastOrderByUserId(UserId); // Assuming this gets the most recent order
+                    if (order == null)
+                    {
+                        ViewBag.Error = "Order not found.";
+                        return View(model);
+                    }
+
+                    // Populate model with order and product details
+                    model.StoreId = (int)order.store_id;
+                    model.StoreName = _storeManager.GetStoreById(order.store_id)?.store_name ?? "Unknown Store";
+
+                    model.Products = order.Order_Detail.Select(od => new ProductViewModel
+                    {
+                        ProductName = od.Product.product_name,
+                        Quantity = (int)od.quatity,
+                        Price = (decimal)od.price
+                    }).ToList();
+
+                    model.Total = model.Products.Sum(p => p.Price * p.Quantity);
+
+                    // Generate Invoice with proper product details
+                    var invoiceFilePath = GenerateInvoicePDF(model);
+
+                    // Update order with invoice path
+                    _orderManager.UpdateOrderInvoicePath(order.order_id, invoiceFilePath);
+
                     return RedirectToAction("MyOrders");
                 }
                 else
@@ -1079,7 +1104,7 @@ namespace UCGrab.Controllers
 
                     // Add Invoice Title
                     doc.Add(new Paragraph("Invoice Receipt"));
-                    doc.Add(new Paragraph("Store Name: UCGrab Store"));
+                    doc.Add(new Paragraph($"Store Name: {model.StoreName}"));
                     doc.Add(new Paragraph($"Date: {DateTime.Now:yyyy-MM-dd}"));
                     doc.Add(new Paragraph("------------------------------------------------------"));
 
@@ -1088,23 +1113,22 @@ namespace UCGrab.Controllers
                     doc.Add(new Paragraph($"Contact: {model.Phone}"));
                     doc.Add(new Paragraph("------------------------------------------------------"));
 
-                    // Retrieve Products Directly from Database
-                    var orderDetails = _orderManager.GetOrderDetailsByOrderId(model.OrderId);
-                    if (orderDetails != null && orderDetails.Any())
+                    // Add Product Details
+                    if (model.Products != null && model.Products.Any())
                     {
                         doc.Add(new Paragraph("Products:"));
-                        foreach (var detail in orderDetails)
+                        foreach (var product in model.Products)
                         {
-                            doc.Add(new Paragraph($"- {detail.Product?.product_name ?? "Unknown Product"} (Qty: {detail.quatity}) - ₱{detail.price}"));
+                            doc.Add(new Paragraph($"- {product.ProductName} (Qty: {product.Quantity}) - ₱{product.Price:N2}"));
                         }
                     }
                     else
                     {
-                        doc.Add(new Paragraph("No products found for this order."));
+                        doc.Add(new Paragraph("No products found in this order."));
                     }
 
                     // Add Total
-                    var totalOrder = orderDetails?.Sum(od => od.price * od.quatity) ?? 0;
+                    var totalOrder = model.Products?.Sum(p => p.Price * p.Quantity) ?? 0;
                     doc.Add(new Paragraph("------------------------------------------------------"));
                     doc.Add(new Paragraph($"Total: ₱{totalOrder:N2}"));
                     doc.Add(new Paragraph("Thank you for your purchase!"));

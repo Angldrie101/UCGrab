@@ -31,6 +31,10 @@ namespace UCGrab.Repository
         {
             return _store.Get(id);
         }
+        public Store GetStoreId(int? storeId)
+        {
+            return _store._table.Where(s => s.id == storeId).FirstOrDefault();
+        }
         public Store GetStoreByGuId(String id)
         {
             return _store.GetAll().Where(m => m.store_id == id).FirstOrDefault();

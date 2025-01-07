@@ -26,7 +26,8 @@ namespace UCGrab.Models
         public int CheckOutOption { get; set; }
         public string StoreImageUrl { get; set; }
         public string DeliveryUserId { get; set; }
-        public string Stores { get; set; }
+        public int StoreId { get; set; }
+        public string StoreName { get; set; }
         public string StoreQrCode { get; set; }
         public string Receipt { get; set; }
         public string StoreAddress { get; set; }

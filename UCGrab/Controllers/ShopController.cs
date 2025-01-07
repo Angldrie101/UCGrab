@@ -10,6 +10,7 @@ using UCGrab.Database;
 using UCGrab.Models;
 using UCGrab.Repository;
 using UCGrab.Utils;
+using OfficeOpenXml;
 
 namespace UCGrab.Controllers
 {
@@ -70,6 +71,87 @@ namespace UCGrab.Controllers
             };
 
             return View(dashboardData);
+        }
+
+        public ActionResult GenerateReports()
+        {
+            var userId = User.Identity.Name;
+            var userInfo = _userManager.GetUserInfoByUsername(userId);
+            var _db = new UCGrabEntities();
+
+            // Fetch Data for Reports
+            var totalSales = _db.Order_Detail
+                                .Where(od => od.Order.store_id == userInfo.store_id && od.Order.order_status == (int)OrderStatus.Delivered)
+                                .Sum(od => od.price) ?? 0;
+
+            var orders = _db.Order
+                            .Where(o => o.store_id == userInfo.store_id)
+                            .Select(o => new
+                            {
+                                o.order_id,
+                                o.order_date,
+                                o.order_status
+                            })
+                            .ToList();
+
+            var products = _db.Product
+                              .Where(p => p.Store.id == userInfo.store_id)
+                              .Select(p => new
+                              {
+                                  p.product_id,
+                                  p.product_name,
+                                  p.price,
+                      })
+                              .ToList();
+
+            // Create Excel Report
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using (var package = new ExcelPackage())
+            {
+                // ✅ Total Sales Sheet
+                var salesSheet = package.Workbook.Worksheets.Add("Total Sales");
+                salesSheet.Cells[1, 1].Value = "Total Sales";
+                salesSheet.Cells[1, 2].Value = totalSales;
+
+                // ✅ Orders Sheet
+                var ordersSheet = package.Workbook.Worksheets.Add("Orders");
+                ordersSheet.Cells[1, 1].Value = "Order ID";
+                ordersSheet.Cells[1, 2].Value = "Order Date";
+                ordersSheet.Cells[1, 3].Value = "Order Status";
+                ordersSheet.Cells[1, 4].Value = "Customer Name";
+                ordersSheet.Cells[1, 5].Value = "Order Status";
+
+                int orderRow = 2;
+                foreach (var order in orders)
+                {
+                    ordersSheet.Cells[orderRow, 1].Value = order.order_id;
+                    ordersSheet.Cells[orderRow, 2].Value = order.order_date?.ToString("yyyy-MM-dd");
+                    ordersSheet.Cells[orderRow, 3].Value = order.order_status == 5 ? "Delivered" : order.order_status == 1 ? "Pending": order.order_status == 3 ? "Confirmed": order.order_status == 4 ? "ReadyToDeliver": order.order_status == 7 ? "Rejected":"Done";
+                    orderRow++;
+                }
+
+                // ✅ Products Sheet
+                var productsSheet = package.Workbook.Worksheets.Add("Products");
+                productsSheet.Cells[1, 1].Value = "Product ID";
+                productsSheet.Cells[1, 2].Value = "Name";
+                productsSheet.Cells[1, 3].Value = "Price";
+
+                int productRow = 2;
+                foreach (var product in products)
+                {
+                    productsSheet.Cells[productRow, 1].Value = product.product_id;
+                    productsSheet.Cells[productRow, 2].Value = product.product_name;
+                    productsSheet.Cells[productRow, 3].Value = product.price;
+                    productRow++;
+                }
+
+                // ✅ Finalize and Download Excel File
+                var stream = new MemoryStream();
+                package.SaveAs(stream);
+                stream.Position = 0;
+                var fileName = $"StoreReports_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
         }
 
         [Authorize]
