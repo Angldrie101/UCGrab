@@ -31,5 +31,6 @@ namespace UCGrab.Models
         public string Receipt { get; set; }
         public string StoreAddress { get; set; }
         public string GCashReceipt { get; set; }
+        public string InvoicePath { get; set; }
     }
 }

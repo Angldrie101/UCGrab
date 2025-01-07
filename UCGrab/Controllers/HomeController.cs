@@ -10,6 +10,11 @@ using UCGrab.Database;
 using System.IO;
 using UCGrab.Repository;
 using System.Data.Entity;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using DbImage = UCGrab.Database.Image; 
+using PdfImage = iTextSharp.text.Image; 
+
 
 namespace UCGrab.Controllers
 {
@@ -545,10 +550,9 @@ namespace UCGrab.Controllers
             }
             
             TempData["SuccessMessage"] = "Registration successful. Admin will validate your registration.";
-            return RedirectToAction("Driver", "Home");
-
+            return RedirectToAction("Verify");
         }
-        
+
         [Authorize]
         public ActionResult MyProfile()
         {
@@ -647,38 +651,47 @@ namespace UCGrab.Controllers
                     // Log the save path
                     System.Diagnostics.Debug.WriteLine("Profile picture saved at: " + profileSavePath);
 
+                    // Handle image management
                     var existingImage = _imageManager.ListImgAttachByImageId(userInf.id).FirstOrDefault();
                     if (existingImage != null)
                     {
-                        existingImage.image_file = profileFileName;
-                        if(_imageManager.UpdateImg(existingImage, ref ErrorMessage) == ErrorCode.Error)
+                        // Delete old image if exists
+                        var oldImagePath = Path.Combine(uploadsFolderPath, existingImage.image_file);
+                        if (System.IO.File.Exists(oldImagePath))
                         {
-                            ModelState.AddModelError(String.Empty, ErrorMessage);
+                            System.IO.File.Delete(oldImagePath);
+                        }
+
+                        existingImage.image_file = profileFileName;
+                        if (_imageManager.UpdateImg(existingImage, ref ErrorMessage) == ErrorCode.Error)
+                        {
+                            ModelState.AddModelError(string.Empty, ErrorMessage);
                             return View(userInf);
                         }
                     }
                     else
                     {
-                        Image img = new Image
+                        DbImage dbImage = new DbImage
                         {
                             image_file = profileFileName,
                             image_id = userInf.id
                         };
 
-                       if (_imageManager.CreateImg(img, ref ErrorMessage) == ErrorCode.Error)
+                        if (_imageManager.CreateImg(dbImage, ref ErrorMessage) == ErrorCode.Error)
                         {
-                            ModelState.AddModelError(String.Empty, ErrorMessage);
+                            ModelState.AddModelError(string.Empty, ErrorMessage);
                             return View(userInf);
                         }
                     }
                 }
 
-           if (_userManager.UpdateUserInformation(userInf, ref ErrorMessage) == ErrorCode.Error)
+                // Update user information
+                if (_userManager.UpdateUserInformation(userInf, ref ErrorMessage) == ErrorCode.Error)
                 {
-                    ModelState.AddModelError(String.Empty, ErrorMessage);
+                    ModelState.AddModelError(string.Empty, ErrorMessage);
                     return View(userInf);
-
                 }
+
                 TempData["SuccessMessage"] = "Profile updated successfully.";
                 return RedirectToAction("MyProfile");
             }
@@ -957,32 +970,40 @@ namespace UCGrab.Controllers
 
             var userId = UserId;
             var userInfo = _userManager.GetUserInfoByUserId(userId);
-            var order = _orderManager.GetOrderByUserId(userId).FirstOrDefault();
-            var orderDetails = _orderManager.GetOrderDetailsByOrderId(order.order_id);
-            var totalOrder = _orderManager.GetTotalByOrderId(order.order_id);
-            var image = _imageManager.GetStoreQrCodeByStoreId(order.store_id);
+            var order = _orderManager.GetOpenOrderByUserId(userId);
+
+            if (order == null)
+            {
+                ViewBag.Error = "No open order found. Please add products to your cart.";
+                return RedirectToAction("Cart");
+            }
+
+            var orderDetails = _orderManager.GetOrderDetailsByOrderId(order.order_id) ?? new List<Order_Detail>();
+            var totalOrder = orderDetails.Sum(od => od.price * od.quatity);
+            var storeQrCode = _imageManager.GetStoreQrCodeByStoreId(order.store_id);
 
             var model = new CheckOutViewModel
             {
                 OrderId = order.order_id,
-                Firstname = userInfo.first_name,
-                Lastname = userInfo.last_name,
-                Phone = userInfo.phone,
-                Email = userInfo.email,
+                Firstname = userInfo?.first_name ?? "N/A",
+                Lastname = userInfo?.last_name ?? "N/A",
+                Phone = userInfo?.phone ?? "N/A",
+                Email = userInfo?.email ?? "N/A",
                 Products = orderDetails.Select(od => new ProductViewModel
                 {
-                    ProductName = od.Product.product_name,
-                    Quantity = (Int32)od.quatity,
-                    Price = (Int32)od.price
+                    ProductName = od?.Product?.product_name ?? "Unknown Product",
+                    Quantity = (int)(od?.quatity ?? 0),
+                    Price = (int)(od?.price ?? 0)
                 }).ToList(),
-                CheckOutOption = (Int32)CheckoutOption.PickUp,
-                PaymentMethod = (Int32)PayMethod.GCash,
-                Total = order.Order_Detail != null ? order.Order_Detail.Sum(od => od.price * od.quatity) : 0,
-                StoreQrCode = image
+                CheckOutOption = (int)CheckoutOption.PickUp,
+                PaymentMethod = (int)PayMethod.GCash,
+                Total = totalOrder,
+                StoreQrCode = storeQrCode
             };
 
             return View(model);
         }
+
 
         [HttpPost]
         [AllowAnonymous]
@@ -1007,7 +1028,6 @@ namespace UCGrab.Controllers
 
                     filePath = Path.Combine(directoryPath, fileName);
                     gcashReceipt.SaveAs(filePath);
-
                     filePath = "/Uploads/Receipts/" + fileName;
                 }
                 else
@@ -1015,8 +1035,11 @@ namespace UCGrab.Controllers
                     ViewBag.Error = "Please upload a receipt.";
                     return View(model);
                 }
+                
 
-                var result = _orderManager.PlaceOrder(UserId, model, filePath, ref errorMessage);
+                var invoiceFilePath = GenerateInvoicePDF(model);
+
+                var result = _orderManager.PlaceOrder(UserId, model, filePath, invoiceFilePath, ref errorMessage);
 
                 if (result == ErrorCode.Success)
                 {
@@ -1034,7 +1057,66 @@ namespace UCGrab.Controllers
                 return View(model);
             }
         }
-        
+
+        private string GenerateInvoicePDF(CheckOutViewModel model)
+        {
+            string invoiceDirectory = Server.MapPath("~/Invoices/");
+
+            if (!Directory.Exists(invoiceDirectory))
+            {
+                Directory.CreateDirectory(invoiceDirectory);
+            }
+
+            string fileName = $"Invoice_{DateTime.Now.Ticks}.pdf";
+            string filePath = Path.Combine(invoiceDirectory, fileName);
+
+            using (FileStream fs = new FileStream(filePath, FileMode.Create))
+            {
+                using (Document doc = new Document())
+                {
+                    PdfWriter.GetInstance(doc, fs);
+                    doc.Open();
+
+                    // Add Invoice Title
+                    doc.Add(new Paragraph("Invoice Receipt"));
+                    doc.Add(new Paragraph("Store Name: UCGrab Store"));
+                    doc.Add(new Paragraph($"Date: {DateTime.Now:yyyy-MM-dd}"));
+                    doc.Add(new Paragraph("------------------------------------------------------"));
+
+                    // Add Customer Details
+                    doc.Add(new Paragraph($"Customer Name: {model.Lastname}, {model.Firstname}"));
+                    doc.Add(new Paragraph($"Contact: {model.Phone}"));
+                    doc.Add(new Paragraph("------------------------------------------------------"));
+
+                    // Retrieve Products Directly from Database
+                    var orderDetails = _orderManager.GetOrderDetailsByOrderId(model.OrderId);
+                    if (orderDetails != null && orderDetails.Any())
+                    {
+                        doc.Add(new Paragraph("Products:"));
+                        foreach (var detail in orderDetails)
+                        {
+                            doc.Add(new Paragraph($"- {detail.Product?.product_name ?? "Unknown Product"} (Qty: {detail.quatity}) - ₱{detail.price}"));
+                        }
+                    }
+                    else
+                    {
+                        doc.Add(new Paragraph("No products found for this order."));
+                    }
+
+                    // Add Total
+                    var totalOrder = orderDetails?.Sum(od => od.price * od.quatity) ?? 0;
+                    doc.Add(new Paragraph("------------------------------------------------------"));
+                    doc.Add(new Paragraph($"Total: ₱{totalOrder:N2}"));
+                    doc.Add(new Paragraph("Thank you for your purchase!"));
+
+                    doc.Close();
+                }
+            }
+
+            return "/Invoices/" + fileName;
+        }
+
+
         [AllowAnonymous]
         public ActionResult Contact()
         {
@@ -1074,6 +1156,7 @@ namespace UCGrab.Controllers
             ViewBag.CancelledCount = orders.Count(o => o.order_status == 2);
             ViewBag.RejectedCount = orders.Count(o => o.order_status == 7);
 
+
             var model = orders.Select(order => new OrderViewModel
             {
                 OrderId = order.order_id,
@@ -1087,7 +1170,9 @@ namespace UCGrab.Controllers
                     Price = (Int32)od.price,
                     ImageFilePath = od.Product.Image_Product.FirstOrDefault().image_file
                 }).ToList(),
-                Total = (Int32)order.Order_Detail.Sum(od => od.price * od.quatity)
+                Total = (Int32)order.Order_Detail.Sum(od => od.price * od.quatity),
+                InvoicePath = order.invoice // Ensure the `invoice` field has the correct file path
+
             }).ToList();
 
             return View(model);

@@ -122,11 +122,11 @@
                     </div>
                     <div class="form-group">
                         <label for="voucherstartdate" class="form-label">Start Date</label>
-                        <input type="date" class="form-control" id="voucherstartdate" name="startDate" placeholder="Enter start date" required>
+                        <input type="date" class="form-control" id="voucherstartdate" name="vstartDate" placeholder="Enter start date" required>
                     </div>
                     <div class="form-group">
                         <label for="voucherendDate" class="form-label">End Date</label>
-                        <input type="date" class="form-control" id="voucherendDate" name="endDate" placeholder="Enter end date" required>
+                        <input type="date" class="form-control" id="voucherendDate" name="vendDate" placeholder="Enter end date" required>
                     </div>
                     <div class="form-group" hidden>
                         <label for="voucherstatus" class="form-label">Voucher Status</label>
@@ -211,7 +211,7 @@
                                 <td>@voucher.min_order_amount</td>
                                 <td>@voucher.max_uses</td>
                                 <td>@(voucher.start_date.HasValue ? voucher.start_date.Value.ToShortDateString() : "N/A")</td>
-                                <td>@(voucher.start_date.HasValue ? voucher.start_date.Value.ToShortDateString() : "N/A")</td>
+                                <td>@(voucher.end_date.HasValue ? voucher.start_date.Value.ToShortDateString() : "N/A")</td>
                                 <td>@(voucher.is_active == 1?"Active":"Inactive")</td>
                             </tr>
                           }

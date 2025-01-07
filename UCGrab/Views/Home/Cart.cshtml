@@ -316,14 +316,3 @@ else
     });
 
 </script>
-@if (TempData["Success"] != null)
-{
-    <script>
-                                                        Swal.fire({
-                                                            title: 'Deleted!',
-                                                            text: '@TempData["Success"]',
-                                                            icon: 'success',
-                                                            confirmButtonColor: '#3085d6'
-                                                        });
-    </script>
-}

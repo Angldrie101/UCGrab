@@ -254,7 +254,7 @@ namespace UCGrab.Repository
             return _orderDetail.Delete(id, out err);
         }
         
-        public ErrorCode PlaceOrder(string userId, CheckOutViewModel model, string gcashReceiptFileName, ref string error)
+        public ErrorCode PlaceOrder(string userId, CheckOutViewModel model, string gcashReceiptFileName,string invoiceFilePath, ref string error)
         {
             try
             {
@@ -273,6 +273,7 @@ namespace UCGrab.Repository
                     order.lastname = model.Lastname;
                     order.phone = model.Phone;
                     order.email = model.Email;
+                    order.invoice = invoiceFilePath;
                     order.additional_info = model.AdditionalInfo;
                     if (!string.IsNullOrEmpty(gcashReceiptFileName))
                     {
@@ -451,8 +452,11 @@ namespace UCGrab.Repository
 
         public Order GetOpenOrderByUserId(string userId)
         {
-            return _db.Order.FirstOrDefault(o => o.user_id == userId && o.order_status == (int)OrderStatus.Open);
+            return _db.Order
+                .Include(o => o.Order_Detail.Select(od => od.Product)) // Ensure products are included
+                .FirstOrDefault(o => o.user_id == userId && o.order_status == (int)OrderStatus.Open);
         }
+
 
         public Order_Detail GetOrderDetailByOrderIdAndProductId(int orderId, int productId)
         {

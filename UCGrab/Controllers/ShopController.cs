@@ -685,7 +685,7 @@ namespace UCGrab.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult AddVoucher(Vouchers model, DateTime startDate, DateTime endDate, string VocherCode, string VDiscountType, decimal VDiscountValue, decimal VMinOrderAmount, int VMaxUses)
+        public ActionResult AddVoucher(Vouchers model, DateTime vstartDate, DateTime vendDate, string VocherCode, string VDiscountType, decimal VDiscountValue, decimal VMinOrderAmount, int VMaxUses)
         {
             var _db = new UCGrabEntities();
             var errorMessage = string.Empty;
@@ -695,7 +695,7 @@ namespace UCGrab.Controllers
                 var username = User.Identity.Name;
                 var userInfo = _userManager.GetUserInfoByUsername(username);
 
-                if (startDate > endDate)
+                if (vstartDate > vendDate)
                 {
                     ModelState.AddModelError("", "Start date cannot be later than end date.");
                     return View(model);
@@ -705,8 +705,8 @@ namespace UCGrab.Controllers
                 {
                     model.store_id = userInfo.store_id;
                     model.voucher_code = VocherCode;
-                    model.start_date = startDate;
-                    model.end_date = endDate;
+                    model.start_date = vstartDate;
+                    model.end_date = vendDate;
                     model.max_uses = VMaxUses;
                     model.discount_type = VDiscountType;
                     model.discount_value = VDiscountValue;

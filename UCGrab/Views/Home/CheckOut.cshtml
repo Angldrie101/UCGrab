@@ -100,12 +100,19 @@
                 <div class="bg-light p-30 mb-5">
                     <div class="border-bottom">
                         <h6 class="mb-3">Products</h6>
-                        @foreach (var product in Model.Products)
+                        @if (Model.Products.Any())
                         {
-                            <div class="d-flex justify-content-between">
-                                <p>@product.ProductName (@product.Quantity pcs)</p>
-                                <p>₱@product.Price</p>
-                            </div>
+                            foreach (var product in Model.Products)
+                            {
+                                <div class="d-flex justify-content-between">
+                                    <p>@product.ProductName (@product.Quantity pcs)</p>
+                                    <p>₱@product.Price</p>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p>No products found in your order. Please return to your cart.</p>
                         }
                     </div>
                     <div class="border-bottom pt-3 pb-2">
@@ -272,6 +279,29 @@
     }
 
     document.addEventListener('DOMContentLoaded', toggleForms);
+
+    function generateReceipt(orderId) {
+        $.ajax({
+            type: 'POST',
+            url: '/Home/GenerateReceipt',
+            data: { orderId: orderId },
+            success: function (response) {
+                if (response.success) {
+                    var receiptLink = document.getElementById("receipt-link");
+                    receiptLink.href = response.receiptUrl;
+                    document.getElementById("receipt-download").style.display = 'block';
+                } else {
+                    Swal.fire('Error!', 'Failed to generate receipt.', 'error');
+                }
+            }
+        });
+    }
+
+    function simulateOrderPlacement() {
+        var orderId = 12345; 
+
+        generateReceipt(orderId);
+    }
 </script>
 
 

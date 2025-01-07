@@ -123,14 +123,17 @@ namespace UCGrab.Controllers
 
                             if (fields.Length >= 4) // Ensure enough columns are available
                             {
-                                string username = fields[0].Trim();
-                                string password = fields[1].Trim();
-                                string roleId = fields[2].Trim();
-                                string status = fields[3].Trim();
+                                string userid = fields[0].Trim();
+                                string username = fields[1].Trim();
+                                string password = fields[2].Trim();
+                                string roleId = fields[3].Trim();
+                                string status = fields[4].Trim();
+                                string verify_code = fields[5].Trim();
+                                string date_created = fields[6].TrimEnd();
 
                                 // Insert the new user account into the database
                                 // Assuming you have a method to add user account
-                                AddUserAccount(username, password, roleId, status);
+                                AddUserAccount(userid, username, password, roleId, status, verify_code,date_created);
                             }
                         }
                     }
@@ -149,15 +152,29 @@ namespace UCGrab.Controllers
 
             return RedirectToAction("UserAccounts");
         }
-        private void AddUserAccount(string username, string password, string roleId, string status)
+        private void AddUserAccount(string userid, string username, string password, string roleId, string status, string verify_code,string date_created)
         {
+            DateTime? parsedDate = null;
+
+            try
+            {
+                parsedDate = DateTime.Parse(date_created);
+            }
+            catch (FormatException)
+            {
+                // Handle invalid date format if needed, or leave parsedDate as null
+                // Optionally log the error or handle differently
+            }
             // Example code to save to the database, modify according to your context
             var userAccount = new User_Accounts
             {
+                user_id = userid,
                 username = username,
                 password = password, // You might want to hash the password
                 role_id = int.Parse(roleId),
-                status = int.Parse(status)
+                status = int.Parse(status),
+                verify_code = verify_code,
+                date_created = parsedDate
             };
 
             // Assuming you have a database context
