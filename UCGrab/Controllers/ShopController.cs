@@ -90,7 +90,9 @@ namespace UCGrab.Controllers
                             {
                                 o.order_id,
                                 o.order_date,
-                                o.order_status
+                                o.order_status,
+                                o.firstname,
+                                o.lastname
                             })
                             .ToList();
 
@@ -118,8 +120,8 @@ namespace UCGrab.Controllers
                 ordersSheet.Cells[1, 1].Value = "Order ID";
                 ordersSheet.Cells[1, 2].Value = "Order Date";
                 ordersSheet.Cells[1, 3].Value = "Order Status";
-                ordersSheet.Cells[1, 4].Value = "Customer Name";
-                ordersSheet.Cells[1, 5].Value = "Order Status";
+                ordersSheet.Cells[1, 4].Value = "Customer Firstname";
+                ordersSheet.Cells[1, 5].Value = "Customer Lastname";
 
                 int orderRow = 2;
                 foreach (var order in orders)
@@ -127,6 +129,8 @@ namespace UCGrab.Controllers
                     ordersSheet.Cells[orderRow, 1].Value = order.order_id;
                     ordersSheet.Cells[orderRow, 2].Value = order.order_date?.ToString("yyyy-MM-dd");
                     ordersSheet.Cells[orderRow, 3].Value = order.order_status == 5 ? "Delivered" : order.order_status == 1 ? "Pending": order.order_status == 3 ? "Confirmed": order.order_status == 4 ? "ReadyToDeliver": order.order_status == 7 ? "Rejected":"Done";
+                    ordersSheet.Cells[orderRow, 4].Value = order.firstname;
+                    ordersSheet.Cells[orderRow, 5].Value = order.lastname;
                     orderRow++;
                 }
 

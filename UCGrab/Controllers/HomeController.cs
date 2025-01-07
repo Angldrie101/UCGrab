@@ -1237,13 +1237,14 @@ namespace UCGrab.Controllers
         }
 
         [HttpPost]
-        public IActionResult SubmitReview([FromBody] Review review, int orderId)
+        public ActionResult SubmitReview(Review review, int orderId)
         {
             var _db = new UCGrabEntities();
 
             if (review == null || review.rating == 0 || string.IsNullOrEmpty(review.comment))
             {
-                return Json(new { success = false, message = "Invalid review data." }) as IActionResult;
+                TempData["ErrorMessage"] = "Invalid review data.";
+                return RedirectToAction("MyOrders");
             }
 
             var username = User.Identity.Name;
@@ -1251,7 +1252,8 @@ namespace UCGrab.Controllers
 
             if (userInfo == null)
             {
-                return Json(new { success = false, message = "User is not logged in." }) as IActionResult;
+                TempData["ErrorMessage"] = "User is not logged in.";
+                return RedirectToAction("MyOrders");
             }
 
             int userId = userInfo.id;
@@ -1268,7 +1270,8 @@ namespace UCGrab.Controllers
             _db.Review.Add(reviewEntity);
             _db.SaveChanges();
 
-            return Json(new { success = true, message = "Review submitted successfully." }) as IActionResult;
+            TempData["SuccessMessage"] = "Review submitted successfully.";
+            return RedirectToAction("MyOrders");
         }
 
         private IActionResult Unauthorized(string v)
