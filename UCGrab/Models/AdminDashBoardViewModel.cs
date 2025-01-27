@@ -14,5 +14,6 @@ namespace UCGrab.Models
         public int NewCustomerInquiries { get; set; }
         public List<Store> RecentStores { get; set; }
         public List<ContactUs> RecentInquiries { get; set; }
+        public List<ActivityLog> ActivityLog { get; set; }
     }
 }

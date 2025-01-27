@@ -42,9 +42,6 @@ namespace UCGrab.Database
         public virtual ICollection<Order_Detail> Order_Detail { get; set; }
         public virtual ICollection<Review> Review { get; set; }
         public virtual ICollection<Product> Products { get; set; }
-        public virtual ICollection<User_Information> User_Information { get; set; }
-
-
         public virtual Store Store { get; set; }
     }
 }

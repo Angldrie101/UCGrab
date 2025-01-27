@@ -106,6 +106,10 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
+    <Reference Include="Rotativa, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rotativa.1.7.3\lib\net461\Rotativa.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
       <Private>True</Private>
@@ -219,6 +223,7 @@
     <Content Include="Assets\Shop\css\bootstrap.min.css" />
     <Content Include="Assets\Shop\css\style.css" />
     <Content Include="Assets\Shop\css\style.min.css" />
+    <Content Include="Assets\Shop\img\5-removebg-preview.png" />
     <Content Include="Assets\Shop\img\acbooks.jpg" />
     <Content Include="Assets\Shop\img\Breakfast.jpg" />
     <Content Include="Assets\Shop\img\CarBooks.jpeg" />
@@ -242,6 +247,7 @@
     <Content Include="Assets\Shop\img\lmfocus.jpg" />
     <Content Include="Assets\Shop\img\lmscholar.jpg" />
     <Content Include="Assets\Shop\img\lmsh.jpg" />
+    <Content Include="Assets\Shop\img\logo1-removebg-preview.png" />
     <Content Include="Assets\Shop\img\logo1.jpg" />
     <Content Include="Assets\Shop\img\LogoUC.jpg" />
     <Content Include="Assets\Shop\img\Lunch.jpg" />
@@ -260,6 +266,10 @@
       <DependentUpon>UCGrab.edmx</DependentUpon>
       <LastGenOutput>UCGrab.cs</LastGenOutput>
     </Content>
+    <Content Include="Rotativa\help-wkhtmltoimage.txt" />
+    <Content Include="Rotativa\help-wkhtmltopdf.txt" />
+    <Content Include="Rotativa\wkhtmltoimage.exe" />
+    <Content Include="Rotativa\wkhtmltopdf.exe" />
     <Content Include="UploadedFiles\profile.jpg" />
     <Content Include="Assets\Shop\img\psits.jpg" />
     <Content Include="Assets\Shop\img\seniorHS.jpg" />
@@ -302,6 +312,9 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\IActionResult.cs" />
     <Compile Include="Controllers\ShopController.cs" />
+    <Compile Include="Database\ActivityLog.cs">
+      <DependentUpon>UCGrab.tt</DependentUpon>
+    </Compile>
     <Compile Include="Database\Category.cs">
       <DependentUpon>UCGrab.tt</DependentUpon>
     </Compile>
@@ -387,6 +400,7 @@
     <Compile Include="Models\OrderViewModel.cs" />
     <Compile Include="Models\ProductViewModel.cs" />
     <Compile Include="Models\ProviderDashboardViewModel.cs" />
+    <Compile Include="Models\ReportViewModel.cs" />
     <Compile Include="Models\Response.cs" />
     <Compile Include="Models\ReviewModel.cs" />
     <Compile Include="Models\StoreDiscountedProductsViewModel.cs" />
@@ -635,7 +649,7 @@
     <Content Include="Views\Home\SelectRole.cshtml" />
     <Content Include="Views\Shared\_DeliveryLayoutPage.cshtml" />
     <Content Include="Views\Delivery\Orders.cshtml" />
-    <Content Include="Views\Delivery\OrderDetails.cshtml" />
+    <Content Include="Views\Admin\OrderDetails.cshtml" />
     <Content Include="Views\Home\SignUpForProvider.cshtml" />
     <Content Include="Views\Home\SignUpForDriver.cshtml" />
     <Content Include="Views\Delivery\ToDeliver.cshtml" />
@@ -648,6 +662,7 @@
     <Content Include="Database\UCGrab.edmx.diagram">
       <DependentUpon>UCGrab.edmx</DependentUpon>
     </Content>
+    <Content Include="App_Browsers\qt.browser" />
     <None Include="Properties\PublishProfiles\UCGrab.pubxml" />
     <Content Include="Views\Admin\Inquires.cshtml" />
     <Content Include="Views\Delivery\MyProfile.cshtml" />
@@ -656,6 +671,8 @@
     <Content Include="Views\Shop\DiscountVouchers.cshtml" />
     <Content Include="Views\Home\DiscountedProducts.cshtml" />
     <Content Include="Views\Home\ActivateAccount.cshtml" />
+    <Content Include="Views\Shop\GenerateReports.cshtml" />
+    <Content Include="Views\Admin\ActivityLogPdf.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

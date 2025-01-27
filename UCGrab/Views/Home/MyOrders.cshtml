@@ -194,7 +194,7 @@ else
             <div class="order-item mb-4">
                 <div class="d-flex justify-content-between align-items-center bg-lightgray text-dark p-3" style="background-color: lightgray;">
                     <div><strong>Order Number: </strong>@order.OrderNumber</div>
-                    <div><strong>Order Date: </strong>@order.OrderDate.ToString("yyyy-MM-dd")</div>
+                    <div><strong>Order Date: </strong>@(order.OrderDate.HasValue ? order.OrderDate.Value.ToString("yyyy-MM-dd") : "N/A")</div>
                     <div><strong>Status: </strong>@order.Status</div>
                 </div>
                 

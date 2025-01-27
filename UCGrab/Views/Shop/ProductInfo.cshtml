@@ -31,6 +31,12 @@
                     {
                         <div class="alert alert-success" role="alert">@TempData["Message"]</div>
                     }
+                    if (!String.IsNullOrEmpty(TempData["ErrorMessage"] as String))
+                    {
+                        <div class="alert alert-danger" style="background-color: red; color: white;" role="alert">
+                            @TempData["ErrorMessage"]
+                        </div>
+                    }
                     <div class="form-group">
                         <label class="form-label">Product Image</label>
                         <div id="preview" class="img-fluid"></div>
@@ -55,8 +61,10 @@
                         <textarea class="form-control" id="productDescription" name="product_description" rows="3" placeholder="Enter product description" required></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="productSize" class="form-label">Product Size</label>
-                        <input type="text" class="form-control" id="productSize" name="size" placeholder="Enter product size" required>
+                        <label for="productSize" class="form-label">Product Sizes</label>
+                        <input type="text" id="productSizeInput" class="form-control" placeholder="Enter product size and press Enter">
+                        <div id="productSizesList" class="mt-2"></div>
+                        <input type="hidden" id="productSizes" name="size">
                     </div>
                     <div class="form-group">
                         <label for="productStock" class="form-label">Initial Stock Quantity</label>
@@ -71,6 +79,10 @@
         <div class="col-lg-6 mb-5">
             <div class="bg-light p-30">
                 <h5 class="card-title">Existing Products</h5>
+                @if (!String.IsNullOrEmpty(TempData["SuccessMessage"] as String))
+                {
+                <div class="alert alert-success" role="alert">@TempData["SuccessMessage"]</div>
+                }
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -94,7 +106,12 @@
                                     <td>@productViewModel.Product.price</td>
                                     <td>@productViewModel.TotalStock</td>
                                     <td>
-                                        <button class="btn btn-sm btn-warning">Edit</button>
+                                        <button class="btn btn-primary edit-product-btn"
+                                                data-id="@productViewModel.Product.id"
+                                                data-name="@productViewModel.Product.product_name"
+                                                data-stock="@productViewModel.TotalStock">
+                                            Edit
+                                        </button>
                                         <button class="btn btn-sm btn-danger" onclick="onDelete(@productViewModel.Product.id)">Delete</button>
                                     </td>
                                 </tr>
@@ -113,6 +130,40 @@
     </div>
 </div>
 
+<!-- Edit Product Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1" role="dialog" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="editProductForm" method="post" action="/Shop/EditProduct">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="productId" name="productId" />
+                    <div class="form-group">
+                        <label for="productName">Product Name</label>
+                        <input type="text" class="form-control" id="editProductName" name="productName" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label for="currentStock">Current Stock</label>
+                        <input type="number" class="form-control" id="currentStock" name="currentStock" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label for="addStock">Add Stock</label>
+                        <input type="number" class="form-control" id="addStock" name="addStock" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
@@ -254,3 +305,51 @@
         });
     }
 </script>
+<script>
+    const sizes = new Set();
+    const input = document.getElementById("productSizeInput");
+    const list = document.getElementById("productSizesList");
+    const hiddenInput = document.getElementById("productSizes");
+
+    input.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && input.value.trim() !== "") {
+            event.preventDefault();
+            const size = input.value.trim();
+            if (!sizes.has(size)) {
+                sizes.add(size);
+                const sizeElement = document.createElement("span");
+                sizeElement.textContent = size;
+                sizeElement.className = "badge badge-primary mr-1";
+                sizeElement.style.cursor = "pointer";
+                sizeElement.addEventListener("click", function () {
+                    sizes.delete(size);
+                    list.removeChild(sizeElement);
+                    hiddenInput.value = Array.from(sizes).join(",");
+                });
+                list.appendChild(sizeElement);
+                hiddenInput.value = Array.from(sizes).join(",");
+                input.value = "";
+            }
+        }
+    });
+</script>
+<script>
+    $('.edit-product-btn').on('click', function () {
+        var productId = $(this).data('id');
+        var productName = $(this).data('name');
+        var currentStock = $(this).data('stock');
+
+        // Populate the modal fields
+        $('#productId').val(productId);
+        $('#editProductName').val(productName); // Updated ID
+        $('#currentStock').val(currentStock);
+
+        // Show the modal
+        $('#editProductModal').modal('show');
+    });
+    $('#editProductModal').on('hidden.bs.modal', function () {
+        $('#productId, #editProductName, #currentStock').val('');
+    });
+
+</script>
+

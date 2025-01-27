@@ -10,6 +10,7 @@ using UCGrab.Repository;
 using UCGrab.Utils;
 using ImageMagick;
 using System.IO;
+using Rotativa;
 
 namespace UCGrab.Controllers
 {
@@ -27,10 +28,9 @@ namespace UCGrab.Controllers
             var totalUsers = _db.User_Accounts.Count();
             var customerInquiries = _db.ContactUs.Count();
 
-            var recentStores = _db.Store
-                .OrderByDescending(s => s.store_id) // Assuming 'CreatedAt' column exists
-                .Take(5)
-                .ToList();
+            var logs = _db.ActivityLog
+                    .OrderByDescending(log => log.timestamp)
+                    .ToList();
 
             var inquiries = _db.ContactUs
                 .OrderByDescending(c => c.contact_id) // Assuming 'CreatedAt' column exists
@@ -43,11 +43,43 @@ namespace UCGrab.Controllers
                 NumberStores = totalStores,
                 NumberAccounts = totalUsers,
                 NewCustomerInquiries = customerInquiries,
-                RecentStores = recentStores,
+                ActivityLog = logs,
                 RecentInquiries = inquiries
             };
 
             return View(dashboardData);
+        }
+        private void LogAdminActivity(string action, string details)
+        {
+            using (var _db = new UCGrabEntities())
+            {
+                var activity = new ActivityLog
+                {
+                    username = User.Identity.Name,
+                    action = action,
+                    details = details,
+                    timestamp = DateTime.Now
+                };
+
+                _db.ActivityLog.Add(activity);
+                _db.SaveChanges();
+            }
+        }
+
+        [HttpGet]
+        public ActionResult GenerateActivityLogPdf()
+        {
+            using (var _db = new UCGrabEntities())
+            {
+                var logs = _db.ActivityLog
+                    .OrderByDescending(log => log.timestamp) 
+                    .ToList();
+
+                return new ViewAsPdf("ActivityLogPdf", logs)
+                {
+                    FileName = "ActivityLog.pdf" 
+                };
+            }
         }
 
         [AllowAnonymous]
@@ -83,6 +115,7 @@ namespace UCGrab.Controllers
             };
 
             userManager.SignUp(newUser, ref ErrorMessage);
+            LogAdminActivity("Add User", $"Added a new user with Username: {username}");
 
             TempData["SuccessMessage"] = "User added successfully.";
             return RedirectToAction("UserAccounts");
@@ -97,20 +130,16 @@ namespace UCGrab.Controllers
 
             if (file != null && file.ContentLength > 0)
             {
-                // Set the path where the file will be saved on the server
                 string folderPath = Server.MapPath("~/Uploads");
                 if (!Directory.Exists(folderPath))
                 {
                     Directory.CreateDirectory(folderPath);
                 }
 
-                // Set the file path (use the original file name)
                 string filePath = Path.Combine(folderPath, file.FileName);
 
-                // Save the file to the server
                 file.SaveAs(filePath);
 
-                // Process the file (e.g., read the file to import user accounts)
                 try
                 {
                     using (var reader = new StreamReader(file.InputStream))
@@ -118,10 +147,9 @@ namespace UCGrab.Controllers
                         string line;
                         while ((line = reader.ReadLine()) != null)
                         {
-                            // Split the line by commas assuming it's a CSV
                             string[] fields = line.Split(',');
 
-                            if (fields.Length >= 4) // Ensure enough columns are available
+                            if (fields.Length >= 4) 
                             {
                                 string userid = fields[0].Trim();
                                 string username = fields[1].Trim();
@@ -131,12 +159,12 @@ namespace UCGrab.Controllers
                                 string verify_code = fields[5].Trim();
                                 string date_created = fields[6].TrimEnd();
 
-                                // Insert the new user account into the database
-                                // Assuming you have a method to add user account
                                 AddUserAccount(userid, username, password, roleId, status, verify_code,date_created);
                             }
                         }
                     }
+
+                    LogAdminActivity("Upload Accounts", $"Uploaded file: {file.FileName}. Accounts added: {Username}");
 
                     TempData["SuccessMessage"] = "File uploaded and accounts added successfully.";
                 }
@@ -162,22 +190,18 @@ namespace UCGrab.Controllers
             }
             catch (FormatException)
             {
-                // Handle invalid date format if needed, or leave parsedDate as null
-                // Optionally log the error or handle differently
             }
-            // Example code to save to the database, modify according to your context
             var userAccount = new User_Accounts
             {
                 user_id = userid,
                 username = username,
-                password = password, // You might want to hash the password
+                password = password, 
                 role_id = int.Parse(roleId),
                 status = int.Parse(status),
                 verify_code = verify_code,
                 date_created = parsedDate
             };
 
-            // Assuming you have a database context
             using (var context = new UCGrabEntities())
             {
                 context.User_Accounts.Add(userAccount);
@@ -192,7 +216,10 @@ namespace UCGrab.Controllers
 
             try
             {
+                var user = _userManager.GetUserById(id);
+
                 res.code = (int)_userManager.DeleteUser(id, ref errorMessage);
+                LogAdminActivity("Delete Account", $"Deleted account with ID: {id}, Username: {user?.username}");
                 res.message = res.code == 1 ? "User deleted successfully." : errorMessage;
             }
             catch (Exception ex)
@@ -225,6 +252,8 @@ namespace UCGrab.Controllers
 
             if (updateResult == ErrorCode.Success) 
             {
+                LogAdminActivity("Edit Account", $"Edited account. Original Username: {existingUser}, Updated Username: {existingUser.username}");
+
                 TempData["SuccessMessage"] = "User updated successfully.";
                 return RedirectToAction("UserAccounts", "Admin");
             }
@@ -297,6 +326,8 @@ namespace UCGrab.Controllers
 
             _db.SaveChanges();
 
+            LogAdminActivity("Accept User", $"Accepted user with ID: {userId}");
+
             string verificationCode = user.verify_code;
 
             string emailBody = $"Your verification code is: {verificationCode}";
@@ -326,6 +357,8 @@ namespace UCGrab.Controllers
             user.status = (int)Status.Rejected;
 
             _db.SaveChanges();
+
+            LogAdminActivity("Reject User", $"Rejected user with ID: {userId}");
 
             string emailBody = "We regret to inform you that your account has been rejected. If you have any questions, please contact support.";
             string errorMessage = "";
@@ -365,7 +398,12 @@ namespace UCGrab.Controllers
 
             try
             {
+
+                var store = _storeManager.GetStoreById(id);
+
                 res.code = (int)_storeManager.DeleteStore(id, ref errorMessage);
+
+                LogAdminActivity("Delete Store", $"Deleted store with ID: {id}, Store Name: {store?.store_name}");
                 res.message = res.code == 1 ? "User deleted successfully." : errorMessage;
             }
             catch (Exception ex)

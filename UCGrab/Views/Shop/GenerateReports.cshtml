@@ -1,0 +1,172 @@
+﻿
+@model UCGrab.Models.ReportViewModel
+
+<html>
+<head>
+    <title>Store Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h3 {
+            text-align: center;
+        }
+        h4{
+            text-align: left;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+        /* Container for the header */
+    .header-container {
+        position: relative;
+        padding: 20px;
+        height: 120px; /* Adjusted height for spacing */
+    }
+
+    /* Left Logo */
+    .left-logo {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        max-height: 80px;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    /* Centered Text */
+    .center-text {
+        position: absolute;
+        top: 30px;
+        left: 17%;
+        transform: translateX(-50%);
+        text-align: center;
+        font-family: Arial, sans-serif;
+        line-height: 1.5;
+        width: 70%; /* Ensures text doesn't stretch too wide */
+    }
+
+        .center-text h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .center-text p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .center-text .bold-text {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+    .right-logo {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        max-height: 80px;
+        max-width: 100%;
+        object-fit: contain;
+    }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <!-- Left Logo -->
+        <img src="@Server.MapPath("~/Assets/Shop/img/logo1-removebg-preview.png")" alt="UC Logo" class="left-logo">
+
+        <!-- Center Text -->
+        <div class="center-text">
+            <h2>UNIVERSITY OF CEBU LAPU-LAPU AND MANDAUE</h2>
+            <p>A. C. Cortes Ave., Looc Mandaue City</p>
+            <p class="bold-text">UC GRAB</p>
+        </div>
+
+        <!-- Right Logo -->
+        <img src="@Server.MapPath("~/Assets/Shop/img/5-removebg-preview.png")" alt="UCGrab Logo" class="right-logo">
+    </div>
+    <h3>Store Report - @Model.StoreName</h3>
+    <p>Generated on: @Model.GeneratedDate</p>
+
+    <h4>Total Sales</h4>
+    <table>
+        <tbody>
+            <tr>
+                <td>Total Sales</td>
+                <td>PHP @Model.TotalSales</td>
+            </tr>
+        </tbody>
+    </table>
+    <h4>Orders</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Order Date</th>
+                <th>Order Status</th>
+                <th>Payment Method</th>
+                <th>Checkout Option</th>
+                <th>Customer Firstname</th>
+                <th>Customer Lastname</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model.Orders)
+            {
+                <tr>
+                    <td>@order.OrderId</td>
+                    <td>@(order.OrderDate?.ToString("yyyy-MM-dd"))</td>
+                    <td>
+                        @(order.OrderStatus == 5 ? "Delivered" :
+                          order.OrderStatus == 1 ? "Pending" :
+                          order.OrderStatus == 3 ? "Confirmed" :
+                          order.OrderStatus == 4 ? "ReadyToDeliver" :
+                          order.OrderStatus == 7 ? "Rejected" : "Done")
+                    </td>
+                    <td>@(order.PaymentMethod == 1 ? "Gcash":"COD")</td>
+                    <td>@(order.CheckOutOption == 1 ? "Delivery":"Pick-Up")</td>
+                    <td>@order.Firstname</td>
+                    <td>@order.Lastname</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4>Products</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Name</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model.Products)
+            {
+                <tr>
+                    <td>@product.ProductId</td>
+                    <td>@product.ProductName</td>
+                    <td>@product.Price</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>

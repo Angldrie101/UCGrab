@@ -211,7 +211,7 @@
                                 <td>@voucher.min_order_amount</td>
                                 <td>@voucher.max_uses</td>
                                 <td>@(voucher.start_date.HasValue ? voucher.start_date.Value.ToShortDateString() : "N/A")</td>
-                                <td>@(voucher.end_date.HasValue ? voucher.start_date.Value.ToShortDateString() : "N/A")</td>
+                                <td>@(voucher.end_date.HasValue ? voucher.end_date.Value.ToShortDateString() : "N/A")</td>
                                 <td>@(voucher.is_active == 1?"Active":"Inactive")</td>
                             </tr>
                           }
@@ -242,27 +242,23 @@
 
 <script>
     $(document).ready(function () {
-        // Get references to the elements
-        const productDropdown = $('#ProductId'); // Product dropdown
-        const minOrderAmountInput = $('#discountThreshold'); // Minimum Order Amount input
+        const productDropdown = $('#ProductId'); 
+        const minOrderAmountInput = $('#discountThreshold'); 
 
-        // Function to handle enabling/disabling the input
         function toggleMinOrderAmount() {
-            if (productDropdown.val() === "") { // Check if "No Specified Product" is selected
-                minOrderAmountInput.prop('disabled', false); // Enable input
+            if (productDropdown.val() === "") { 
+                minOrderAmountInput.prop('disabled', false); 
             } else {
-                minOrderAmountInput.prop('disabled', true); // Disable input
-                minOrderAmountInput.val('0.00'); // Clear input value
+                minOrderAmountInput.prop('disabled', true); 
+                minOrderAmountInput.val('0.00'); 
             }
         }
 
-        // Attach event listener for change in product dropdown
         productDropdown.change(function () {
-            toggleMinOrderAmount(); // Call the function when the dropdown changes
+            toggleMinOrderAmount();
         });
 
-        // Initial call to handle pre-selected value
-        toggleMinOrderAmount(); // Ensure the correct state on page load
+        toggleMinOrderAmount(); 
     });
 
 </script>

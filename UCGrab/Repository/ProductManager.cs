@@ -15,12 +15,14 @@ namespace UCGrab.Repository
         UserManager _userMgr;
         BaseRepository<Product> _product;
         BaseRepository<Stock> _stock;
+        UCGrabEntities _db;
 
         public ProductManager()
         {
             _userMgr = new UserManager();
             _product = new BaseRepository<Product>();
             _stock = new BaseRepository<Stock>();
+            _db = new UCGrabEntities();
         }
         public List<Product> ListActiveProduct(String storeId)
         {
@@ -98,6 +100,47 @@ namespace UCGrab.Repository
             }
         }
 
+        public Stock GetStockByProductId(int productId)
+        {
+            using (var context = new UCGrabEntities())
+            {
+                return context.Stock.FirstOrDefault(s => s.product_id == productId);
+            }
+        }
+
+        public ErrorCode UpdateStock(Stock stock, ref string errorMessage)
+        {
+            try
+            {
+                using (var context = new UCGrabEntities())
+                {
+                    var existingStock = context.Stock.FirstOrDefault(s => s.stock_id == stock.stock_id);
+                    if (existingStock == null)
+                    {
+                        errorMessage = "Stock entry not found.";
+                        return ErrorCode.Error;
+                    }
+
+                    existingStock.quantity = stock.quantity;
+                    context.SaveChanges();
+                    return ErrorCode.Success;
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
+        public void UpdateStock(int productId, int quantitySold)
+        {
+            var stock = _db.Stock.FirstOrDefault(s => s.product_id == productId);
+            if (stock != null)
+            {
+                stock.quantity -= quantitySold;
+                _db.SaveChanges();
+            }
+        }
         public int GetTotalProducts(string userId)
         {
             return _product._table.Count(p => p.user_id == userId && p.status == (int)ProductStatus.HasStock);

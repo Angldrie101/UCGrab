@@ -1,0 +1,115 @@
+﻿@model UCGrab.Models.OrderViewModel
+
+@{
+    ViewBag.Title = "OrderDetails";
+    Layout = "~/Views/Shared/_DeliveryLayoutPage.cshtml";
+}
+<style>
+    .order-details-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .order-details-card,
+    .image-card {
+        flex: 1;
+        max-width: 48%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .card {
+        border: none;
+    }
+
+    .card-header {
+        background-color: #343a40;
+        color: #fff;
+        padding: 10px;
+        font-size: 1.25rem;
+        font-weight: bold;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .store-image {
+        width: 100%;
+        height: auto;
+        border-radius: 5px;
+    }
+
+    .back-button {
+        margin-top: 20px;
+        text-decoration: none;
+    }
+
+</style>
+
+
+<div class="order-details-container">
+    <div class="card order-details-card">
+        <div class="card-header">
+            Order #@Model.OrderId
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Customer: @Model.Firstname @Model.Lastname</h5>
+            <p class="card-text">
+                Address: @Model.Building at room @Model.Room<br />
+                Total: Php @Model.Total
+            </p>
+            <h5>Items</h5>
+            <ul class="list-group">
+                @foreach (var product in Model.Products)
+                {
+                    <li class="list-group-item">
+                        <strong>@product.ProductName</strong><br />
+                        Quantity: @product.Quantity<br />
+                        Price: Php @product.Price<br />
+                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#productDetailsModal-@product.ProductId">
+                            View Details
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="productDetailsModal-@product.ProductId" tabindex="-1" role="dialog" aria-labelledby="productDetailsModalLabel-@product.ProductId" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="productDetailsModalLabel-@product.ProductId">@product.ProductName - Details</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p><strong>Product Name:</strong> @product.ProductName</p>
+                                        <p><strong>Quantity:</strong> @product.Quantity</p>
+                                        <p><strong>Price:</strong> Php @product.Price.ToString("N2")</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+    <div class="card image-card">
+        <div class="card-header">
+            Store Location
+        </div>
+        <div class="card-body">
+            <img src="@Model.StoreImageUrl" alt="Store Image" class="store-image">
+        </div>
+    </div>
+</div>
+<a href="/Delivery/Orders" class="btn btn-secondary back-button">Back to Orders</a>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>

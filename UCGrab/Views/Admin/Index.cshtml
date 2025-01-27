@@ -13,9 +13,9 @@
         <div class="col-lg-3 mb-5">
             <div class="p-30 mb-30" style="background-color: #E8E742;">
                 <h5 class="card-title text-dark">
-                    <i class="fas fa-dollar-sign mr-2"></i>Total Revenue
+                    <i class="fas fa-coins mr-2"></i>Total Revenue
                 </h5>
-                <p class="display-4 text-dark">₱<span id="total-sales">@Model.TotalRevenue</span></p>
+                <p class="display-4 text-dark">₱<span >@Model.TotalRevenue</span></p>
             </div>
         </div>
         <div class="col-lg-3 mb-5">
@@ -46,24 +46,32 @@
     <div class="row px-xl-5">
         <div class="col-lg-6 mb-5">
             <div class="bg-light p-30 mb-30">
-                <h5 class="card-title">Recent Added Store</h5>
+                <!-- Flex container for heading and button -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Activity Log</h5>
+                    <button id="generateReportsBtn" class="btn btn-primary">
+                        <i class="fas fa-file-download"></i> Generate Reports
+                    </button>
+                </div>
                 <table class="table table-striped">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
-                            <th>Description</th>
-                            <th>Status</th>
+                            <th>Actions</th>
+                            <th>Details</th>
+                            <th>Time Stamp</th>
                         </tr>
                     </thead>
                     <tbody id="recent-stores">
-                        @foreach (var store in Model.RecentStores)
+                        @foreach (var logs in Model.ActivityLog)
                         {
                             <tr>
-                                <td>@store.id</td>
-                                <td>@store.store_name</td>
-                                <td>@store.store_description</td>
-                                <td>@(store.status == 1 ? "Active" : "Inactive")</td>
+                                <td>@logs.act_id</td>
+                                <td>@logs.username</td>
+                                <td>@logs.action</td>
+                                <td>@logs.details</td>
+                                <td>@logs.timestamp</td>
                             </tr>
                         }
                     </tbody>
@@ -99,6 +107,7 @@
             </div>
         </div>
     </div>
+
 </div>
 <!-- Dashboard End -->
 <!-- JavaScript Libraries -->
@@ -113,5 +122,10 @@
 
 <!-- Template Javascript -->
 <script src="/Assets/Shop/js/main.js"></script>
+<script>
+    document.getElementById('generateReportsBtn').addEventListener('click', function () {
+        window.location.href = '@Url.Action("GenerateActivityLogPdf", "Admin")';
+    });
+</script>
 
 

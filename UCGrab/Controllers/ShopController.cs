@@ -11,6 +11,8 @@ using UCGrab.Models;
 using UCGrab.Repository;
 using UCGrab.Utils;
 using OfficeOpenXml;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 
 namespace UCGrab.Controllers
 {
@@ -79,83 +81,63 @@ namespace UCGrab.Controllers
             var userInfo = _userManager.GetUserInfoByUsername(userId);
             var _db = new UCGrabEntities();
 
-            // Fetch Data for Reports
+            // Get total sales
             var totalSales = _db.Order_Detail
                                 .Where(od => od.Order.store_id == userInfo.store_id && od.Order.order_status == (int)OrderStatus.Delivered)
                                 .Sum(od => od.price) ?? 0;
 
+            // Get orders
             var orders = _db.Order
                             .Where(o => o.store_id == userInfo.store_id)
-                            .Select(o => new
+                            .Select(o => new OrderViewModel
                             {
-                                o.order_id,
-                                o.order_date,
-                                o.order_status,
-                                o.firstname,
-                                o.lastname
+                                OrderId = o.order_id,
+                                OrderDate = o.order_date,
+                                OrderStatus = o.order_status,
+                                PaymentMethod = o.payment_method,
+                                CheckOutOption = o.checkOut_option,
+                                DeliveryUserId = o.delivery_id,
+                                Firstname = o.firstname,
+                                Lastname = o.lastname
                             })
                             .ToList();
 
+            // Get products
             var products = _db.Product
                               .Where(p => p.Store.id == userInfo.store_id)
-                              .Select(p => new
+                              .Select(p => new ProductViewModel
                               {
-                                  p.product_id,
-                                  p.product_name,
-                                  p.price,
-                      })
+                                  ProductId = p.id,
+                                  ProductName = p.product_name,
+                                  Price = p.price,
+                              })
                               .ToList();
+            
 
-            // Create Excel Report
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            using (var package = new ExcelPackage())
+            var store = _db.Store
+                        .Where(s => s.id == userInfo.store_id)
+                       .Select(s => s.store_name)
+                       .FirstOrDefault();
+
+            // Create a model to pass to the view
+            var model = new ReportViewModel
             {
-                // ✅ Total Sales Sheet
-                var salesSheet = package.Workbook.Worksheets.Add("Total Sales");
-                salesSheet.Cells[1, 1].Value = "Total Sales";
-                salesSheet.Cells[1, 2].Value = totalSales;
+                TotalSales = totalSales,
+                Orders = orders,
+                Products = products,
+                GeneratedDate = DateTime.Now,
+                StoreName = store
+            };
 
-                // ✅ Orders Sheet
-                var ordersSheet = package.Workbook.Worksheets.Add("Orders");
-                ordersSheet.Cells[1, 1].Value = "Order ID";
-                ordersSheet.Cells[1, 2].Value = "Order Date";
-                ordersSheet.Cells[1, 3].Value = "Order Status";
-                ordersSheet.Cells[1, 4].Value = "Customer Firstname";
-                ordersSheet.Cells[1, 5].Value = "Customer Lastname";
+            // Render the view as PDF
+            var pdf = new Rotativa.ViewAsPdf("GenerateReports", model)
+            {
+                FileName = $"StoreReports_{DateTime.Now:yyyyMMddHHmmss}.pdf",
+                PageSize = Rotativa.Options.Size.A4,
+                PageMargins = new Rotativa.Options.Margins(25, 25, 30, 30)
+            };
 
-                int orderRow = 2;
-                foreach (var order in orders)
-                {
-                    ordersSheet.Cells[orderRow, 1].Value = order.order_id;
-                    ordersSheet.Cells[orderRow, 2].Value = order.order_date?.ToString("yyyy-MM-dd");
-                    ordersSheet.Cells[orderRow, 3].Value = order.order_status == 5 ? "Delivered" : order.order_status == 1 ? "Pending": order.order_status == 3 ? "Confirmed": order.order_status == 4 ? "ReadyToDeliver": order.order_status == 7 ? "Rejected":"Done";
-                    ordersSheet.Cells[orderRow, 4].Value = order.firstname;
-                    ordersSheet.Cells[orderRow, 5].Value = order.lastname;
-                    orderRow++;
-                }
-
-                // ✅ Products Sheet
-                var productsSheet = package.Workbook.Worksheets.Add("Products");
-                productsSheet.Cells[1, 1].Value = "Product ID";
-                productsSheet.Cells[1, 2].Value = "Name";
-                productsSheet.Cells[1, 3].Value = "Price";
-
-                int productRow = 2;
-                foreach (var product in products)
-                {
-                    productsSheet.Cells[productRow, 1].Value = product.product_id;
-                    productsSheet.Cells[productRow, 2].Value = product.product_name;
-                    productsSheet.Cells[productRow, 3].Value = product.price;
-                    productRow++;
-                }
-
-                // ✅ Finalize and Download Excel File
-                var stream = new MemoryStream();
-                package.SaveAs(stream);
-                stream.Position = 0;
-                var fileName = $"StoreReports_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
-            }
+            return pdf;
         }
 
         [Authorize]
@@ -239,11 +221,32 @@ namespace UCGrab.Controllers
 
             if (result == ErrorCode.Success)
             {
+                var _db = new UCGrabEntities();
+                var order = _db.Order.FirstOrDefault(o => o.order_id == orderId);
+
+                if (order != null)
+                {
+                    var customer = _db.User_Accounts.FirstOrDefault(u => u.user_id == order.user_id);
+                    if (customer != null)
+                    {
+                        string emailBody = "We regret to inform you that your order has been rejected. If you have any questions, please contact support. Your payment will be refunded to your account.";
+                        string errorMessage = "";
+
+                        var mailManager = new MailManager();
+                        bool emailSent = mailManager.SendEmail(customer.email, "Order Rejection Notice", emailBody, ref errorMessage);
+
+                        if (!emailSent)
+                        {
+                            ModelState.AddModelError(string.Empty, $"Failed to send rejection email: {errorMessage}");
+                        }
+                    }
+                }
+
                 return RedirectToAction("ListOrders");
             }
             else
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Unable to confirm the order.");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Unable to reject the order.");
             }
         }
 
@@ -301,7 +304,7 @@ namespace UCGrab.Controllers
                     }
                     else
                     {
-                        Image img = new Image
+                        UCGrab.Database.Image img = new UCGrab.Database.Image
                         {
                             image_file = profileFileName,
                             image_id = userInf.id
@@ -542,7 +545,7 @@ namespace UCGrab.Controllers
         [Authorize]
         public ActionResult ProductInfo()
         {
-            ViewBag.Categories = Utilities.GetAllCategory;
+            ViewBag.Categories = UCGrab.Utils.Utilities.GetAllCategory;
 
             var products = _productManager.ListProduct(Username) ?? new List<Product>();
             var productViewModels = products.Select(product => new ProductViewModel
@@ -557,33 +560,52 @@ namespace UCGrab.Controllers
         }
 
         [HttpPost]
-        public ActionResult ProductInfo(Stock stocks,Product product, HttpPostedFileBase files, int stock_quantity, int Category)
+        public ActionResult ProductInfo(Stock stocks,Product product, HttpPostedFileBase files, int stock_quantity, int Category, string size)
         {
-            ViewBag.Categories = Utilities.GetAllCategory;
-            ViewBag.Products = _productManager.ListProduct(Username) ?? new List<Product>();
+            ViewBag.Categories = UCGrab.Utils.Utilities.GetAllCategory;
+            var products = _productManager.ListProduct(Username) ?? new List<Product>();
+            var productViewModels = products.Select(p => new ProductViewModel
+            {
+                Product = p,
+                TotalStock = p.Stock.Sum(s => s.quantity)
+            }).ToList();
+            ViewBag.Products = productViewModels;
+
+            if (stock_quantity <= 0)
+            {
+                TempData["ErrorMessage"] = "Product stock should be greater than 0.";
+                return View(productViewModels);
+            }
+
             var user = _userManager.GetUserInfoByUsername(Username);
             var storeId = _storeManager.GetStoreByUserId(user.user_id);
 
-            var prodgUid = $"Item-{Utilities.gUid}";
+            if (products.Any(p => p.product_name.Equals(product.product_name, StringComparison.OrdinalIgnoreCase) && p.store_id == storeId.id))
+            {
+                TempData["ErrorMessage"] = $"Product is already in your store.";
+                return View(productViewModels);
+            }
+
+            var prodgUid = $"Item-{UCGrab.Utils.Utilities.gUid}";
             product.product_id = prodgUid;
-            product.user_id = UserId;
+            product.user_id = user.user_id;
+            product.size = string.Join(",", size.Split(',').Distinct());
             product.date_created = DateTime.Now;
             product.status = (Int32)ProductStatus.NoStock;
             product.store_id = storeId.id;
             product.category_id = Category;
-            
 
             if (_productManager.CreateProduct(product, ref ErrorMessage) == ErrorCode.Error)
             {
                 ModelState.AddModelError(String.Empty, ErrorMessage);
-                return View(product);
+                return View(productViewModels);
             }
 
             product = _productManager.GetProductBygUId(prodgUid);
 
             Stock stock = new Stock
             {
-                product_id = product.id, 
+                product_id = product.id,
                 quantity = stock_quantity
             };
 
@@ -592,40 +614,40 @@ namespace UCGrab.Controllers
                 ModelState.AddModelError(String.Empty, ErrorMessage);
                 _productManager.DeleteProduct(product.id, ref ErrorMessage);
                 _imageManager.DeleteImgByProductId(product.id, ref ErrorMessage);
-                return View(product);
+                return View(productViewModels);
             }
 
             product.status = (stock_quantity > 0) ? (Int32)ProductStatus.HasStock : (Int32)ProductStatus.NoStock;
             if (_productManager.UpdateProduct(product, ref ErrorMessage) == ErrorCode.Error)
             {
                 ModelState.AddModelError(String.Empty, ErrorMessage);
-                return View(product);
+                return View(productViewModels);
             }
 
             if (files != null)
             {
-              var InputFileName = Path.GetFileName(files.FileName);
-                        if (!Directory.Exists(Server.MapPath("~/UploadedFiles/")))
-                            Directory.CreateDirectory(Server.MapPath("~/UploadedFiles/"));
+                var InputFileName = Path.GetFileName(files.FileName);
+                if (!Directory.Exists(Server.MapPath("~/UploadedFiles/")))
+                    Directory.CreateDirectory(Server.MapPath("~/UploadedFiles/"));
 
-                        var ServerSavePath = Path.Combine(Server.MapPath("~/UploadedFiles/") + InputFileName);
-                        files.SaveAs(ServerSavePath);
+                var ServerSavePath = Path.Combine(Server.MapPath("~/UploadedFiles/") + InputFileName);
+                files.SaveAs(ServerSavePath);
 
-                        Image_Product imgproduct = new Image_Product
-                        {
-                            image_file = InputFileName,
-                            product_id = product.id
-                        };
+                Image_Product imgproduct = new Image_Product
+                {
+                    image_file = InputFileName,
+                    product_id = product.id
+                };
 
-                        if (_imageManager.CreateImgProduct(imgproduct, ref ErrorMessage) == ErrorCode.Error)
-                        {
-                            ModelState.AddModelError(String.Empty, ErrorMessage);
-                            _productManager.DeleteProduct(product.id, ref ErrorMessage);
-                            _imageManager.DeleteImgByProductId(product.id, ref ErrorMessage);
-                            return View(product);
-                        }
-                    }                          
-               
+                if (_imageManager.CreateImgProduct(imgproduct, ref ErrorMessage) == ErrorCode.Error)
+                {
+                    ModelState.AddModelError(String.Empty, ErrorMessage);
+                    _productManager.DeleteProduct(product.id, ref ErrorMessage);
+                    _imageManager.DeleteImgByProductId(product.id, ref ErrorMessage);
+                    return View(productViewModels);
+                }
+            }
+
             TempData["Message"] = $"Product {product.product_name} added!";
             return RedirectToAction("ProductInfo");
         }
@@ -638,6 +660,40 @@ namespace UCGrab.Controllers
 
             return Json(res, JsonRequestBehavior.AllowGet);
         }
+        [HttpPost]
+        public ActionResult EditProduct(int productId, int addStock)
+        {
+            var product = _productManager.GetProductById(productId);
+            if (product == null)
+            {
+                TempData["Error"] = "Product not found.";
+                return RedirectToAction("ProductInfo");
+            }
+
+            var existingStock = _productManager.GetStockByProductId(productId);
+            if (existingStock != null)
+            {
+                existingStock.quantity += addStock;
+
+                if (_productManager.UpdateStock(existingStock, ref ErrorMessage) == ErrorCode.Error)
+                {
+                    TempData["Error"] = ErrorMessage;
+                    return RedirectToAction("ProductInfo");
+                }
+            }
+            else
+            {
+                TempData["Error"] = "Stock entry not found for this product.";
+                return RedirectToAction("ProductInfo");
+            }
+
+            product.status = (product.Stock.Sum(s => s.quantity) > 0) ? (int)ProductStatus.HasStock : (int)ProductStatus.NoStock;
+            _productManager.UpdateProduct(product, ref ErrorMessage);
+
+            TempData["SuccessMessage"] = "Product updated successfully.";
+            return RedirectToAction("ProductInfo");
+        }
+
 
         public JsonResult CategoryDelete(int? id)
         {
@@ -683,8 +739,8 @@ namespace UCGrab.Controllers
             ViewBag.CurrentStoreId = userInfo.store_id;
             ViewBag.ProductByStoreId = products;
 
-            var discountList = _db.Discounts.ToList();  // Get the list of discounts
-            var voucherList = _db.Vouchers.ToList();    // Get the list of vouchers
+            var discountList = _db.Discounts.ToList(); 
+            var voucherList = _db.Vouchers.ToList();  
 
             var viewModel = new DiscountVoucherViewModel
             {
@@ -728,7 +784,7 @@ namespace UCGrab.Controllers
 
                     if (existingDiscount != null)
                     {
-                        if (startDate <= existingDiscount.end_date) // New discount start date is not after the existing one
+                        if (startDate <= existingDiscount.end_date) 
                         {
                             TempData["Error"] = "New discount can only be added if the start date is beyond the existing discount's end date.";
                             return RedirectToAction("DiscountVouchers");
@@ -781,10 +837,17 @@ namespace UCGrab.Controllers
                 var username = User.Identity.Name;
                 var userInfo = _userManager.GetUserInfoByUsername(username);
 
+                 bool voucherExists = _db.Vouchers.Any(v => v.voucher_code == VocherCode && v.store_id == userInfo.store_id);
+                if (voucherExists)
+                {
+                    TempData["ErrorVoucher"] = "The voucher code already exists. Please use a different code.";
+                    return RedirectToAction("DiscountVouchers");
+                }
+
                 if (vstartDate > vendDate)
                 {
-                    ModelState.AddModelError("", "Start date cannot be later than end date.");
-                    return View(model);
+                    TempData["ErrorVoucher"] = "Start date cannot be later than end date.";
+                    return RedirectToAction("DiscountVouchers");
                 }
 
                 try

@@ -1,0 +1,112 @@
+﻿@model IEnumerable<UCGrab.Database.ActivityLog>
+
+<style>
+    .header-container {
+        position: relative;
+        padding: 20px;
+        height: 120px; 
+    }
+
+    .left-logo {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        max-height: 80px;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    .center-text {
+        position: absolute;
+        top: 30px;
+        left: 17%;
+        transform: translateX(-50%);
+        text-align: center;
+        font-family: Arial, sans-serif;
+        line-height: 1.5;
+        width: 70%; 
+    }
+
+        .center-text h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .center-text p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .center-text .bold-text {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+    .right-logo {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        max-height: 80px;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid black;
+        margin-top: 20px;
+    }
+
+    th, td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+    }
+</style>
+
+<div class="header-container">
+    <img src="@Server.MapPath("~/Assets/Shop/img/logo1-removebg-preview.png")" alt="UC Logo" class="left-logo">
+
+    <div class="center-text">
+        <h2>UNIVERSITY OF CEBU LAPU-LAPU AND MANDAUE</h2>
+        <p>A. C. Cortes Ave., Looc Mandaue City</p>
+        <p class="bold-text">UC GRAB</p>
+    </div>
+
+    <img src="@Server.MapPath("~/Assets/Shop/img/5-removebg-preview.png")" alt="UCGrab Logo" class="right-logo">
+</div>
+
+<h2 style="text-align: center; margin-top: 20px;">Admin Activity Log</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Admin Username</th>
+            <th>Action</th>
+            <th>Details</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var log in Model)
+            {
+                <tr>
+                    <td>@log.username</td>
+                    <td>@log.action</td>
+                    <td>@log.details</td>
+                    <td>@(log.timestamp.HasValue ? log.timestamp.Value.ToString("g") : "N/A")</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4">No activity logs found.</td>
+            </tr>
+        }
+    </tbody>
+</table>

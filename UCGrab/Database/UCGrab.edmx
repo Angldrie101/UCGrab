@@ -5,6 +5,16 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="UCGrabModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="ActivityLog">
+          <Key>
+            <PropertyRef Name="act_id" />
+          </Key>
+          <Property Name="act_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="username" Type="nvarchar" MaxLength="50" />
+          <Property Name="action" Type="nvarchar(max)" />
+          <Property Name="details" Type="nvarchar(max)" />
+          <Property Name="timestamp" Type="datetime" />
+        </EntityType>
         <EntityType Name="Category">
           <Key>
             <PropertyRef Name="category_id" />
@@ -542,6 +552,7 @@ warning 6002: The table/view 'UCGrab.dbo.vw_Role' does not have a primary key de
           <Parameter Name="user_id" Type="nvarchar" Mode="In" />
         </Function>
         <EntityContainer Name="UCGrabModelStoreContainer">
+          <EntitySet Name="ActivityLog" EntityType="Self.ActivityLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ContactUs" EntityType="Self.ContactUs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Discounts" EntityType="Self.Discounts" Schema="dbo" store:Type="Tables" />
@@ -673,6 +684,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <FunctionImport Name="sp_getCartCountByUserId" ReturnType="Collection(Int32)">
           <Parameter Name="user_id" Mode="In" Type="String" />
           </FunctionImport>
+          <EntitySet Name="ActivityLog" EntityType="UCGrabModel.ActivityLog" />
           <EntitySet Name="Category" EntityType="UCGrabModel.Category" />
           <EntitySet Name="ContactUs" EntityType="UCGrabModel.ContactUs" />
           <EntitySet Name="Discounts" EntityType="UCGrabModel.Discounts" />
@@ -691,6 +703,7 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <EntitySet Name="User_Information" EntityType="UCGrabModel.User_Information" />
           <EntitySet Name="User_Role" EntityType="UCGrabModel.User_Role" />
           <EntitySet Name="Vouchers" EntityType="UCGrabModel.Vouchers" />
+          <EntitySet Name="VoucherUsage" EntityType="UCGrabModel.VoucherUsage" />
           <EntitySet Name="vw_Role" EntityType="UCGrabModel.vw_Role" />
           <AssociationSet Name="FK_Category_Category" Association="UCGrabModel.FK_Category_Category">
             <End Role="Category" EntitySet="Category" />
@@ -784,12 +797,21 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             <End Role="User_Role" EntitySet="User_Role" />
             <End Role="User_Role1" EntitySet="User_Role" />
           </AssociationSet>
-          <EntitySet Name="VoucherUsage" EntityType="UCGrabModel.VoucherUsage" />
           <AssociationSet Name="FK_VoucherUsage_Vouchers" Association="UCGrabModel.FK_VoucherUsage_Vouchers">
             <End Role="Vouchers" EntitySet="Vouchers" />
             <End Role="VoucherUsage" EntitySet="VoucherUsage" />
           </AssociationSet>
           </EntityContainer>
+        <EntityType Name="ActivityLog">
+          <Key>
+            <PropertyRef Name="act_id" />
+          </Key>
+          <Property Name="act_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="username" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="action" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="details" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="timestamp" Type="DateTime" Precision="3" />
+        </EntityType>
         <EntityType Name="Category">
           <Key>
             <PropertyRef Name="category_id" />
@@ -899,10 +921,10 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="delivery_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="gcash_receipt" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="invoice" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Order_Detail" Relationship="UCGrabModel.FK_Order_Detail_Order" FromRole="Order" ToRole="Order_Detail" />
           <NavigationProperty Name="Review" Relationship="UCGrabModel.FK_Order_Review" FromRole="Order" ToRole="Review" />
           <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Order_Store" FromRole="Order" ToRole="Store" />
-          <Property Name="invoice" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="Order_Detail">
           <Key>
@@ -1046,6 +1068,16 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           <Property Name="is_active" Type="Int32" />
           <NavigationProperty Name="Store" Relationship="UCGrabModel.FK_Vouchers_Store" FromRole="Vouchers" ToRole="Store" />
           <NavigationProperty Name="VoucherUsage" Relationship="UCGrabModel.FK_VoucherUsage_Vouchers" FromRole="Vouchers" ToRole="VoucherUsage" />
+        </EntityType>
+        <EntityType Name="VoucherUsage">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="voucher_id" Type="Int32" />
+          <Property Name="user_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="usage_date" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Vouchers" Relationship="UCGrabModel.FK_VoucherUsage_Vouchers" FromRole="VoucherUsage" ToRole="Vouchers" />
         </EntityType>
         <EntityType Name="vw_Role">
           <Key>
@@ -1222,7 +1254,9 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Order_Store">
-          <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1" />
+          <End Type="UCGrabModel.Store" Role="Store" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Type="UCGrabModel.Order" Role="Order" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Store">
@@ -1345,16 +1379,6 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="VoucherUsage">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="voucher_id" Type="Int32" />
-          <Property Name="user_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="usage_date" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="Vouchers" Relationship="UCGrabModel.FK_VoucherUsage_Vouchers" FromRole="VoucherUsage" ToRole="Vouchers" />
-        </EntityType>
         <Association Name="FK_VoucherUsage_Vouchers">
           <End Type="UCGrabModel.Vouchers" Role="Vouchers" Multiplicity="0..1" />
           <End Type="UCGrabModel.VoucherUsage" Role="VoucherUsage" Multiplicity="*" />
@@ -1374,6 +1398,17 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="UCGrabModelStoreContainer" CdmEntityContainer="UCGrabEntities">
           <FunctionImportMapping FunctionImportName="sp_getCartCountByUserId" FunctionName="UCGrabModel.Store.sp_getCartCountByUserId" />
+          <EntitySetMapping Name="ActivityLog">
+            <EntityTypeMapping TypeName="UCGrabModel.ActivityLog">
+              <MappingFragment StoreEntitySet="ActivityLog">
+                <ScalarProperty Name="timestamp" ColumnName="timestamp" />
+                <ScalarProperty Name="details" ColumnName="details" />
+                <ScalarProperty Name="action" ColumnName="action" />
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="act_id" ColumnName="act_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Category">
             <EntityTypeMapping TypeName="UCGrabModel.Category">
               <MappingFragment StoreEntitySet="Category">
@@ -1602,21 +1637,21 @@ FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="vw_Role">
-            <EntityTypeMapping TypeName="UCGrabModel.vw_Role">
-              <MappingFragment StoreEntitySet="vw_Role">
-                <ScalarProperty Name="rolename" ColumnName="rolename" />
-                <ScalarProperty Name="username" ColumnName="username" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="VoucherUsage">
             <EntityTypeMapping TypeName="UCGrabModel.VoucherUsage">
               <MappingFragment StoreEntitySet="VoucherUsage">
                 <ScalarProperty Name="usage_date" ColumnName="usage_date" />
                 <ScalarProperty Name="user_id" ColumnName="user_id" />
                 <ScalarProperty Name="voucher_id" ColumnName="voucher_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_Role">
+            <EntityTypeMapping TypeName="UCGrabModel.vw_Role">
+              <MappingFragment StoreEntitySet="vw_Role">
+                <ScalarProperty Name="rolename" ColumnName="rolename" />
+                <ScalarProperty Name="username" ColumnName="username" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

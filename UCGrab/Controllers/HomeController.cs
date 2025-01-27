@@ -12,9 +12,9 @@ using UCGrab.Repository;
 using System.Data.Entity;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
-using DbImage = UCGrab.Database.Image; 
-using PdfImage = iTextSharp.text.Image; 
-
+using DbImage = UCGrab.Database.Image;
+using PdfImage = iTextSharp.text.Image;
+using System.Text;
 
 namespace UCGrab.Controllers
 {
@@ -31,15 +31,14 @@ namespace UCGrab.Controllers
             {
                 var shops = db.Store
                               .Where(s => s.status == 1)
-                              .Include(s => s.Image_Store) // Ensure navigation property is loaded
+                              .Include(s => s.Image_Store) 
                               .ToList();
 
-                var products = db.Product
+                var products = db.Product.OrderByDescending(p => p.date_created)
                                  .Where(p => p.status == 1)
-                                 .Include(p => p.Image_Product) // Ensure navigation property is loaded
+                                 .Include(p => p.Image_Product)
                                  .ToList();
 
-                // Check for null and assign empty lists if needed
                 ViewBag.Shops = shops ?? new List<Store>();
                 ViewBag.Products = products ?? new List<Product>();
             }
@@ -178,8 +177,7 @@ namespace UCGrab.Controllers
         }
         private string HashPassword(string password)
         {
-            // Implement your password hashing logic here
-            return password;  // Replace with actual hashing, e.g., using SHA256 or bcrypt
+            return password; 
         }
 
         [AllowAnonymous]
@@ -206,7 +204,6 @@ namespace UCGrab.Controllers
                 return View();
             }
 
-            // Update only the password
             user.password = password;
 
             User_Accounts updatedUser = new User_Accounts
@@ -218,7 +215,7 @@ namespace UCGrab.Controllers
                 status = user.status,
                 verify_code = user.verify_code,
                 date_created = user.date_created,
-                email = user.email, // Use existing email
+                email = user.email, 
                 password = password
             };
 
@@ -300,7 +297,6 @@ namespace UCGrab.Controllers
 
             if (!emailSent)
             {
-                // Handle email sending failure
             }
         }
         [AllowAnonymous]
@@ -419,14 +415,12 @@ namespace UCGrab.Controllers
 
             string errorMessage = string.Empty;
 
-            // Create account and store
             if (_storeManager.CreateAccountAndStore(ua, store, ref errorMessage) != ErrorCode.Success)
             {
                 ModelState.AddModelError(string.Empty, errorMessage);
                 return View(ua);
             }
 
-            // Process business permit
             if (businessPermit != null && businessPermit.ContentLength > 0)
             {
                 try
@@ -637,7 +631,6 @@ namespace UCGrab.Controllers
                     return View(userInf);
                 }
 
-                // Handle profile picture upload
                 if (profilePicture != null && profilePicture.ContentLength > 0)
                 {
                     var uploadsFolderPath = Server.MapPath("~/UploadedFiles/");
@@ -648,14 +641,11 @@ namespace UCGrab.Controllers
                     var profileSavePath = Path.Combine(uploadsFolderPath, profileFileName);
                     profilePicture.SaveAs(profileSavePath);
 
-                    // Log the save path
                     System.Diagnostics.Debug.WriteLine("Profile picture saved at: " + profileSavePath);
 
-                    // Handle image management
                     var existingImage = _imageManager.ListImgAttachByImageId(userInf.id).FirstOrDefault();
                     if (existingImage != null)
                     {
-                        // Delete old image if exists
                         var oldImagePath = Path.Combine(uploadsFolderPath, existingImage.image_file);
                         if (System.IO.File.Exists(oldImagePath))
                         {
@@ -685,7 +675,6 @@ namespace UCGrab.Controllers
                     }
                 }
 
-                // Update user information
                 if (_userManager.UpdateUserInformation(userInf, ref ErrorMessage) == ErrorCode.Error)
                 {
                     ModelState.AddModelError(string.Empty, ErrorMessage);
@@ -726,7 +715,7 @@ namespace UCGrab.Controllers
                     ? _productManager.ListActiveProductByCategory(store.user_id, categoryId.Value)
                     : _productManager.ListActiveProduct(store.user_id);
 
-                ViewBag.SelectedCategory = categoryId; // Pass the category ID for display
+                ViewBag.SelectedCategory = categoryId;
                 ViewBag.StoreName = store.store_name;
                 return View(products);
             }
@@ -741,7 +730,7 @@ namespace UCGrab.Controllers
                 ? _storeManager.ListStoresByCategory(categoryId.Value)
                 : _storeManager.ListStore();
 
-            ViewBag.SelectedCategory = categoryId; // Pass the category ID for display
+            ViewBag.SelectedCategory = categoryId; 
             ViewBag.CategoryName = categoryId.HasValue
                 ? ((Categories)categoryId.Value).ToString()
                 : "All Categories";
@@ -777,7 +766,6 @@ namespace UCGrab.Controllers
 
             try
             {
-                // Pass the price explicitly
                 var result = _orderManager.AddCart(UserId, prodId, qty, price, ref ErrorMessage);
 
                 if (result == ErrorCode.Error)
@@ -863,14 +851,13 @@ namespace UCGrab.Controllers
                     break;
             }
 
-            // Fetch updated orders and group them again
             var updatedOrders = _orderManager.GetOrderByUserId(UserId)
-                .Where(order => order.Order_Detail.Any()) // Exclude orders with no details
+                .Where(order => order.Order_Detail.Any()) 
                 .ToList();
 
             var groupedOrders = updatedOrders
                 .GroupBy(order => order.Store?.store_name)
-                .Where(group => group.Any()) // Ensure each group has at least one order
+                .Where(group => group.Any())
                 .ToList();
 
             var _db = new UCGrabEntities();
@@ -1016,6 +1003,7 @@ namespace UCGrab.Controllers
                 string errorMessage = string.Empty;
                 string filePath = string.Empty;
 
+                // Upload the receipt if provided
                 if (gcashReceipt != null && gcashReceipt.ContentLength > 0)
                 {
                     string fileName = Path.GetFileName(gcashReceipt.FileName);
@@ -1036,20 +1024,18 @@ namespace UCGrab.Controllers
                     return View(model);
                 }
 
-                // Place the order first
+                // Place the order
                 var result = _orderManager.PlaceOrder(UserId, model, filePath, null, ref errorMessage);
 
                 if (result == ErrorCode.Success)
                 {
-                    // Retrieve the newly created order details
-                    var order = _orderManager.GetLastOrderByUserId(UserId); // Assuming this gets the most recent order
+                    var order = _orderManager.GetLastOrderByUserId(UserId);
                     if (order == null)
                     {
                         ViewBag.Error = "Order not found.";
                         return View(model);
                     }
 
-                    // Populate model with order and product details
                     model.StoreId = (int)order.store_id;
                     model.StoreName = _storeManager.GetStoreById(order.store_id)?.store_name ?? "Unknown Store";
 
@@ -1062,10 +1048,16 @@ namespace UCGrab.Controllers
 
                     model.Total = model.Products.Sum(p => p.Price * p.Quantity);
 
-                    // Generate Invoice with proper product details
-                    var invoiceFilePath = GenerateInvoicePDF(model);
+                    var productManager = new ProductManager();  
+                    foreach (var product in model.Products)
+                    {
+                        int productId = product.ProductId;
+                        int orderedQuantity = product.Quantity;
 
-                    // Update order with invoice path
+                        productManager.UpdateStock(productId, orderedQuantity);
+                    }
+
+                    var invoiceFilePath = GenerateInvoicePDF(model);
                     _orderManager.UpdateOrderInvoicePath(order.order_id, invoiceFilePath);
 
                     return RedirectToAction("MyOrders");
@@ -1095,43 +1087,123 @@ namespace UCGrab.Controllers
             string fileName = $"Invoice_{DateTime.Now.Ticks}.pdf";
             string filePath = Path.Combine(invoiceDirectory, fileName);
 
+            var pageSize = new iTextSharp.text.Rectangle(
+                Utilities.InchesToPoints(4.5f),
+                Utilities.InchesToPoints(8.5f)
+            );
+
             using (FileStream fs = new FileStream(filePath, FileMode.Create))
             {
-                using (Document doc = new Document())
+                using (Document doc = new Document(pageSize, 36, 36, 20, 20)) // Add margins
                 {
-                    PdfWriter.GetInstance(doc, fs);
+                    PdfWriter writer = PdfWriter.GetInstance(doc, fs);
                     doc.Open();
 
-                    // Add Invoice Title
-                    doc.Add(new Paragraph("Invoice Receipt"));
-                    doc.Add(new Paragraph($"Store Name: {model.StoreName}"));
-                    doc.Add(new Paragraph($"Date: {DateTime.Now:yyyy-MM-dd}"));
-                    doc.Add(new Paragraph("------------------------------------------------------"));
+                    PdfContentByte canvas = writer.DirectContent;
 
-                    // Add Customer Details
-                    doc.Add(new Paragraph($"Customer Name: {model.Lastname}, {model.Firstname}"));
-                    doc.Add(new Paragraph($"Contact: {model.Phone}"));
-                    doc.Add(new Paragraph("------------------------------------------------------"));
+                    float contentWidth = pageSize.Width - doc.LeftMargin - doc.RightMargin;
 
-                    // Add Product Details
+                    var ucGrabLogoPath = Server.MapPath("~/Assets/Shop/img/5-removebg-preview.png");
+                    iTextSharp.text.Image ucGrabLogo = iTextSharp.text.Image.GetInstance(ucGrabLogoPath);
+                    ucGrabLogo.ScaleAbsolute(100, 100); 
+
+                    PdfPTable logoTable = new PdfPTable(1); 
+                    logoTable.WidthPercentage = 100;
+
+                    PdfPCell logoCell = new PdfPCell(ucGrabLogo)
+                    {
+                        Border = Rectangle.NO_BORDER, 
+                        HorizontalAlignment = Element.ALIGN_CENTER, 
+                        VerticalAlignment = Element.ALIGN_MIDDLE 
+                    };
+
+                    logoTable.AddCell(logoCell); 
+                    doc.Add(logoTable);
+
+                    doc.Add(new Paragraph("\n\n"));
+                    var headerText = new StringBuilder()
+                        .AppendLine("University of Cebu Lapu-Lapu Mandaue")
+                        .AppendLine("A.C. Cortes Ave., Looc Mandaue City")
+                        .AppendLine("")
+
+                        .AppendLine("-----------------------------------------------------------")
+                        .AppendLine("Sales INVOICE - CUSTOMER COPY")
+                        .AppendLine("-----------------------------------------------------------");
+
+                    ColumnText headerColumn = new ColumnText(canvas);
+                    headerColumn.SetSimpleColumn(
+                        doc.LeftMargin,
+                        pageSize.Height - doc.TopMargin - 170, // Adjust to give more space for the header
+                        doc.LeftMargin + contentWidth,
+                        pageSize.Height - doc.TopMargin - 80
+                    );
+                    headerColumn.AddText(new Phrase(headerText.ToString(), new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD)));
+                    headerColumn.Alignment = Element.ALIGN_CENTER;
+                    headerColumn.Go();
+
+                    float currentY = headerColumn.YLine - 20;
+
+                    var bodyText = new StringBuilder();
+                    bodyText.AppendLine(model.StoreName?.Trim() ?? string.Empty)
+                            .AppendLine("==========================================")
+                            .AppendLine($"Date: {DateTime.Now:yyyy-MM-dd}                                  Time: {DateTime.Now:HH:mm:ss}")
+                            .AppendLine("==========================================");
+
                     if (model.Products != null && model.Products.Any())
                     {
-                        doc.Add(new Paragraph("Products:"));
+                        bodyText.AppendLine("Products                               Qty                         Price");
                         foreach (var product in model.Products)
                         {
-                            doc.Add(new Paragraph($"- {product.ProductName} (Qty: {product.Quantity}) - ₱{product.Price:N2}"));
+                            bodyText.AppendLine(
+                                $"{product.ProductName?.Trim(),-25}           {product.Quantity,-10}             ₱{product.Price,10:N2}"
+                            );
                         }
                     }
                     else
                     {
-                        doc.Add(new Paragraph("No products found in this order."));
+                        bodyText.AppendLine("No products found in this order.");
                     }
 
-                    // Add Total
                     var totalOrder = model.Products?.Sum(p => p.Price * p.Quantity) ?? 0;
-                    doc.Add(new Paragraph("------------------------------------------------------"));
-                    doc.Add(new Paragraph($"Total: ₱{totalOrder:N2}"));
-                    doc.Add(new Paragraph("Thank you for your purchase!"));
+                    bodyText.AppendLine("------------------------------------------------------------------------")
+                            .AppendLine($"Total: ₱{totalOrder:N2}".PadLeft(80))
+                            .AppendLine("------------------------------------------------------------------------")
+                            .AppendLine("")
+                            .AppendLine($"Order ID: {model.OrderNumber}")
+                            .AppendLine($"Customer Name: {model.Lastname?.Trim()}, {model.Firstname?.Trim()}")
+                            .AppendLine($"Contact: {model.Phone?.Trim()}")
+                            .AppendLine($"Order Date: {DateTime.Now:yyyy-MM-dd}")
+                            .AppendLine("------------------------------------------------------------------------");
+
+                    ColumnText bodyColumn = new ColumnText(canvas);
+                    bodyColumn.SetSimpleColumn(
+                        doc.LeftMargin,
+                        doc.BottomMargin - 50, // Leave space above the footer
+                        doc.LeftMargin + contentWidth,
+                        currentY
+                    );
+                    bodyColumn.AddText(new Phrase(bodyText.ToString(), new Font(Font.FontFamily.HELVETICA, 10)));
+                    bodyColumn.Alignment = Element.ALIGN_LEFT;
+                    bodyColumn.Go();
+
+                    // Footer Section
+                    var footerText = new StringBuilder()
+                        .AppendLine("Tell us about your experience.")
+                        .AppendLine("Contact Us: ucgrab@gmail.com")
+                        .AppendLine("Visit us also at ucgrablm.somee.com")
+                        .AppendLine("------------------------------------------------------")
+                        .AppendLine("This serves as a SALES INVOICE");
+
+                    ColumnText footerColumn = new ColumnText(canvas);
+                    footerColumn.SetSimpleColumn(
+                        doc.LeftMargin,
+                        doc.BottomMargin, // Ensure it starts from the bottom margin
+                        doc.LeftMargin + contentWidth,
+                        doc.BottomMargin + 80 // Define a height for the footer
+                    );
+                    footerColumn.AddText(new Phrase(footerText.ToString(), new Font(Font.FontFamily.HELVETICA, 10, Font.ITALIC)));
+                    footerColumn.Alignment = Element.ALIGN_CENTER;
+                    footerColumn.Go();
 
                     doc.Close();
                 }
@@ -1139,6 +1211,16 @@ namespace UCGrab.Controllers
 
             return "/Invoices/" + fileName;
         }
+
+
+        public static class Utilities
+        {
+            public static float InchesToPoints(float inches)
+            {
+                return inches * 72; // 1 inch = 72 points
+            }
+        }
+
 
 
         [AllowAnonymous]
@@ -1195,7 +1277,7 @@ namespace UCGrab.Controllers
                     ImageFilePath = od.Product.Image_Product.FirstOrDefault().image_file
                 }).ToList(),
                 Total = (Int32)order.Order_Detail.Sum(od => od.price * od.quatity),
-                InvoicePath = order.invoice // Ensure the `invoice` field has the correct file path
+                InvoicePath = order.invoice 
 
             }).ToList();
 
@@ -1331,9 +1413,8 @@ namespace UCGrab.Controllers
                 return RedirectToAction("Cart");
             }
 
-            var userId = UserId; // Replace with logic to get the current user's ID
+            var userId = UserId; 
 
-            // Check if the user has already used this voucher
             var hasUsedVoucher = _db.VoucherUsage.Any(vu => vu.user_id == userId && vu.voucher_id == voucher.voucher_id);
 
             if (hasUsedVoucher)
@@ -1342,7 +1423,6 @@ namespace UCGrab.Controllers
                 return RedirectToAction("Cart");
             }
 
-            // Check if max uses are exceeded
             if (voucher.max_uses.HasValue && voucher.max_uses <= 0)
             {
                 TempData["Error"] = "This voucher has already been fully redeemed.";
@@ -1375,19 +1455,16 @@ namespace UCGrab.Controllers
                 }
             }
 
-            // Deduct one use from max_uses
             if (voucher.max_uses.HasValue)
             {
                 voucher.max_uses -= 1;
 
-                // Optionally deactivate the voucher if no uses remain
                 if (voucher.max_uses <= 0)
                 {
                     voucher.is_active = 0;
                 }
             }
 
-            // Record the voucher usage
             _db.VoucherUsage.Add(new VoucherUsage
             {
                 user_id = userId,
